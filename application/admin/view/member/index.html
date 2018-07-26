@@ -1,0 +1,120 @@
+﻿{include file='pub/header'/}
+<title>会员列表</title>
+</head>
+<body>
+<nav class="breadcrumb">{$breadNav} <a class="btn btn-success radius r" style="line-height:1.6em;margin-top:3px"
+                                       href="javascript:location.replace(location.href);" title="刷新"><i
+        class="Hui-iconfont">&#xe68f;</i></a></nav>
+<div class="page-container">
+    <form action="" method="get">
+        <div class="text-c"> 注册日期：
+            <input type="text" onfocus="WdatePicker({maxDate:'#F{ $dp.$D(\'datemax\')}'})" id="datemin" name="mintime"
+                   class="input-text Wdate" style="width:120px;">
+            -
+            <input type="text" onfocus="WdatePicker({minDate:'#F{ $dp.$D(\'datemin\')}'})" id="datemax" name="maxtime"
+                   class="input-text Wdate" style="width:120px;">
+            <input type="text" class="input-text" style="width:250px" placeholder="输入会员/手机号名称" name="uname">
+            <button type="submit" class="btn btn-success" id="" name=""><i class="Hui-iconfont">&#xe665;</i> 搜会员
+            </button>
+        </div>
+    </form>
+    <div class="cl pd-5 bg-1 bk-gray mt-20">
+		<span class="l">
+            <a class="btn btn-primary radius" href="javascript:;" onclick="downloadMember()"><i class="Hui-iconfont">&#xe641;</i>下载会员</a>
+		</span>
+    </div>
+    <table class="table table-border table-bordered table-bg">
+        <thead>
+        <tr>
+            <th scope="col" colspan="9">会员列表</th>
+        </tr>
+        <tr class="text-c">
+            <th width="25"><input type="checkbox" name="" value=""></th>
+            <th>ID</th>
+            <th>会员名</th>
+            <th>卡号</th>
+            <th>手机号</th>
+            <th>注册时间</th>
+            <th>末次登陆时间</th>
+            <th>会员积分</th>
+            <th>会员余额</th>
+            <th>是否可用</th>
+            <th width="100">操作</th>
+        </tr>
+        </thead>
+        <tbody>
+        {foreach $list as $v}
+        <tr class="text-c">
+            <td><input type="checkbox" value="{$v.id}" name=""></td>
+            <td>{$v.id}</td>
+            <td>{$v.username}</td>
+            <td>{$v.card_no}</td>
+            <td>{$v.phone}</td>
+            <td>{$v.creattime}</td>
+            <td>{$v.logintime}</td>
+            <td>{$v.score}</td>
+            <td>{$v.cost}</td>
+            <td class="td-status">
+                {if $v.status==0}
+                <span class="label label-success radius">已启用</span>
+                {else}
+                <span class="label label-default radius">已禁止</span>
+                {/if}
+            </td>
+            <td class="td-manage">
+                {if $v.status == 0}
+                <a style="text-decoration:none" onClick="member_stop(this,'{$v.id}')" href="javascript:;" title="停用">
+                    <i class="Hui-iconfont">&#xe631;</i>停用
+                </a>
+                {else}
+                <a style="text-decoration:none" onClick="member_start(this,'{$v.id}')" href="javascript:;" title="启用">
+                    <i class="Hui-iconfont">&#xe615;</i>启用
+                </a>
+                {/if}
+            </td>
+        </tr>
+        {/foreach}
+        </tbody>
+    </table>
+</div>
+{include file="pub/footer"/}
+
+<!--请在下方写此页面业务相关的脚本-->
+<script type="text/javascript">
+    $(function () {
+        $("table").dataTable();
+    })
+    //下载会员信息
+    function downloadMember() {
+        layer_show('下载订单', "{:url('Member/downloadMember')}", '350', '300');
+    }
+    function member_stop(obj, id) {
+        layer.confirm('确认要停用吗？', function (index) {
+
+            $.post("{:url('Member/changeStatus')}", {id:id, enable:1}, function (res) {
+                if(res.code == 1){
+                    $(obj).parents("tr").find(".td-manage").prepend('<a onClick="member_start(this,id)" href="javascript:;" title="启用" style="text-decoration:none"><i class="Hui-iconfont">&#xe615;</i>启用</a>');
+                    $(obj).parents("tr").find(".td-status").html('<span class="label label-default radius">已禁用</span>');
+                    $(obj).remove();
+                }
+                layer.msg(res.msg, {icon: 6, time: 1000});
+            });
+        });
+    }
+
+    function member_start(obj, id) {
+        layer.confirm('确认要启用吗？', function (index) {
+
+            $.post("{:url('Member/changeStatus')}", {id:id, enable:0}, function (res) {
+                if(res.code == 1){
+                    $(obj).parents("tr").find(".td-manage").prepend('<a onClick="member_stop(this,id)" href="javascript:;" title="停用" style="text-decoration:none"><i class="Hui-iconfont">&#xe631;</i>停用</a>');
+                    $(obj).parents("tr").find(".td-status").html('<span class="label label-success radius">已启用</span>');
+                    $(obj).remove();
+                }
+                layer.msg(res.msg, {icon: 6, time: 1000});
+            });
+        });
+    }
+</script>
+</body>
+</html>

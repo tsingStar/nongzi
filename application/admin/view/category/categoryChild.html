@@ -1,0 +1,136 @@
+﻿{include file='pub/header'/}
+<title>产品分类</title>
+</head>
+<body>
+<div class="page-container">
+    <div class="cl pd-5 bg-1 bk-gray mt-20">
+        <span class="l">
+            <a href="javascript:;" onclick="datadel()" class="btn btn-danger radius"><i
+                    class="Hui-iconfont">&#xe6e2;</i> 批量删除</a>
+            <a class="btn btn-primary radius"
+               onclick="category_add('添加分类','{:url(\'Category/categoryAdd\', [\'parentId\'=>$parentId])}')"
+               href="javascript:;"><i class="Hui-iconfont">&#xe600;</i> 添加分类</a>
+        </span>
+    </div>
+    <div class="mt-20">
+        <table class="table table-border table-bordered table-bg table-hover table-sort">
+            <thead>
+            <tr class="text-c">
+                <th width="40"><input name="" type="checkbox" value=""></th>
+                <th width="80">ID</th>
+                <th width="100">分类名称</th>
+                <th width="100">图片</th>
+                <th width="150">创建时间</th>
+                <th width="150">维护时间</th>
+                <th width="100">操作</th>
+            </tr>
+            </thead>
+            <tbody>
+            {foreach $cateList as $list}
+            <tr class="text-c">
+                <td><input name="ids[]" type="checkbox" value="{$list.id}"></td>
+                <td>{$list.id}</td>
+                <td>{$list.name}</td>
+                <td><img height="45px;" class="picture-thumb" src="{$list.image}"
+                         onclick="picture_show('{$list.name}', '{$list.image}')"></td>
+                <td>{$list.create_time}</td>
+                <td>{$list.update_time}</td>
+                <td class="td-manage">
+                    <a style="text-decoration:none" class="ml-5"
+                       onClick="category_edit('分类编辑','{:url(\'Category/categoryEdit\', [\'categoryId\'=>$list.id])}','{$list.id}')"
+                       href="javascript:;" title="编辑"><i class="Hui-iconfont">&#xe6df;</i>编辑</a>
+                    <a style="text-decoration:none" class="ml-5" onClick="category_del(this,'{$list.id}')"
+                       href="javascript:;" title="删除"><i class="Hui-iconfont">&#xe6e2;</i>删除</a>
+                </td>
+            </tr>
+            {/foreach}
+            </tbody>
+        </table>
+    </div>
+</div>
+
+{include file="pub/footer"/}
+<script type="text/javascript">
+    $('.table-sort').dataTable({
+        "aaSorting": [[1, "asc"]],//默认第几个排序
+        "bStateSave": true,//状态保存
+        "aoColumnDefs": [
+            //{"bVisible": false, "aTargets": [ 3 ]} //控制列的隐藏显示
+            {"orderable": false, "aTargets": [0, 3, 6]}// 制定列不参与排序
+        ]
+    });
+
+    /*分类-添加*/
+    function category_add(title, url) {
+        var index = layer.open({
+            type: 2,
+            title: title,
+            area: ['600px', '450px'],
+            content: url
+        });
+    }
+
+    //批量删除分类
+    function datadel() {
+        var idNode = $("tbody input[type='checkbox']:checked");
+        var ids = '';
+        $.each(idNode, function (i, v) {
+            ids += $(v).val() + ",";
+        });
+        ids = ids.substr(0, ids.length - 1);
+        layer.confirm('确定删除选中分类？', function (res) {
+            $.post('{:url("Category/delCate")}', {ids: ids}, function (res) {
+                if (res.code == 1) {
+                    idNode.parent().parent().remove();
+                    layer.msg('操作成功', {icon: 6, time: 1000});
+                } else {
+                    layer.msg('操作失败');
+                }
+            });
+        });
+
+    }
+
+    /*分类图片-查看*/
+    function picture_show(title, url, id) {
+        var index = layer.open({
+            type: 1,
+            title: title,
+            area: ['300px', '300px'],
+            content: "<div style='width: 280px; text-align: center; margin: auto;'> <img src='" + url + "' style='width: 180px;'></div>"
+        });
+        // layer.full(index);
+    }
+
+    /*分类-编辑*/
+    function category_edit(title, url, id) {
+        var index = layer.open({
+            type: 2,
+            title: title,
+            content: url,
+            area: ['600px', '450px']
+        });
+        // layer.full(index);
+    }
+
+    /*分类-删除*/
+    function category_del(obj, id) {
+        layer.confirm('确认要删除吗？', function (index) {
+            $.ajax({
+                type: 'POST',
+                url: '{:url("Category/delCate")}',
+                data: {ids:id},
+                dataType: 'json',
+                success: function (data) {
+                    $(obj).parents("tr").remove();
+                    layer.msg('已删除!', {icon: 1, time: 1000});
+                },
+                error: function (data) {
+                    console.log(data.msg);
+                },
+            });
+        });
+    }
+</script>
+</body>
+</html>

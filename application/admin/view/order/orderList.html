@@ -1,0 +1,171 @@
+﻿{include file='pub/header'/}
+<title>订单列表</title>
+</head>
+
+<body class="pos-r">
+<nav class="breadcrumb">{$breadNav} <a class="btn btn-success radius r" style="line-height:1.6em;margin-top:3px"
+                                       href="javascript:location.replace(location.href);" title="刷新"><i
+        class="Hui-iconfont">&#xe68f;</i></a></nav>
+    <div class="page-container">
+        <div class="text-c">
+            <form action="" method="post">
+                查询类型：
+                <select name="searchKey" style="width:auto" class="select-box">
+                    <option value="">未选择</option>
+                    <option value="order_no">订单编号</option>
+                    <option value="receive_name">收货人姓名</option>
+                </select>
+                查询条件：
+                <input type="text" name="searchValue" style="width:250px" class="input-text"/>
+                订单状态：
+                <select name="order_status" style="width: auto;" class="select-box">
+                    <option value="">全部</option>
+                    {foreach :config("order_status") as $key=>$val}
+                    <option value="{$key}">{$val}</option>
+                    {/foreach}
+                </select>
+                {if !isset($is_show)}
+                订单生成时间：
+                <input type="text" onfocus="WdatePicker({maxDate:'#F{ $dp.$D(datemax)}'})" id="datemin"
+                       name="start_time" class="input-text Wdate" style="width:120px;">-
+                <input type="text" onfocus="WdatePicker({minDate:'#F{ $dp.$D(datemin)}'})" id="datemax"
+                       name="end_time" class="input-text Wdate" style="width:120px;">
+                {/if}
+                <button class="btn btn-success" type="submit">
+                    <i class="Hui-iconfont">&#xe665;</i>查询
+                </button>
+            </form>
+        </div>
+        <div class="cl pd-5 bg-1 bk-gray mt-20">
+            {if !isset($is_show)}
+            <span class="l">
+                <a class="btn btn-primary radius" onclick="downloadOrder()" href="javascript:;">
+                    <i class="Hui-iconfont">&#xe640;</i> 下载订单
+                </a>
+            </span>
+            {/if}
+        </div>
+        <div class="mt-20">
+            <table class="table table-border table-bordered table-bg table-hover table-sort">
+                <thead>
+                <tr class="text-c">
+                    <th width="50">店铺名称</th>
+                    <th width="50">订单编号</th>
+                    <th width="60">下单时间</th>
+                    <th width="60">下单会员</th>
+                    <th width="30">订单状态</th>
+                    <th width="30">配送状态</th>
+                    <th width="30">支付方式</th>
+                    <th width="30">订单总金额</th>
+                    <th width="60">支付总金额</th>
+                    <th width="60">配送方式</th>
+                    <th width="60">预计配送/到店自提时间</th>
+                    <th width="60">实际配送/到店自提时间</th>
+                    <th width="100">操作</th>
+                </tr>
+                </thead>
+                <tbody>
+                {foreach $list as $item}
+                <tr class="text-c va-m">
+                    <td>{$item.shop_name}</td>
+                    <td>{$item.order_no}</td>
+                    <td>{$item.create_time}</td>
+                    <td>{$item.username}</td>
+                    <td>
+                        {if $item.is_apply_refund == 0}
+                        {:config('order_status')[$item.order_status]}
+                        {elseif $item.is_apply_refund == 1/}
+                        申请退款
+                        {else/}
+                        已退款
+                        {/if}
+                    </td>
+                    <td class="is_send">
+                        {if $item.is_send == 0}
+                        未配送
+                        {else/}
+                        已配送
+                        {/if}
+                    </td>
+                    <td>{:config('pay_type')[$item.pay_type]}</td>
+                    <td>{$item.shop_cost}</td>
+                    <td>{$item.real_cost}</td>
+                    <td class="text-c">
+                        {if $item.dispatch_type == 0}
+                        店铺配送
+                        {else/}
+                        到店自提
+                        {/if}
+                    </td>
+                    <td>{$item.dispatch_time}</td>
+                    <td>{$item.send_time}</td>
+                    <td class="td-manage">
+                        <a style="text-decoration:none" class="ml-5" onClick="order_detail('{$item.id}')"
+                           href="javascript:;" title="订单详情">
+                            <i class="Hui-iconfont">&#xe623;</i>订单详情
+                        </a>
+                        <a style="text-decoration:none" class="ml-5"
+                           href="{:url('order_print', ['order_id'=>$item.id])}" target="_blank" title="打印小票">
+                            <i class="Hui-iconfont">&#xe623;</i>打印小票
+                        </a>
+                    </td>
+                </tr>
+                {/foreach}
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+{include file='pub/footer'/}
+<script type="text/javascript">
+    $('.table-sort').dataTable({
+        "aaSorting": [[1, "desc"]],//默认第几个排序
+        "bStateSave": false,//状态保存
+        "aoColumnDefs": [
+            {"orderable": false, "aTargets": [8]}// 制定列不参与排序
+        ],
+    });
+
+
+    //下载订单
+    function downloadOrder() {
+        layer_show('下载订单', "{:url('Order/downloadOrder')}", '350', '300');
+    }
+
+    //订单详情
+    function order_detail(order_id) {
+        layer_show('订单详情', "{:url('Order/order_detail')}?order_id=" + order_id);
+
+    }
+
+    //订单配送
+    function send(o, order_id) {
+        layer.confirm('确认配送订单？', function () {
+            $.post("{:url('send_order')}", {'order_id': order_id}, function (res) {
+                if (res.code == 1) {
+                    $(o).parent().siblings('.is_send').html("已配送");
+                    $(o).remove();
+                }
+                layer.msg(res.msg);
+            });
+        });
+    }
+
+    //确认收获
+    function sure_order(o, order_id) {
+        layer.confirm("确认收获？", function () {
+            $.post("{:url('sure_order')}", {'order_id': order_id}, function (res) {
+                if (res.code == 1) {
+                    location.reload();
+                } else {
+                    layer.msg(res.msg);
+                }
+
+            });
+        });
+
+    }
+
+</script>
+</body>
+</html>

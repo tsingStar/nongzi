@@ -1,0 +1,199 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>订单</title>
+    <style>
+        table td{
+            text-align: center;
+        }
+    </style>
+</head>
+<body>
+<table border="1" id="aaa" style="margin:0px;padding:0px; display: none;" cellspacing="0">
+    <thead>
+        <tr>
+            <th>订单编号</th>
+            <th>交易单号</th>
+            <th>店铺名称</th>
+            <th>支付方式</th>
+            <th>支付时间</th>
+            <th>商品总价</th>
+            <th>优惠券抵扣</th>
+            <th>实收金额</th>
+            <th>创建时间</th>
+            <th>申请退款时间</th>
+            <th>退款状态</th>
+            <th>退款金额</th>
+        </tr>
+    </thead>
+    <tbody>
+        {foreach $list as $item}
+        <tr>
+            <td style="mso-number-format:'\@';">{$item.order_no}</td>
+            <td style="mso-number-format:'\@';">{$item.trade_no}</td>
+            <td>{$item.shop_name}</td>
+            <td>{:config('pay_type')[$item.pay_type]}</td>
+            <td>{$item.pay_time}</td>
+            <td>{$item.shop_cost}</td>
+            <td>{$item.coupon_fee}</td>
+            <td>{$item.real_cost}</td>
+            <td>{$item.create_time}</td>
+            <td>{$item.refund_time?date('Y-m-d H:i:s', $item.refund_time):""}</td>
+            <td>
+                {if $item.refund_status == 1}
+                已处理
+                {else/}
+                未处理
+                {/if}
+            </td>
+            <td>{$item.refund_money}</td>
+        </tr>
+        {/foreach}
+        <tr>
+            <td colspan="12">======================================</td>
+        </tr>
+        <tr>
+            <td colspan="6">
+                <table border="1px;" cellspacing="0" cellpadding="0" width="100%;">
+                    <tr>
+                        <th colspan="2">用户注册统计</th>
+                    </tr>
+                    <tr>
+                        <td>安卓用户注册量：</td>
+                        <td>{$reg_data.android}</td>
+                    </tr>
+                    <tr>
+                        <td>IOS用户注册量：</td>
+                        <td>{$reg_data.iphone}</td>
+                    </tr>
+                    <tr>
+                        <td>活跃用户：</td>
+                        <td>{$reg_data.active_num}</td>
+                    </tr>
+                </table>
+            </td>
+            <td colspan="6">
+                <table border="1" cellspacing="0" cellpadding="0" width="100%;">
+                    <tr>
+                        <th colspan="2">店铺销售统计</th>
+                    </tr>
+                    {foreach $amount as $key=>$val}
+                    <tr>
+                        <td>{$key}</td>
+                        <td>{$val}</td>
+                    </tr>
+                    {/foreach}
+                </table>
+            </td>
+        </tr>
+    </tbody>
+</table>
+<a id="dlink" href="" style="display: none"></a>
+</body>
+<script type="text/javascript" src="__STATIC__/lib/jquery/1.9.1/jquery.min.js"></script>
+<script>
+    $(function () {
+        method1("aaa", "订单详情", "{$filename}");
+    });
+    var idTmr;
+
+    function getExplorer() {
+        var explorer = window.navigator.userAgent;
+        //ie
+        if (explorer.indexOf("MSIE") >= 0) {
+            return 'ie';
+        }
+        //firefox
+        else if (explorer.indexOf("Firefox") >= 0) {
+            return 'Firefox';
+        }
+        //Chrome
+        else if (explorer.indexOf("Chrome") >= 0) {
+            return 'Chrome';
+        }
+        //Opera
+        else if (explorer.indexOf("Opera") >= 0) {
+            return 'Opera';
+        }
+        //Safari
+        else if (explorer.indexOf("Safari") >= 0) {
+            return 'Safari';
+        }
+    }
+
+    function method1(tableid, name, filename) {
+        //整个表格拷贝到EXCEL中
+        if (getExplorer() == 'ie') {
+            var curTbl = document.getElementById(tableid);
+            var oXL = new ActiveXObject("Excel.Application");
+            //创建AX对象excel
+            var oWB = oXL.Workbooks.Add();
+            //获取workbook对象
+            var xlsheet = oWB.Worksheets(1);
+            //激活当前sheet
+            var sel = document.body.createTextRange();
+            sel.moveToElementText(curTbl);
+            //把表格中的内容移到TextRange中
+            sel.select();
+            //全选TextRange中内容
+            sel.execCommand("Copy");
+            //复制TextRange中内容
+            xlsheet.Paste();
+            //粘贴到活动的EXCEL中
+            oXL.Visible = true;
+            //设置excel可见属性
+
+            try {
+                var fname = oXL.Application.GetSaveAsFilename("Excel.xls", "Excel Spreadsheets (*.xls), *.xls");
+            } catch (e) {
+                print("Nested catch caught " + e);
+            } finally {
+                oWB.SaveAs(fname);
+
+                oWB.Close(savechanges = false);
+                //xls.visible = false;
+                oXL.Quit();
+                oXL = null;
+                //结束excel进程，退出完成
+                //window.setInterval("Cleanup();",1);
+                idTmr = window.setInterval("Cleanup();", 1);
+
+            }
+
+        }
+        else {
+            tableToExcel(tableid, name, filename);
+        }
+
+    }
+
+    function Cleanup() {
+        window.clearInterval(idTmr);
+        CollectGarbage();
+    }
+
+    var tableToExcel = (function () {
+        var uri = 'data:application/vnd.ms-excel;base64,',
+            template = '<html xmlns:o="urn:schemas-microsoft-com:office:office" xmlns:x="urn:schemas-microsoft-com:office:excel" xmlns="http://www.w3.org/TR/REC-html40"><head><!--[if gte mso 9]><xml><x:ExcelWorkbook><x:ExcelWorksheets><x:ExcelWorksheet><x:Name>{worksheet}</x:Name><x:WorksheetOptions><x:DisplayGridlines/></x:WorksheetOptions></x:ExcelWorksheet></x:ExcelWorksheets></x:ExcelWorkbook></xml><![endif]--></head><body><table>{table}</table></body></html>',
+            base64 = function (s) {
+                return window.btoa(unescape(encodeURIComponent(s)))
+            },
+            format = function (s, c) {
+                return s.replace(/{(\w+)}/g,
+                    function (m, p) {
+                        return c[p];
+                    })
+            }
+        return function (table, name, filename) {
+            console.log(filename);
+            if (!table.nodeType) table = document.getElementById(table)
+            var ctx = {worksheet: name || 'Worksheet', table: table.innerHTML}
+            // window.location.href = uri + base64(format(template, ctx))
+            document.getElementById("dlink").href = uri + base64(format(template, ctx));
+            document.getElementById("dlink").download = filename;
+            document.getElementById("dlink").click();
+        }
+    })();
+</script>
+</html>

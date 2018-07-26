@@ -1,0 +1,229 @@
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+    <meta http-equiv="Content-Language" content="zh-CN">
+    <meta content="all" name="robots">
+    <meta name="description" content="">
+    <meta content="" name="keywords">
+    <title>打印</title>
+    <style>
+        /* */
+
+        html {
+            scrollbar-face-color: #F5F5F5;
+            scrollbar-arrow-color: #A0A0A0;
+            padding: 0 !important;
+            width: 100%;
+            height: 100%;
+
+        }
+
+        img {
+            border: 0px;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+        }
+
+        fieldset, img {
+            border: 0;
+        }
+
+        li {
+            list-style: none;
+        }
+
+        body, button, input, select, textarea /* for ie */
+        {
+            font: tahoma, Helvetica, arial, "\5b8b\4f53", sans-serif;
+            sans-serif;
+            vertical-align: middle;
+            font-size: 10px;
+        }
+
+        address, cite, dfn, em, var {
+            font-style: normal;
+        }
+
+        code, kbd, samp {
+            font-family: courier new, courier, monospace;
+        }
+
+        ins {
+            text-decoration: none;
+        }
+
+        del {
+            text-decoration: line-through;
+        }
+
+        h1, h2, h3, h4, h5, h6 {
+        }
+
+        h1 {
+            font-size: 2em;
+        }
+
+        h2 {
+            font-size: 1.7em;
+        }
+
+        h3 {
+            font-size: 1.5em;
+        }
+
+        h4 {
+            font-size: 1.38em;
+        }
+
+        h5 {
+            font-size: 1.2em;
+        }
+
+        h6 {
+            font-size: 1.1em;
+            font-style: italic;
+        }
+
+        address, cite, dfn, em, var {
+            font-style: normal;
+        }
+
+        caption, td {
+            font-weight: normal;
+        }
+
+        cite, blackquote, em, i {
+            font-style: italic;
+        }
+
+        strong, b {
+            font-weight: bold;
+        }
+
+        pre, code {
+            font-family: monospace;
+            font-size: 1.1em;
+        }
+
+        body {
+
+            color: #0076cf;
+            font-size: 10px;
+            line-height: 150%;
+            text-align: left;
+            background-attachment: fixed;
+            font-family: '微软雅黑', 'Lucida Grande', 'Lucida Sans Unicode', '宋体', '新宋体', arial, verdana, sans-serif;
+        }
+
+        table td {
+            font-size: 10px;
+        }
+
+
+    </style>
+</head>
+<body>
+<div id="ordercontrol"
+     style="width:100%;height:40px;background-color:gray;text-align:center;font-size:30px;font-weight:bold;color:#fff;line-height:40px;cursor:pointer;"
+     onclick="printorder();">立即打印
+</div>
+<div id="ordercontent">
+
+    <table class="table table-bordered" width=95% style="font-size:10px;margin-top:5px;text-align:left;">
+        <tr>
+            <td style="font-size:8px;">单号：{$order.order_no}</td>
+        </tr>
+        <tr>
+            <td>创建时间：{$order.create_time}</td>
+        </tr>
+        <tr>
+            <td>
+                订单状态: {:config('order_status')[$order.order_status]}
+            </td>
+        </tr>
+        <tr>
+            <td>店铺名称：{$order.shop_name}</td>
+        </tr>
+        <tr>
+            <td>店铺电话: {$order.phone}</td>
+        </tr>
+        <tr>
+            <td>店铺地址：{$order.shop_address}</td>
+        </tr>
+        <tr>
+            <td>支付状态：{if $order.pay_status eq 1}已付{else/}未付{/if}</td>
+        </tr>
+        <tr>
+            <td>支付方式：{:config('pay_type')[$order.pay_type]}</td>
+        </tr>
+        <tr>
+            <td>配送/取货时间：{$order.dispatch_time}</td>
+        </tr>
+        <tr>
+            <td>配送方式：{if $order.dispatch_type eq 1}到店自提{else/}店铺配送{/if}</td>
+        </tr>
+        {if $order.dispatch_type eq 0}
+        <tr>
+            <td>收获人：{$order.receiver_name}</td>
+        </tr>
+        <tr>
+            <td>联系电话：{$order.receiver_telephone}</td>
+        </tr>
+        <tr>
+            <td>送货地址：{$order.receiver_address}</td>
+        </tr>
+        {/if}
+        <tr>
+            <td>备注:{$order.remarks}</td>
+        </tr>
+        <tr>
+            <td>
+                <table style="margin:0px;padding:0px;font-size:12px;" width="100%">
+                    <tr style="height:20px;line-height:20px;">
+                        <td style="border:none;padding:0px;color:gray;text-align:left;" width="20%">名称</td>
+                        <td style="border:none;padding:0px;color:gray;" width="20%">规格</td>
+                        <td style="border:none;padding:0px;color:gray;" width="20%">原价</td>
+                        <td style="border:none;padding:0px;color:gray;" width="20%">价格</td>
+                        <td style="border:none;padding:0px;color:gray;" width="20%">数量</td>
+                    </tr>
+                    {foreach $order.order_det as $item}
+                    <tr style="height:20px;line-height:20px;">
+                        <td style="border-bottom:1px dotted #000;padding:0px;">{$item.good_name}</td>
+                        <td style="border-bottom:1px dotted #000;padding:0px;">{$item.prop_name}</td>
+                        <td style="border-bottom:1px dotted #000;padding:0px;">￥{$item.sale_price}</td>
+                        <td style="border-bottom:1px dotted #000;padding:0px;">￥{$item.cost}</td>
+                        <td style="border-bottom:1px dotted #000;padding:0px;">{$item.num}</td>
+                    </tr>
+                    {/foreach}
+                </table>
+            </td>
+        </tr>
+
+        <tr style="height:20px;line-height:20px;">
+            <td>
+                订单原价： {$order.shop_cost}元
+                优惠券抵扣：{$order.coupon_fee}元
+                支付金额： {$order.real_cost}元
+            </td>
+        </tr>
+    </table>
+</div>
+
+<div id="print_area" style="display:none;font-size:40px;"></div>
+<style>
+    #ordercontent td {
+        color: #000;
+    }
+</style>
+<script>
+    function printorder() {
+        $("#ordercontent").printArea();
+    }
+</script>
+<script type="text/javascript" src="__STATIC__/lib/jquery/1.9.1/jquery.min.js"></script>
+<script src="__STATIC__/lib/jquery.PrintArea.js"></script>
+</body>
+</html>
