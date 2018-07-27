@@ -77,4 +77,72 @@ class Site extends BaseController
         $this->assign('item', $reg);
         return $this->fetch();
     }
+
+
+    /**
+     * 首页轮播图设置
+     */
+    public function swiperList()
+    {
+        $list = model('swiper')->order('')->select();
+        $this->assign('list', $list);
+        return $this->fetch();
+
+    }
+
+    /**
+     * 添加轮播图
+     */
+    public function swiperAdd()
+    {
+        if (request()->isAjax()) {
+            $image = input('image');
+            $ord = input('ord');
+            $res = model('swiper')->save(['image' => $image, 'ord' => $ord]);
+            if ($res) {
+                exit_json();
+            } else {
+                exit_json(-1, '保存失败');
+            }
+        }
+        return $this->fetch();
+    }
+
+    /**
+     * 轮播编辑
+     */
+    public function swiperEdit()
+    {
+        $s_id = input('id');
+        $swiper = model('swiper')->where('id', $s_id)->find();
+        if (request()->isAjax()) {
+            $res = $swiper->allowField(true)->save(input('post.'), ['id' => $s_id]);
+            if ($res) {
+                exit_json(1, '编辑成功');
+            } else {
+                exit_json(-1, '操作失败');
+            }
+        }
+
+        $this->assign('item', $swiper);
+        return $this->fetch();
+
+    }
+
+    /**
+     * 删除轮播图
+     */
+    public function swiperDel()
+    {
+        $id = input('id');
+        $res = model('swiper')->where('id', $id)->delete();
+        if ($res) {
+            exit_json();
+        } else {
+            exit_json(-1, '删除失败');
+        }
+    }
+
+
+
 }
