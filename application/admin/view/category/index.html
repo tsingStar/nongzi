@@ -1,5 +1,5 @@
 ﻿{include file='pub/header'/}
-<title>产品分类</title>
+<title>商品分类</title>
 </head>
 <body>
 <nav class="breadcrumb">{$breadNav} <a class="btn btn-success radius r" style="line-height:1.6em;margin-top:3px"
@@ -8,9 +8,6 @@
 <div class="page-container">
     <div class="cl pd-5 bg-1 bk-gray mt-20">
         <span class="l">
-            <a href="javascript:;" onclick="datadel()" class="btn btn-danger radius"><i
-                    class="Hui-iconfont">&#xe6e2;</i> 批量删除</a>
-            <a href="javascript:;" onclick="asyncCategory()" class="btn btn-danger radius"><i class="Hui-iconfont">&#xe641;</i> 同步分类</a>
             <a class="btn btn-primary radius" onclick="category_add('添加分类','{:url(\'Category/categoryAdd\')}')"
                href="javascript:;"><i class="Hui-iconfont">&#xe600;</i> 添加分类</a>
         </span>
@@ -23,6 +20,7 @@
                 <th width="80">ID</th>
                 <th width="100">分类名称</th>
                 <th width="100">图片</th>
+                <th width="150">排序</th>
                 <th width="150">创建时间</th>
                 <th width="150">维护时间</th>
                 <th width="100">操作</th>
@@ -34,8 +32,11 @@
                 <td><input name="ids[]" type="checkbox" value="{$list.id}"></td>
                 <td>{$list.id}</td>
                 <td>{$list.name}</td>
-                <td><img height="45px;" class="picture-thumb" src="{$list.image}"
-                         onclick="picture_show('{$list.name}', '{$list.image}')"></td>
+                <td>
+                    <img height="45px;" class="picture-thumb" src="{$list.image}"
+                         onclick="picture_show('{$list.name}', '{$list.image}')">
+                </td>
+                <td>{$list.ord}</td>
                 <td>{$list.create_time}</td>
                 <td>{$list.update_time}</td>
                 <td class="td-manage">
@@ -157,7 +158,7 @@
             $.ajax({
                 type: 'POST',
                 url: '{:url("Category/delCate")}',
-                data: {ids:id},
+                data: {ids: id},
                 dataType: 'json',
                 success: function (data) {
                     $(obj).parents("tr").remove();

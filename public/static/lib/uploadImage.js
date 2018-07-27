@@ -4,11 +4,12 @@
  * @param $config 上传配置参数 {}
  * @param $form_id 已选择表单id $("#form")
  * @param $node_name 表单name
- * @param $btn
+ * @param $filePicker 选择文件控件id
+ * @param $num 上传数量
  */
-uploadImage = function($list, $config, $form_id, $node_name, $btn) {
+uploadImage = function ($list, $config, $form_id, $node_name, $filePicker, $num) {
     var state = "pending";
-    if($config == null){
+    if ($config == null) {
         $config = {
             auto: true,
             swf: '__STATIC__/lib/webuploader/0.1.5/Uploader.swf',
@@ -16,7 +17,7 @@ uploadImage = function($list, $config, $form_id, $node_name, $btn) {
             server: '/admin/Pub/uploadImg',
             // 选择文件的按钮。可选。
             // 内部根据当前运行是创建，可能是input元素，也可能是flash.
-            pick: '#filePicker',
+            pick: $filePicker||'#filePicker',
             // 不压缩image, 默认如果是jpeg，文件上传前会压缩一把再上传！
             resize: false,
             // 只允许选择图片文件。
@@ -25,7 +26,7 @@ uploadImage = function($list, $config, $form_id, $node_name, $btn) {
                 extensions: 'gif,jpg,jpeg,bmp,png',
                 mimeTypes: 'image/*'
             },
-            fileNumLimit:1
+            fileNumLimit: $num||1
         };
     }
     var uploader = WebUploader.create($config);
@@ -38,9 +39,9 @@ uploadImage = function($list, $config, $form_id, $node_name, $btn) {
             '</div>'
             ),
             $img = $li.find('img');
-        if($config.fileNumLimit.toString() == '1'){
+        if ($config.fileNumLimit.toString() == '1') {
             $list.html($li);
-        }else{
+        } else {
             $list.append($li);
         }
         // 创建缩略图
@@ -72,11 +73,11 @@ uploadImage = function($list, $config, $form_id, $node_name, $btn) {
         $('#' + file.id).addClass('upload-state-success').find(".state").text("已上传");
         if (res.code == 1) {
             // var img = res.data;
-            var img = "<input type='hidden' class='" + file.id + " uploadimg' name='"+$node_name+"' value='" + res.data + "'/>";
-            if($config.fileNumLimit.toString() == '1'){
+            var img = "<input type='hidden' class='" + file.id + " uploadimg' name='" + $node_name + "' value='" + res.data + "'/>";
+            if ($config.fileNumLimit.toString() == '1') {
                 $form_id.find('.uploadimg').remove();
                 $form_id.append(img);
-            }else{
+            } else {
                 $form_id.append(img);
             }
         }
@@ -118,11 +119,11 @@ uploadImage = function($list, $config, $form_id, $node_name, $btn) {
 }
 
 
-function dropPic(o){
+function dropPic(o) {
     var id = $(o).parents('.item').attr('id');
-    var path = $("."+id).val();
-    $("."+id).remove();
-    $("#"+id).remove();
+    var path = $("." + id).val();
+    $("." + id).remove();
+    $("#" + id).remove();
     // $.post('{:url("Pub/dropPic")}', {path:path},function(){
     //
     // });

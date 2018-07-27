@@ -15,14 +15,8 @@
                 <a href="javascript:;" onclick="datadel()" class="btn btn-danger radius">
                     <i class="Hui-iconfont">&#xe6e2;</i> 批量删除
                 </a>
-                <a class="btn btn-primary radius" onclick="asyncGoods()" href="javascript:;">
-                    <i class="Hui-iconfont">&#xe641;</i> 同步商品库
-                </a>
                 <a class="btn btn-primary radius" onclick="product_add('添加商品','productAdd.html')" href="javascript:;">
                     <i class="Hui-iconfont">&#xe600;</i> 添加商品
-                </a>
-                <a class="btn btn-primary radius" onclick="updateImage()" href="javascript:;">
-                    <i class="Hui-iconfont Hui-iconfont-huanyipi"></i> 更新商品图片
                 </a>
             </span>
             <a class="btn btn-success radius r" style="line-height:1.6em;margin-top:3px"
@@ -41,7 +35,6 @@
                     <th width="100">单价</th>
                     <th width="60">单位</th>
                     <th width="60">规格</th>
-                    <th width="60">是否是组合商品</th>
                     <th width="100">操作</th>
                 </tr>
                 </thead>
@@ -96,41 +89,7 @@
     $('.table-sort').dataTable({
         "aaSorting": [[1, "asc"]],//默认第几个排序
         "bStateSave": true,//状态保存
-        "aoColumnDefs": [
-            {"orderable": false, "aTargets": [0, 8]}// 制定列不参与排序
-        ]
     });
-
-    //同步商品
-    function asyncGoods() {
-        layer.confirm("确定同步商品库？", function (index) {
-            var li = layer.load();
-            $.post("{:url('asyncGoods')}", null, function (res) {
-                if (res.code == 1) {
-                    layer.alert(res.msg, function () {
-                        location.reload();
-                    });
-                } else {
-                    layer.close(li);
-                    layer.alert(res.msg);
-                }
-            });
-        });
-    }
-    /**
-     * 更新商品图片
-     */
-    function updateImage(){
-        layer.load();
-        $.post("{:url('updateImage')}", null, function (res) {
-            layer.closeAll();
-            if(res.code == 1){
-                layer.alert('更新成功');
-            }else{
-                layer.alert(res.msg);
-            }
-        });
-    }
 
     /*产品-添加*/
     function product_add(title, url) {

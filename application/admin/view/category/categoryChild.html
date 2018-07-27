@@ -1,5 +1,5 @@
 ﻿{include file='pub/header'/}
-<title>产品分类</title>
+<title>商品分类</title>
 </head>
 <body>
 <div class="page-container">
@@ -55,7 +55,6 @@
         "aaSorting": [[1, "asc"]],//默认第几个排序
         "bStateSave": true,//状态保存
         "aoColumnDefs": [
-            //{"bVisible": false, "aTargets": [ 3 ]} //控制列的隐藏显示
             {"orderable": false, "aTargets": [0, 3, 6]}// 制定列不参与排序
         ]
     });
@@ -119,7 +118,7 @@
             $.ajax({
                 type: 'POST',
                 url: '{:url("Category/delCate")}',
-                data: {ids:id},
+                data: {ids: id},
                 dataType: 'json',
                 success: function (data) {
                     $(obj).parents("tr").remove();

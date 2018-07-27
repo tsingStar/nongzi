@@ -92,7 +92,7 @@ class Pub extends Controller
             if ($sms['code'] != $vcode) {
                 exit_json(-1, '验证码错误');
             }
-            $res = model('user')->isUpdate(false)->save(['telephone' => $telephone, 'password' => md5($password), 'vip_code' => $vip_code]);
+            $res = model('user')->isUpdate(false)->save(['telephone' => $telephone, 'password' => md5($password), 'vip_code' => $vip_code, 'user_name'=>uniqid()]);
             if ($res) {
                 $sms->save(['status' => 1]);
                 $user_id = model('user')->getAttr('id');
