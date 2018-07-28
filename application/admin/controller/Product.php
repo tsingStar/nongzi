@@ -30,7 +30,7 @@ class Product extends BaseController
     {
         $cateId = input('cateId');
         if ($cateId) {
-            $goodsList = model('Product')->getGoods($cateId);
+            $goodsList = model('Product')->where('cate_id', $cateId)->select();
         } else {
             $goodsList = [];
         }

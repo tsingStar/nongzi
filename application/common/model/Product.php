@@ -20,23 +20,5 @@ class Product extends Model
         parent::initialize();
     }
 
-    /**
-     * @param int $cateId
-     * 根据分类获取产品
-     * @return false|\PDOStatement|string|\think\Collection
-     * @throws \think\db\exception\DataNotFoundException
-     * @throws \think\db\exception\ModelNotFoundException
-     * @throws \think\exception\DbException
-     */
-    public function getGoods($cateId=0)
-    {
-        $map = [];
-        if($cateId){
-            $map['cateId'] = $cateId;
-        }
-        $list = $this->where($map)->select();
-        return $list;
-    }
-
 
 }
