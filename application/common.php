@@ -90,9 +90,9 @@ function addAdminOperaLog()
  */
 function exit_json($code = 1, $msg = "操作成功", $data = null)
 {
-    if (is_null($data)) {
-        $data = new stdClass();
-    }
+//    if (is_null($data)) {
+//        $data = new stdClass();
+//    }
     header('Content-Type:application/json');
     exit(json_encode(['code' => $code, 'msg' => $msg, 'data' => $data]));
 }
@@ -307,4 +307,58 @@ function get_millisecond()
     return $msec;
 
 }
+
+/**
+ * 上传图片通用方法
+ * @param $name
+ * @return bool|string
+ */
+function uploadImg($name){
+    $file = request()->file($name);
+    if ($file) {
+        $info = $file->move(__UPLOAD__);
+        if ($info) {
+            $saveName = $info->getSaveName();
+            $path = "/upload/" . $saveName;
+            return $path;
+        } else {
+            // 上传失败获取错误信息
+            return false;
+        }
+    }else{
+        return false;
+    }
+}
+
+
+
+/**
+ * Excel一键导出
+ */
+function excel($header, $data, $filename)
+{
+    $error = \Excel::export($header, $data, $filename, '2007');
+    return $error;
+}
+
+/**
+ * 二位数组去重
+ * @param $arr
+ * @return array
+ */
+function arr_unique($arr)
+{
+    $data = [];
+    foreach ($arr as $a){
+        $data[] = json_encode($a);
+    }
+    $data = array_unique($data);
+    $list = [];
+    foreach ($data as $t){
+        $list[] = json_decode($t, true);
+    }
+    return $list;
+}
+
+
 

@@ -96,6 +96,22 @@ class Category extends BaseController
         } else {
             exit_json(-1);
         }
+    }
 
+    /**
+     * 是否首页展示
+     */
+    public function changeCateStatus()
+    {
+        $cate_id = input('id');
+        $is_index = input('is_index');
+        $res = model('ProductCate')->where('id', $cate_id)->setField('is_index', $is_index);
+        if($res){
+            exit_json();
+        }else{
+            exit_json(-1, '操作失败');
+        }
+
+        
     }
 }

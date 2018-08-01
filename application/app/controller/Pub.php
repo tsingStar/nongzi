@@ -22,6 +22,7 @@ class Pub extends Controller
 
     }
 
+
     public function getVersion()
     {
         $version = input('version');
@@ -92,7 +93,7 @@ class Pub extends Controller
             if ($sms['code'] != $vcode) {
                 exit_json(-1, '验证码错误');
             }
-            $res = model('user')->isUpdate(false)->save(['telephone' => $telephone, 'password' => md5($password), 'vip_code' => $vip_code, 'user_name'=>uniqid()]);
+            $res = model('user')->isUpdate(false)->save(['telephone' => $telephone, 'password' => md5($password), 'vip_code' => $vip_code, 'user_name' => uniqid()]);
             if ($res) {
                 $sms->save(['status' => 1]);
                 $user_id = model('user')->getAttr('id');
@@ -104,18 +105,32 @@ class Pub extends Controller
     }
 
     /**
-     * 重置密码
+     * 校验验证码
      */
-    function resetPassword()
+    function verifyCode()
     {
         $data = input('post.');
-        if (!$data['telephone'] || !$data['code'] || !$data['password']) {
+        if (!$data['telephone'] || !$data['code']) {
             exit_json(-1, '参数错误');
         }
-        $code = model('SmsLog')->where([ 'status' => 0, 'telephone' => $data['telephone'], 'type' => 2])->value('code');
-        if ($code != $data['code']) {
+        $sms = model('SmsLog')->where(['create_time' => ['gt', time() - 30], 'status' => 0, 'telephone' => $data['telephone'], 'type' => 2])->find();
+        if ($sms['code'] != $data['code']) {
             exit_json(-1, '验证码错误');
+        } else {
+            $sms->save(['status' => 1]);
+            exit_json();
         }
+    }
+
+    /**
+     * 重置密码
+     * @throws \think\db\exception\DataNotFoundException
+     * @throws \think\db\exception\ModelNotFoundException
+     * @throws \think\exception\DbException
+     */
+    public function resetPassword()
+    {
+        $data = input('post.');
         $userModel = new User();
         $user = $userModel->where(['telephone' => $data['telephone']])->find();
         $res = $user->save(['password' => md5($data['password'])]);
@@ -124,6 +139,7 @@ class Pub extends Controller
         } else {
             exit_json(-1, '重置密码失败');
         }
+
     }
 
     /**
@@ -131,7 +147,7 @@ class Pub extends Controller
      */
     function getVcode()
     {
-        //sendType  1 注册 2 忘记密码 3 短信验证码登陆
+        //sendType  1 注册 2 忘记密码 3 短信验证码登陆 4 绑定手机
         $telephone = input('telephone');
         $sendType = input('sendType');
         if (!test_tel($telephone)) {
@@ -154,6 +170,11 @@ class Pub extends Controller
                     exit_json(-1, '手机号未注册，请注册后登陆');
                 }
                 break;
+            case 4:
+                $lock = model('User')->where('lock_mob', $telephone)->find();
+                if ($lock) {
+                    exit_json(-1, '手机号已被绑定');
+                }
             default:
                 exit_json(-1, '参数错误');
         }
@@ -169,5 +190,76 @@ class Pub extends Controller
             exit_json(-1, $sendSms->getError());
         }
     }
+
+
+
+    //TODO 待处理
+
+    /**
+     * 微信小程序登陆
+     */
+    public function loginByWeiXin()
+    {
+        $app_id = input('app_id');
+        $app_secret = input('app_secret');
+        $js_code = input('js_code');
+        $encryptedData = input('encryptedData');
+        $iv = input('iv');
+        if (!$app_id || !$app_secret || $js_code) {
+            exit_json(-1, '参数错误');
+        }
+
+        //返回数据格式
+//            {
+//                  "openid": "OPENID",
+//                  "session_key": "SESSIONKEY"
+//                  "expires_in": 2592000
+//            }
+        $res = file_get_contents("https://api.weixin.qq.com/sns/jscode2session?appid=$app_id&secret=$app_secret&js_code=$js_code&grant_type=authorization_code");
+        $res = json_decode($res, true);
+
+        if (!$res['openid']) {
+            exit_json(-1, '参数错误');
+        }
+        $session_key = $res['session_key'];
+        $open_id = $res['openid'];
+        if (!session('session_key')) {
+            session('session_key', $session_key);
+        }
+        include VENDOR_PATH . 'WeiXin/wxBizDataCrypt.php';
+        $pc = new \WXBizDataCrypt($app_id, $session_key);
+        $errCode = $pc->decryptData($encryptedData, $iv, $data);
+
+        if ($errCode == 0) {
+
+
+            print($data . "\n");
+        } else {
+            print($errCode . "\n");
+        }
+    }
+
+    /**
+     * 绑定手机号
+     */
+    public function bindTelephone()
+    {
+        $iv = input('iv');
+        $encryptedData = input('encryptedData');
+        $session_key = session('session_key');
+        include VENDOR_PATH . 'WeiXin/wxBizDataCrypt.php';
+        $pc = new \WXBizDataCrypt($app_id, $session_key);
+        $errCode = $pc->decryptData($encryptedData, $iv, $data);
+        if($errCode == 0){
+            //请求成功
+        }else{
+            //请求失败
+
+        }
+
+
+
+    }
+
 
 }

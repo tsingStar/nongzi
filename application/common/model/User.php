@@ -20,7 +20,6 @@ class User extends Model
     }
 
     protected $autoWriteTimestamp = true;
-    protected $updateTime = false;
 
     /**
      * 根据用户id格式化单个用户
@@ -36,7 +35,7 @@ class User extends Model
         $user = $this->where('id', $user_id)->find();
         $data['user_id'] = $user['id'];
         $data['user_name'] = $user['user_name'];
-        $data['head_img'] = $user['head_img'];
+        $data['head_img'] = __URL__.$user['head_img'];
         $data['telephone'] = $user['telephone'];
         $data['vip_code'] = $user['vip_code'];
         $data['open_id'] = $user['open_id'];

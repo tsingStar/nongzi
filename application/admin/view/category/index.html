@@ -40,7 +40,13 @@
                 <td>{$list.ord}</td>
                 <td>{$list.create_time}</td>
                 <td>{$list.update_time}</td>
-                <td>{$list.update_time}</td>
+                <td>
+                    {if $list.is_index eq 1}
+                    <a href="javascript:;" onclick="changeStatus('{$list.id}', 0)" style="text-decoration: none;">是</a>
+                    {else/}
+                    <a href="javascript:;" onclick="changeStatus('{$list.id}', 1)" style="text-decoration: none;">否</a>
+                    {/if}
+                </td>
                 <td class="td-manage">
                     <a style="text-decoration:none" class="ml-5"
                        onClick="category_edit('分类编辑','{:url(\'Category/categoryEdit\', [\'categoryId\'=>$list.id])}')"
@@ -68,6 +74,16 @@
             {"orderable": false, "aTargets": [0, 3, 6]}// 制定列不参与排序
         ]
     });
+
+    function changeStatus(id, status) {
+        $.post('{:url("changeCateStatus")}', {id:id, is_index:status}, function (res) {
+            if(res.code == 1){
+                location.reload();
+            }else{
+                layer.msg(res.msg);
+            }
+        });
+    }
 
     /*分类-添加*/
     function category_add(title, url) {

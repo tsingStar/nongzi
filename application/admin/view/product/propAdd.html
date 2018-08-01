@@ -1,0 +1,81 @@
+{include file='pub/header'/}
+<title>新增商品</title>
+</head>
+<body>
+<div class="page-container">
+    <form class="form form-horizontal">
+        <input type="hidden" name="prop_id" id="" value="{$item.id}">
+        <div class="row cl">
+            <label class="form-label col-xs-4 col-sm-2"><span class="c-red">*</span>属性名称：</label>
+            <div class="formControls col-xs-8 col-sm-9">
+                <input type="text" class="input-text" value="{$item.prop_name}" placeholder="" name="prop_name">
+            </div>
+        </div>
+        <div class="row cl">
+            <label class="form-label col-xs-4 col-sm-2"><span class="c-red">*</span>是否展示：</label>
+            <div class="formControls col-xs-8 col-sm-9">
+				<span class="select-box">
+					<select name="is_show" class="select">
+						<option value="1" {if $item.is_show eq 1}selected{/if}>
+							是
+						</option>
+						<option value="0" {if $item.is_show eq 0}selected{/if}>
+							否
+						</option>
+					</select>
+				</span>
+            </div>
+        </div>
+        <div class="row cl">
+            <div class="col-xs-8 col-sm-9 col-xs-offset-4 col-sm-offset-2">
+                <button class="btn btn-secondary radius" type="submit"><i class="Hui-iconfont">&#xe632;</i> 保存属性
+                </button>
+                <button onClick="layer_close();" class="btn btn-default radius" type="button">
+                    &nbsp;&nbsp;取消&nbsp;&nbsp;
+                </button>
+            </div>
+        </div>
+    </form>
+</div>
+{include file="pub/footer"/}
+
+<script type="text/javascript">
+    $(function () {
+        $("form").validate({
+            rules: {
+                prop_name: {
+                    required: true
+                },
+            },
+            messages: {
+                prop_name: {
+                    required: '分类名称不能为空'
+                },
+            },
+            onkeyup: false,
+            focusCleanup: true,
+            success: "valid",
+            submitHandler: function (form) {
+                $(form).ajaxSubmit({
+                    type: 'post',
+                    url: '{:url("Product/propAdd")}',
+                    success: function (res) {
+                        if (1 == res.code) {
+                            var index = parent.layer.getFrameIndex(window.name);
+                            layer.msg(res.msg, {icon: 6, time: 1000});
+                            setTimeout(function () {
+                                parent.location.reload();
+                                parent.layer.close(index);
+                            }, 1000);
+                        } else {
+                            layer.msg(res.msg, {icon: 5, time: 1000});
+                        }
+                    }
+                });
+
+            }
+        });
+    });
+</script>
+</body>
+</html>
