@@ -143,6 +143,26 @@ class Site extends BaseController
         }
     }
 
+    /**
+     * 搜索关键字设置
+     */
+    public function keywords()
+    {
+        $keywords = model("keywords")->find();
+        if (request()->isAjax()) {
+            $keywords1 = str_replace("，", ",", trim(input('keywords')));
+            $count = count(explode(",", $keywords1));
+            if ($count > config('recommendKey')) {
+                exit_json(-1, '推荐搜索关键字最多' . config('recommendKey') . '个');
+            }
+            $keywords->save(['keywords' => $keywords1]);
+            exit_json();
+        } else {
+            $this->assign('keystring', $keywords['keywords']);
+            return $this->fetch();
+        }
+    }
+
 
 
 }

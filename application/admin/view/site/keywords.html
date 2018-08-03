@@ -1,0 +1,52 @@
+{include file='pub/header'/}
+<title>搜索关键字</title>
+</head>
+<body>
+<nav class="breadcrumb">{$breadNav} <a class="btn btn-success radius r" style="line-height:1.6em;margin-top:3px"
+                                       href="javascript:location.replace(location.href);" title="刷新"><i
+        class="Hui-iconfont">&#xe68f;</i></a></nav>
+<div class="page-container">
+    <form class="form form-horizontal" id="open_time" method="post" enctype="multipart/form-data">
+        <div class="row cl">
+            <label class="form-label col-xs-4 col-sm-2">推荐搜索关键字：</label>
+            <div class="formControls col-xs-8 col-sm-9">
+                <textarea class="textarea" name="keywords">{$keystring}</textarea>
+                <p style="color: red;">（多个关键字以英文模式下逗号分割开）</p>
+            </div>
+        </div>
+        <div class="row cl">
+            <div class="col-xs-8 col-sm-9 col-xs-offset-4 col-sm-offset-2">
+                <button class="btn btn-secondary radius" type="submit"><i class="Hui-iconfont">&#xe632;</i> 保存信息
+                </button>
+            </div>
+        </div>
+    </form>
+</div>
+
+
+{include file="pub/footer"/}
+<script type="text/javascript">
+    $(function () {
+        $("#open_time").validate({
+            submitHandler: function (form) {
+                $(form).ajaxSubmit({
+                    type: 'post',
+                    url: '{:url("Site/keywords")}',
+                    success: function (res) {
+                        if (1 == res.code) {
+                            layer.msg(res.msg, {icon: 6, time: 1000});
+                        } else {
+                            layer.msg(res.msg, {icon: 5, time: 1000});
+                            setTimeout(function () {
+                                location.reload();
+                            }, 888);
+                        }
+                    }
+                });
+
+            }
+        });
+    });
+</script>
+</body>
+</html>

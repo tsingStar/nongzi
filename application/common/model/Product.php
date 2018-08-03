@@ -37,6 +37,32 @@ class Product extends Model
     }
 
     /**
+     * 格式化单个商品详情
+     * @param $product
+     * @return mixed
+     */
+    public function formatOneDetail($product)
+    {
+        $data = $product;
+        $data['thumb_img'] = __URL__.$data['thumb_img'];
+        $sw = explode(',', $data['swiper_img']);
+        $swiper_img = [];
+        foreach ($sw as $item) {
+            $swiper_img[] = __URL__.$item;
+        }
+        $data['swiper_img'] = $swiper_img;
+        $prop = \model('ProductPropName')->where('product_id', $product['id'])->column('prop_name', 'prop_name_id');
+        $prop_data = [];
+        foreach ($prop as $k=>$v){
+            $prop_data[$v] = \model('ProductPropValue')->where(['product_id'=>$product['id'], 'prop_name_id'=>$k])->field('prop_value_id, prop_value')->select();
+        }
+        $data['prop_data'] = $prop_data;
+        $prop_value = \model('ProductAttr')->where('product_id', $product['id'])->field('id, product_id, prop_value_attr, prop_value_name, remain, limit_remain, price_one, price_comb, img_url')->select();
+        $data['prop_value'] = $prop_value;
+        return $data;
+    }
+
+    /**
      * 根据分类id获取商品列表
      * @param $cate_id
      * @return array
@@ -67,6 +93,18 @@ class Product extends Model
 //            $data[] = $this->formatOne($l);
 //        }
 //        return $data;
+    }
+
+    /**
+     * 获取商品详情
+     * @param $product_id
+     * @return array
+     * @throws \think\exception\DbException
+     */
+    public function getInfo($product_id)
+    {
+        $product = self::get($product_id);
+        return $this->formatOneDetail($product);
     }
 
 

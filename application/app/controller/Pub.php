@@ -191,10 +191,6 @@ class Pub extends Controller
         }
     }
 
-
-
-    //TODO 待处理
-
     /**
      * 微信小程序登陆
      */
@@ -203,21 +199,11 @@ class Pub extends Controller
         $app_id = input('app_id');
         $app_secret = input('app_secret');
         $js_code = input('js_code');
-        $encryptedData = input('encryptedData');
-        $iv = input('iv');
         if (!$app_id || !$app_secret || $js_code) {
             exit_json(-1, '参数错误');
         }
-
-        //返回数据格式
-//            {
-//                  "openid": "OPENID",
-//                  "session_key": "SESSIONKEY"
-//                  "expires_in": 2592000
-//            }
         $res = file_get_contents("https://api.weixin.qq.com/sns/jscode2session?appid=$app_id&secret=$app_secret&js_code=$js_code&grant_type=authorization_code");
         $res = json_decode($res, true);
-
         if (!$res['openid']) {
             exit_json(-1, '参数错误');
         }
@@ -226,38 +212,65 @@ class Pub extends Controller
         if (!session('session_key')) {
             session('session_key', $session_key);
         }
-        include VENDOR_PATH . 'WeiXin/wxBizDataCrypt.php';
-        $pc = new \WXBizDataCrypt($app_id, $session_key);
-        $errCode = $pc->decryptData($encryptedData, $iv, $data);
-
-        if ($errCode == 0) {
-
-
-            print($data . "\n");
-        } else {
-            print($errCode . "\n");
-        }
+        exit_json(1, '请求成功', [
+            'open_id' => $open_id
+        ]);
     }
 
     /**
-     * 绑定手机号
+     * 获取微信绑定手机号
      */
-    public function bindTelephone()
+    public function getBindNum()
     {
+        $app_id = input('app_id');
         $iv = input('iv');
         $encryptedData = input('encryptedData');
         $session_key = session('session_key');
         include VENDOR_PATH . 'WeiXin/wxBizDataCrypt.php';
         $pc = new \WXBizDataCrypt($app_id, $session_key);
         $errCode = $pc->decryptData($encryptedData, $iv, $data);
-        if($errCode == 0){
-            //请求成功
-        }else{
-            //请求失败
-
+        if ($errCode == 0) {
+            $data = json_decode($data, true);
+            $telephone = $data['purePhoneNumber'];
+            exit_json(1, '请求成功', ['telephone' => $telephone]);
+        } else {
+            exit_json(-1, '请求参数异常');
         }
+    }
 
-
+    /**
+     * 小程序注册
+     */
+    public function registByWeiXin()
+    {
+        $telephone = input('telephone');
+        $vcode = input('code');
+        $vip_code = input('vip_code');
+        $user_name = input('user_name');
+        $head_img = input('head_img');
+        $open_id = input('open_id');
+        $user = model('user')->where('telephone', $telephone)->find();
+        $sms = model('SmsLog')->where(['create_time' => ['gt', time() - 30], 'status' => 0, 'telephone' => $telephone, 'type' => 1])->find();
+        if ($sms['code'] != $vcode) {
+            exit_json(-1, '验证码错误');
+        }
+        if ($user) {
+            if ($user['open_id']) {
+                exit_json(-1, '手机号已被绑定过，请重新绑定');
+            }
+            $user->save(['head_img' => $head_img, 'open_id' => $open_id, 'user_name' => $user_name]);
+            $user_id = $user->getAttr('id');
+            exit_json(1, '注册成功', model('user')->formatOne($user_id));
+        } else {
+            $res = model('user')->isUpdate(false)->save(['telephone' => $telephone, 'vip_code' => $vip_code, 'user_name' => $user_name, 'head_img' => $head_img, "open_id" => $open_id]);
+            if ($res) {
+                $sms->save(['status' => 1]);
+                $user_id = model('user')->getAttr('id');
+                exit_json(1, '注册成功', model('user')->formatOne($user_id));
+            } else {
+                exit_json(-1, '注册失败');
+            }
+        }
 
     }
 
