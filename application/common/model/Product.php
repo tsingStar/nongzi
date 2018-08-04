@@ -54,7 +54,12 @@ class Product extends Model
         $prop = \model('ProductPropName')->where('product_id', $product['id'])->column('prop_name', 'prop_name_id');
         $prop_data = [];
         foreach ($prop as $k=>$v){
-            $prop_data[$v] = \model('ProductPropValue')->where(['product_id'=>$product['id'], 'prop_name_id'=>$k])->field('prop_value_id, prop_value')->select();
+            $is_show = \model('PropName')->where('id', $k)->value('is_show');
+            $prop_data[] = [
+                'name'=>$v,
+                'is_show'=>$is_show,
+                'value'=>\model('ProductPropValue')->where(['product_id'=>$product['id'], 'prop_name_id'=>$k
+                ])->field('prop_value_id, prop_value')->select()];
         }
         $data['prop_data'] = $prop_data;
         $prop_value = \model('ProductAttr')->where('product_id', $product['id'])->field('id, product_id, prop_value_attr, prop_value_name, remain, limit_remain, price_one, price_comb, img_url')->select();
@@ -71,7 +76,7 @@ class Product extends Model
     {
 
         $product = [
-            'id'=>10,
+            'id'=>3468,
             'thumb_img'=>__URL__."/upload/20180730/0f67922f113bff0df803cac8e95a5d7d.png",
             'name'=>'测试商品',
             'prop_name'=>'200克*50瓶/箱',
@@ -104,6 +109,9 @@ class Product extends Model
     public function getInfo($product_id)
     {
         $product = self::get($product_id);
+        if(!$product){
+            exit_json(-1, '商品不存在');
+        }
         return $this->formatOneDetail($product);
     }
 
