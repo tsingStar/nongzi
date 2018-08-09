@@ -313,8 +313,8 @@ function get_millisecond()
  * @param $name
  * @return bool|string
  */
-function uploadImg($name){
-    $file = request()->file($name);
+function uploadImg(){
+    $file = request()->file('file');
     if ($file) {
         $info = $file->move(__UPLOAD__);
         if ($info) {
