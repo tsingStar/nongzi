@@ -28,6 +28,16 @@
             </div>
         </div>
         <div class="row cl">
+            <label class="form-label col-xs-4 col-sm-2">分类文字图标：</label>
+            <div class="formControls col-xs-8 col-sm-9">
+                <div class="uploader-thum-container">
+                    <div id="fileList1" class="uploader-list">
+                    </div>
+                    <div id="filePicker1">选择图片</div>
+                </div>
+            </div>
+        </div>
+        <div class="row cl">
             <div class="col-xs-8 col-sm-9 col-xs-offset-4 col-sm-offset-2">
                 <button class="btn btn-secondary radius" type="submit"><i class="Hui-iconfont">&#xe632;</i> 保存分类
                 </button>
@@ -49,6 +59,7 @@
             increaseArea: '20%'
         });
         uploadImage($("#fileList"), null, $("#form-category-add"), "image");
+        uploadImage($("#fileList1"), null, $("#form-category-add"), "word_image", "#filePicker1", 1);
         $("#form-category-add").validate({
             rules: {
                 name: {
