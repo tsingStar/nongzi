@@ -72,6 +72,7 @@ class Pub extends Controller
     }
 
     /**
+     * @param string $name
      * 上传图片
      */
     public function uploadImg()

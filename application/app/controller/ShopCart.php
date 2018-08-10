@@ -37,6 +37,9 @@ class ShopCart extends BaseUser
             'prop_value_attr' => $prop_attr
         ])->find();
         $product = model('Product')->where('id', $product_id)->find();
+        if(!$p_attr){
+            exit_json(-1,'当前属性商品不存在');
+        }
         if ($p_attr['remain'] < $num) {
             exit_json(-1, '商品库存不足');
         } else {

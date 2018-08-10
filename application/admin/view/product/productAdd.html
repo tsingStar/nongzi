@@ -80,7 +80,7 @@
                 $.each(prop_arr, function (i,v) {
                     tableHtml += "<th>"+v.prop_name+"</th>";
                 });
-                tableHtml += "<th>单价</th><th>件价</th><th>库存</th><th>库存预警数量</th><th>外部编码</th><th>图片</th>";
+                tableHtml += "<th>单价</th><th>件价</th><th>库存</th><th>库存预警数量</th><th>外部编码</th>";
                 tableHtml += "</tr></thead>";
                 tableHtml += "<tbody>";
                 var numsArr = new Array();
@@ -135,7 +135,7 @@
                     tableHtml += '<td><input type="text" class="input-text" name="prop_attr['+id+'][remain]" style="width: 60px;" required/></td>';
                     tableHtml += '<td><input type="text" class="input-text" name="prop_attr['+id+'][limit_remain]" style="width: 60px;" required/></td>';
                     tableHtml += '<td><input type="text" class="input-text" name="prop_attr['+id+'][gno]" style="width: 60px;"/></td>';
-                    tableHtml += '<td><input type="file" class="input-text" name="prop_attr['+id+'][img_url]" style="font-size: 12px;"/></td>';
+                    // tableHtml += '<td><input type="file" class="input-text" name="prop_attr['+id+'][img_url]" style="font-size: 12px;"/></td>';
                     tableHtml += '<input type="hidden" value="'+prop_name+'" name="prop_attr['+id+'][prop_name]"/>'
                     tableHtml += '</tr>';
                 }
@@ -251,12 +251,6 @@
 			<label class="form-label col-xs-4 col-sm-2"><span class="c-red">*</span>防治对象：</label>
 			<div class="formControls col-xs-8 col-sm-9">
 				<input type="text" class="input-text" value="" placeholder="" name="prevent">
-			</div>
-		</div>
-		<div class="row cl">
-			<label class="form-label col-xs-4 col-sm-2"><span class="c-red">*</span>品牌：</label>
-			<div class="formControls col-xs-8 col-sm-9">
-				<input type="text" class="input-text" value="" placeholder="" name="brand">
 			</div>
 		</div>
 		<div class="row cl">

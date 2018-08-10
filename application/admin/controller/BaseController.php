@@ -11,6 +11,7 @@ namespace app\admin\controller;
 
 use app\admin\model\Admins;
 use think\Controller;
+use think\Log;
 
 class BaseController extends Controller
 {
@@ -18,6 +19,7 @@ class BaseController extends Controller
     public function __construct()
     {
         parent::__construct();
+//        Log::error($_POST);
         $this->assign('sitename', config('sitename'));
         $this->assign('breadNav', $this->getNavBread());
         $this->checkIsLogin();

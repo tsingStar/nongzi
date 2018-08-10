@@ -40,13 +40,6 @@
                     <input id="password" name="password" type="password" placeholder="密码" class="input-text size-L" dataType="*5-16" nullmsg="密码不能为空">
                 </div>
             </div>
-            <!--<div class="row cl">-->
-                <!--<div class="formControls col-xs-8 col-xs-offset-3">-->
-                    <!--<input class="input-text size-L" type="text" placeholder="验证码" name="captcha"-->
-                           <!--onblur="if(this.value==''){this.value='验证码:'}"-->
-                           <!--onclick="if(this.value=='验证码:'){this.value='';}" value="验证码:" style="width:130px;">-->
-                    <!--<img id="captcha" src="{:captcha_src()}"> <a id="kanbuq" href="javascript:;">看不清，换一张</a></div>-->
-            <!--</div>-->
             <div class="row cl">
                 <div class="formControls col-xs-8 col-xs-offset-3">
                     <label for="online">
@@ -80,9 +73,6 @@
             }else{
                 $(this).val(1);
             }
-        });
-        $("#kanbuq").click(function () {
-            $("#captcha").attr("src", "{:captcha_src()}?t=" + new Date().getTime());
         });
         $(".form").Validform({
             btnSubmit: "#submit",

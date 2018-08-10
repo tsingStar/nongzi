@@ -9,8 +9,6 @@
 
 namespace app\admin\controller;
 
-use think\Exception;
-
 class Product extends BaseController
 {
     public function __construct()
@@ -193,7 +191,7 @@ class Product extends BaseController
                 $prop_data = [];
                 foreach ($prop_attr as $key => $item) {
                     //属性图片处理
-                    $img_url = uploadImg($key.'[img_url]');
+//                    $img_url = uploadImg($key.'[img_url]');
                     $temp = [
                         "product_id" => $product_id,
                         "prop_value_attr" => $key,
@@ -203,7 +201,7 @@ class Product extends BaseController
                         "price_one" => $item['price_one'],
                         "price_comb" => $item['price_comb'],
                         "gno" => $item['gno'],
-                        "img_url" => $img_url
+//                        "img_url" => $img_url
                     ];
                     $prop_data[] = $temp;
                 }
@@ -240,52 +238,207 @@ class Product extends BaseController
         return $this->fetch();
     }
 
-    //TODO 待处理
-
-    /**
-     * 编辑商品
-     */
-    public function productEdit()
-    {
-        $productModel = new Goodslibrary();
-        if (request()->isAjax()) {
-            $data = input('post.');
-            if (isset($data['img'])) {
-                $data['img'] = join(',', $data['img']);
-            } else {
-                $data['img'] = '';
-            }
-            $res = $productModel->allowField(true)->save($data, ['id' => $data['id']]);
-            if ($res) {
-                exit_json();
-            } else {
-                exit_json(-1, '添加失败');
-            }
-        }
-        $product = $productModel->where('id', input('goodid'))->find();
-        $cateModel = new Goodslibrarycate();
-        $list = $cateModel->field('id, name, pid parent_id')->select();
-        $cateTree = getTree($list, 0);
-        $pid = $cateModel->where('id', $product['cateId'])->value('pid');
-        $this->assign('pid', $pid);
-        $this->assign('product', $product);
-        $this->assign('cateTree', $cateTree);
-        return $this->fetch();
-    }
-
-
     /**
      * 根据id删除数据
      */
     function delData()
     {
         $ids = input('idstr');
-        $goodModel = new Goodslibrary();
-        $res = $goodModel->where('id', 'in', $ids)->delete();
-        if ($res) {
+        model('Product')->startTrans();
+        model('ProductPropName')->startTrans();
+        model('ProductPropValue')->startTrans();
+        model('ProductAttr')->startTrans();
+        $res = model('Product')->whereIn('id', $ids)->delete();
+        $res1 = model('ProductPropName')->whereIn('product_id', $ids)->delete();
+        $res2 = model('ProductPropValue')->whereIn('product_id', $ids)->delete();
+        $res3 = model('ProductAttr')->whereIn('product_id', $ids)->delete();
+        if ($res && $res1 && $res2 && $res3) {
+            model('Product')->commit();
+            model('ProductPropName')->commit();
+            model('ProductPropValue')->commit();
+            model('ProductAttr')->commit();
             exit_json();
         } else {
+            model('Product')->rollback();
+            model('ProductPropName')->rollback();
+            model('ProductPropValue')->rollback();
+            model('ProductAttr')->rollback();
             exit_json('操作失败');
         }
     }
+
+    /**
+     * 编辑商品
+     */
+    public function productEdit()
+    {
+        $product = model('Product')->where('id', input('product_id'))->find();
+        if (request()->isAjax()) {
+
+            $data = input('post.');
+            $prop = $data['prop'];
+            $prop_attr = $data['prop_attr'];
+            if(isset($data['swiper_img'])){
+                $data['swiper_img'] = join(',', $data['swiper_img']);
+            }
+            if(!isset($data['thumb_img'])){
+                unset($data['thumb_img']);
+            }
+            model('Product')->startTrans();
+            model('ProductPropName')->startTrans();
+            model('ProductPropValue')->startTrans();
+            model('ProductAttr')->startTrans();
+            $res = $product->allowField(true)->save($data);
+            if ($res) {
+                $product_id = input('product_id');
+                //规格属性处理
+                $prop_name = [];
+                $prop_value = [];
+                foreach ($prop as $t) {
+                    $tmp = explode(":", $t);
+                    $prop_name[] = [
+                        "prop_name_id" => explode('|', $tmp[0])[0],
+                        "prop_name" => explode('|', $tmp[0])[1],
+                        "product_id" => $product_id
+                    ];
+                    $prop_value[] = [
+                        "prop_name_id" => explode('|', $tmp[0])[0],
+                        "prop_value_id" => explode('|', $tmp[1])[0],
+                        "prop_value" => explode('|', $tmp[1])[1],
+                        "product_id" => $product_id
+                    ];
+                }
+                //商品属性格式化处理
+                $prop_data = [];
+                foreach ($prop_attr as $key => $item) {
+                    //属性图片处理
+//                    $img_url = uploadImg($key.'[img_url]');
+                    $temp = [
+                        "product_id" => $product_id,
+                        "prop_value_attr" => $key,
+                        "prop_value_name" => $item['prop_name'],
+                        "remain" => $item['remain'],
+                        "limit_remain" => $item['limit_remain'],
+                        "price_one" => $item['price_one'],
+                        "price_comb" => $item['price_comb'],
+                        "gno" => $item['gno'],
+//                        "img_url" => $img_url
+                    ];
+                    $prop_data[] = $temp;
+                }
+                try {
+                    model('ProductPropName')->where('product_id', $product_id)->delete();
+                    model('ProductPropName')->saveAll(arr_unique($prop_name));
+                    model('ProductPropValue')->where('product_id', $product_id)->delete();
+                    model('ProductPropValue')->saveAll($prop_value);
+                    model('ProductAttr')->where('product_id', $product_id)->delete();
+                    model('ProductAttr')->saveAll($prop_data);
+                    model('Product')->commit();
+                    model('ProductPropName')->commit();
+                    model('ProductPropValue')->commit();
+                    model('ProductAttr')->commit();
+                } catch (\Exception $e) {
+                    model('Product')->rollback();
+                    model('ProductPropName')->rollback();
+                    model('ProductPropValue')->rollback();
+                    model('ProductAttr')->rollback();
+                    exit_json(-1, $e->getMessage());
+                }
+                exit_json();
+            } else {
+                exit_json(-1, '商品添加失败');
+            }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+        }
+        $cate_parent = model('ProductCate')->where('id', $product['cate_parent_id'])->find();
+        $cate = model('ProductCate')->where('id', $product['cate_id'])->find();
+        $list = model('ProductCate')->field('id, name, parent_id')->select();
+        $cateTree = getTree($list, 0);
+        $prop_value = model('ProductPropValue')->where('product_id', $product['id'])->column('prop_value_id');
+        $this->assign('prop_val', $prop_value);
+        $this->assign('pid', $cate['id']);
+        $this->assign('parent_cate', $cate_parent);
+        $this->assign('product', $product);
+        $this->assign('cateTree', $cateTree);
+        $prop_arr = model('PropName')->column('prop_name', 'id');
+        $prop = [];
+        foreach ($prop_arr as $k => $v) {
+            $prop["$k"] = model('PropValue')->where('prop_id', $k)->column('prop_val', 'id');
+        }
+        $this->assign('prop_name', $prop_arr);
+        $this->assign('prop_value', $prop);
+        //获取商品规格属性信息，前端加载显示
+        $prop_attr = model('ProductAttr')->where('product_id', $product['id'])->column('*', 'prop_value_attr');
+        $this->assign('prop_attr', $prop_attr);
+        return $this->fetch();
+
+    }
+
+    /**
+     * 设为首页
+     */
+    public function setIndex()
+    {
+        $product_id = input('product_id');
+        $is_index = input('is_index');
+        $pro = model('Product')->where('id', $product_id)->find();
+        if($pro){
+            $r = $pro->save(['is_index'=>$is_index]);
+            if($r){
+                exit_json();
+            }else{
+                exit_json(-1, '设置失败');
+            }
+        }else{
+            exit_json(-1, '商品不存在');
+        }
+
+    }
+    /**
+     * 设为热销
+     */
+    public function setHot()
+    {
+        $product_id = input('product_id');
+        $is_index = input('is_hot');
+        $pro = model('Product')->where('id', $product_id)->find();
+        if($pro){
+            $r = $pro->save(['is_hot'=>$is_index]);
+            if($r){
+                exit_json();
+            }else{
+                exit_json(-1, '设置失败');
+            }
+        }else{
+            exit_json(-1, '商品不存在');
+        }
+
+    }
+
+
+
+
+    //TODO 待处理
+
+
 }

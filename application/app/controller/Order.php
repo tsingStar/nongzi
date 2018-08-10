@@ -11,7 +11,7 @@ namespace app\app\controller;
 
 
 use app\common\model\Pay;
-use think\Cache;
+use app\common\model\WeiXinPay;
 
 class Order extends BaseUser
 {
@@ -37,11 +37,13 @@ class Order extends BaseUser
             $total_price = sprintf("%.2f", $prop_attr['price_comb'] * $c['num']);
             $temp = [
                 'name' => $p['name'],
-                'thumb_img' => $p['thumb_img'],
+                'thumb_img' => __URL__ . $p['thumb_img'],
+                'prop_value_attr' => $prop_attr['prop_value_attr'],
                 'price_comb' => $prop_attr['price_comb'],
                 'prop_name' => $prop_attr['prop_value_name'],
                 'num' => $c['num'],
-                'total_price' => $total_price
+                'total_price' => $total_price,
+                'product_id' => $c['product_id'],
             ];
             if ($p['is_send'] != 1) {
                 $send_fee += $c['num'] * $p['send_fee'];
@@ -55,13 +57,13 @@ class Order extends BaseUser
             'send_fee' => $send_fee,
             'total_money' => $total_money,
             'cart_ids' => $cart_ids,
-            'src' => 1
+            'src' => 1,
+            'count' => $count,
+            'order_money'=>$send_fee+$total_money
         ];
         $prepay_id = uniqid(USER_ID);
-//        cache($prepay_id, $data);
-        Cache::clear(USER_ID);
-        Cache::tag(USER_ID)->set($prepay_id, $data);
         $data['prepay_id'] = $prepay_id;
+        cache(USER_ID . 'order', $data);
         exit_json(1, '请求成功', $data);
 
     }
@@ -72,14 +74,40 @@ class Order extends BaseUser
     public function makePreOrderByPro()
     {
         $product_id = input('product_id');
-        $prop_value = input('prop_attr_value');
-
-
+        $prop_value = input('prop_value_attr');
+        $num = input('num');
+        $p = model('Product')->where('id', $product_id)->find();
+        $prop_attr = model('ProductAttr')->where('product_id', $product_id)->where('prop_value_attr', $prop_value)->find();
+        $total_money = sprintf('%.2f', $num * $prop_attr['price_comb']);
+        $pros = [
+            [
+                'name' => $p['name'],
+                'thumb_img' => __URL__ . $p['thumb_img'],
+                'prop_value_attr' => $prop_value,
+                'price_comb' => $prop_attr['price_comb'],
+                'prop_name' => $prop_attr['prop_value_name'],
+                'num' => $num,
+                'total_price' => $total_money,
+                'product_id' => $product_id
+            ]
+        ];
+        $send_fee = 0;
+        if ($p['is_send'] != 1) {
+            $send_fee = $num * $p['send_fee'];
+        }
+        $data = [
+            'products' => $pros,
+            'send_fee' => $send_fee,
+            'total_money' => $total_money,
+            'cart_ids' => '',
+            'src' => 2,
+            'count' => $num,
+            'order_money'=>$send_fee+$total_money
+        ];
         $prepay_id = uniqid(USER_ID);
-        session($prepay_id, $data);
+        $data['prepay_id'] = $prepay_id;
+        cache(USER_ID . 'order', $data);
         exit_json(1, '请求成功', $data);
-
-
     }
 
     /**
@@ -89,147 +117,74 @@ class Order extends BaseUser
     {
 
         $prepay_id = input('prepay_id');
-        $data = Cache::tag(USER_ID)->get($prepay_id);
-//        Cache::clear(USER_ID);
-        exit_json(1, '下单成功', $data);
-
-    }
-
-
-    /**
-     * 获取订单基础信息
-     * @throws \think\db\exception\DataNotFoundException
-     * @throws \think\db\exception\ModelNotFoundException
-     * @throws \think\exception\DbException
-     */
-    public function getOrderInfo()
-    {
-        $type = input('type');
-        $shop_id = input('shop_id');
-        $good_list = [];
-        $shop_cost = 0;
-        if ($type == 1) {
-            // 立即购买
-            $good_id = input('good_id');
-            $prop_id = input('prop_id') ? input('prop_id') : 0;
-            $num = input('num');
-            if (!$good_id) {
-                exit_json(-1, '商品参数错误');
+        $data = cache(USER_ID . 'order');
+        if ($data['prepay_id'] == $prepay_id) {
+            $address = input('address');
+            $receiver_telephone = input('receiver_telephone');
+            $receiver_name = input('receiver_name');
+            $remarks = input('remarks');
+            if (!$address || !$receiver_telephone || !$receiver_name) {
+                exit_json(-1, '收货人信息不能为空');
             }
-            if ($num <= 0) {
-                exit_json(-1, '商品数量错误');
+            $order_no = getOrderNo();
+            model('Order')->startTrans();
+            model('OrderDet')->startTrans();
+            //订单基本信息
+            $order_data = [
+                'order_no' => $order_no,
+                'user_id' => USER_ID,
+                'receiver_name' => $receiver_name,
+                'address' => $address,
+                'receiver_telephone' => $receiver_telephone,
+                'total_money' => $data['total_money'],
+                'send_fee' => $data['send_fee'],
+                'remarks' => $remarks,
+                'order_money' => $data['total_money'] + $data['send_fee']
+            ];
+            //订单详情信息
+            $order_detail = [];
+            foreach ($data['products'] as $item) {
+                $temp = [
+                    'order_no' => $order_no,
+                    'user_id' => USER_ID,
+                    'product_id' => $item['product_id'],
+                    'prop_value_attr' => $item['prop_value_attr'],
+                    'price' => $item['price_comb'],
+                    'num' => $item['num'],
+                    'name' => $item['name'],
+                    'prop_name' => $item['prop_name'],
+                    'thumb_img' => $item['thumb_img'],
+                ];
+                $order_detail[] = $temp;
             }
-            $res = $this->getGoodList($good_id, $num, $prop_id);
-            if ($res['code'] == -1) {
-                exit_json(-1, $res['msg']);
-            }
-            $temp = $res['data'];
-            $shop_cost += $temp['total_price'];
-            $good_list[] = $temp;
-        } else if ($type == 2) {
-            //购物车购买
-            $good_cart = model('Shopcart')->where(['shop_id' => $shop_id, 'user_id' => USER_ID])->select();
-            foreach ($good_cart as $good) {
-                $res = $this->getGoodList($good['good_id'], $good['num'], $good['prop_id']);
-                if ($res['code'] == -1) {
-                    exit_json(-1, $res['msg']);
+            try {
+                $res = model('Order')->save($order_data);
+                $res1 = model('OrderDet')->saveAll($order_detail);
+                if ($res && $res1) {
+                    if ($data['src'] == 1) {
+                        model('ShopCart')->whereIn('id', $data['cart_ids'])->delete();
+                    }
+                    model('Order')->commit();
+                    model('OrderDet')->commit();
+                    cache(USER_ID . 'order');
+                    exit_json(1, '订单生成成功', [
+                        'order_no' => $order_no
+                    ]);
+                } else {
+                    model('Order')->rollback();
+                    model('OrderDet')->rollback();
+                    exit_json(-1, '订单生成失败');
                 }
-                $temp = $res['data'];
-                $shop_cost += $temp['total_price'];
-                $good_list[] = $temp;
+            } catch (\Exception $e) {
+                model('Order')->rollback();
+                model('OrderDet')->rollback();
+                exit_json(-1, '订单生成失败123');
             }
         } else {
             exit_json(-1, '参数错误');
         }
-
-
-        $default_address = model('user_address')->where(['user_id' => USER_ID, 'is_default' => 1, 'shop_id' => $shop_id])->find();
-        if (!$default_address) {
-            $default_address = new \stdClass();
-        }
-        $coupon_list = model('userCoupon')->field('id coupon_id, name, cost, start_time, end_time, min_cost, status')->where(['status' => 0, 'start_time' => ['lt', date('Y-m-d H:i:s')], 'end_time' => ['gt', date('Y-m-d H:i:s')], 'min_cost' => ['lt', $shop_cost], 'userid' => USER_ID])->select();
-        $shop_name = model('shop')->where('id', $shop_id)->value('shopname');
-        $data = [
-            'good_list' => $good_list,
-            'shop_cost' => $shop_cost,
-            'default_address' => $default_address,
-            'coupon_list' => $coupon_list,
-            'shop_name' => $shop_name
-        ];
-        exit_json(1, '请求成功', $data);
     }
 
-    /**
-     * 生成订单前订单详情列表
-     * @param $good_id
-     * @param $num
-     * @param int $prop_id
-     * @return array
-     * @throws \think\db\exception\DataNotFoundException
-     * @throws \think\db\exception\ModelNotFoundException
-     * @throws \think\exception\DbException
-     */
-    private function getGoodList($good_id, $num, $prop_id = 0)
-    {
-        $data = [
-            'code' => 1,
-            'msg' => '',
-            'data' => []
-        ];
-        $good = model('goods')->where(['id' => $good_id, 'is_live' => 1])->find();
-        if (!$good) {
-            $data['code'] = -1;
-            $data['msg'] = '商品不存在或已下架';
-        }
-        $temp['good_image'] = explode(',', $good['img'])[0];
-        $temp['good_name'] = $good['name'];
-        $temp['num'] = $num;
-        $temp['sale_price'] = $good['sale_price'];
-        $temp['active_price'] = $good['active_price'];
-        $temp['good_id'] = $good_id;
-        $temp['gno'] = $good['gno'];
-        $temp['prop_id'] = $prop_id;
-        $temp['prop_name'] = $good['guige'] ?: $good['goodattr'];
-        if ($prop_id == 0) {
-            if ($good['count'] < $num) {
-                $data['code'] = -1;
-                $data['msg'] = '商品库存不足';
-            }
-        } else {
-            $p = model('goods_prop')->where(['id' => $prop_id, 'good_id' => $good_id])->find();
-            $temp['sale_price'] = $p['prop_price'];
-            $temp['active_price'] = $p['prop_active_price'];
-            $temp['prop_name'] = $p['prop_name'];
-            if ($p['num'] < $num) {
-                $data['code'] = -1;
-                $data['msg'] = '商品库存不足';
-            }
-        }
-        $temp['total_price'] = sprintf('%.2f', $temp['num'] * $temp['active_price']);
-        $data['data'] = $temp;
-        return $data;
-    }
-
-    /**
-     * 获取订单列表
-     */
-    public function getOrderList()
-    {
-        $order = model("order");
-        $time = time() - 30 * 60;
-        $order->save(['order_status' => 3], ['user_id' => USER_ID, 'create_time' => ['lt', $time], 'pay_status' => 0]);
-        $order_status = input('order_status');
-        $where = ['user_id' => USER_ID, 'is_del' => 0];
-        if (isset($order_status) && trim($order_status) != '') {
-            $where['order_status'] = $order_status;
-        }
-        $page = input('page') ? input('page') : 1;
-        $pageNum = input('pageNum') ? input('pageNum') : 10;
-        $offset = ($page - 1) * $pageNum;
-        $order_list = $order->where($where)->limit($offset, $pageNum)->order('create_time desc')->select();
-        $list = $order->formatList($order_list);
-        exit_json(1, '请求成功', $list);
-    }
 
     /**
      * 订单支付
@@ -241,28 +196,90 @@ class Order extends BaseUser
     {
         $order_no = input('order_no');
         $pay_type = input('pay_type');
-        $orderInfo = model('order')->where('order_no', $order_no)->find();
+        $orderInfo = model('Order')->where('order_no', $order_no)->find();
         if ($orderInfo['user_id'] != USER_ID) {
             exit_json(-1, '不是当前登陆用户订单');
         }
         if ($orderInfo['order_status'] != 0) {
             exit_json(-1, '订单状态不支持支付');
         }
+
         if ($orderInfo->getData('create_time') < time() - 30 * 60) {
-            $orderInfo->save(['order_status' => 4]);
+            $orderInfo->save(['order_status' => 5]);
             exit_json(-1, '订单超时');
         }
-        $payModel = new Pay();
-        $orderString = $payModel->payOrder($order_no, $pay_type, 'order');
-        if ($orderString === false) {
-            exit_json(-1, '支付参数错误');
+        $order = model('Order')->where('order_no', $order_no)->find();
+        //pay_type 支付方式   1 威富通 微信支付  2 支付宝
+        if ($order['order_status'] != 0) {
+            exit_json(-1, '订单不可支付');
         }
+        $pay_info = [
+            'wxpay' => "",
+            'alipay' => "",
+            'xcxpay' => ""
+        ];
         if ($pay_type == 1) {
-            exit_json(1, '请求成功', ['weixinOrderString' => new \stdClass(), 'aliOrderString' => $orderString]);
+            $pay_data = [
+                'out_trade_no' => $order['order_no'],
+                'body' => "订单支付",
+                'total_fee' => $order['order_money'] * 100,
+                'mch_create_ip' => getIp()
+            ];
+            $weixin = new WeiXinPay();
+            $result = $weixin->createPrePayOrder($pay_data);
+            if (isset($result['status'])) {
+                exit_json(-1, '系统错误，稍后重试');
+            } else {
+                $pay_info['wxpay'] = $result;
+            }
+        } else if ($pay_type == 2) {
+
+            $result = [];
+            $pay_info['alipay'] = $result;
+
+
+        } else if ($pay_type == 3) {
+            $result = [];
+            $pay_info['xcxpay'] = $result;
         } else {
-            exit_json(1, '请求成功', ['weixinOrderString' => $orderString, 'aliOrderString' => ""]);
+            exit_json(-1, '参数错误');
         }
+        exit_json(1, '请求成功', $pay_info);
     }
+
+    /**
+     * 获取订单列表
+     */
+    public function getOrderList()
+    {
+        $order_status = input('order_status');
+        $page = input('page') ? input('page') : 0;
+        $pageNum = input('pageNum') ? input('pageNum') : 10;
+        $offset = $page * $pageNum;
+        $orderList = model('Order')->where('user_id', USER_ID)->where('order_status', $order_status)->field('order_no, receiver_name, receiver_telephone, address, remarks, send_fee, order_status, order_money')->limit($offset, $pageNum)->order('create_time desc')->select();
+        foreach ($orderList as $order) {
+            $order_no = $order['order_no'];
+            $order_det = model('OrderDet')->where('order_no', $order_no)->field('name, thumb_img, prop_value_attr, prop_name, price price_comb, num, price*num total_price, product_id')->select();
+            $order['order_det'] = $order_det;
+        }
+        exit_json(1, '请求成功', $orderList);
+    }
+
+    /**
+     * 获取求购/供应
+     */
+    public function getBuyAndSupply()
+    {
+        $type = input('type');
+        if($type != 1 && $type != 2){
+            exit_json(-1, '参数错误');
+        }
+        $list = model('BuySupply')->where('type', $type)->where('user_id', USER_ID)->field('product_name, num, telephone, description, remarks')->select();
+        exit_json(1, '请求成功', $list);
+    }
+
+    //TODO 待处理
+
 
     /**
      * 取消订单

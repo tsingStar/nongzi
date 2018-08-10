@@ -14,6 +14,8 @@ use app\common\model\ChargeOrder;
 use app\common\model\Order;
 use app\common\model\Pay;
 use app\common\model\PayOrder;
+use app\common\model\WeiXinPay;
+use MongoDB\Driver\WriteError;
 use think\Controller;
 use think\Log;
 
@@ -25,91 +27,56 @@ class PayResult extends Controller
     }
 
     /**
-     * 支付通知入口
+     * 微信支付回调
      */
-    public function index()
+    public function weixinPay()
     {
-        $pay = new Pay();
-        $is_refund = 1;
-        if ($_POST) {
-            //支付宝支付来源
-            $pay_type = 1;
-            $log_path = LOG_PATH . 'ali';
-            if ($_POST['trade_status'] == 'TRADE_FINISHED') {
-                $is_refund = 0;
-            }
-        } else {
-            //微信支付来源
-            $pay_type = 2;
-            $xml = file_get_contents('php://input');
-            $_POST = simplexml_load_string($xml, 'SimpleXMLElement', LIBXML_NOCDATA);
-            $log_path = LOG_PATH . 'weixin';
-        }
-        @mkdir($log_path);
-        file_put_contents($log_path . DS . date('Y-m-d') . '.txt', date('H:m:s') . json_encode($_POST) . '\n', FILE_APPEND);
-        if (isset($is_refund) || $_POST['result_code'] == 'SUCCESS') {
-            $validRes = $pay->validate($pay_type);
-            if ($validRes === false) {
-                Log::error('签名错误');
-            }
-            $orderInfo = $this->formatRes($validRes, $pay_type);
-            $orderInfo['is_refund'] = $is_refund;
-            $payOrder = new PayOrder();
-            try {
-                $pay_order = $payOrder->where('id', $orderInfo['out_trade_no'])->find();
-                if ($orderInfo['total_money'] != $pay_order['total_money']) {
-                    Log::error('支付金额错误');
-                } else {
-                    $orderInfo['order_no'] = $pay_order['order_no'];
-                    if ($pay_order['pay_status'] == 0) {
-                        $pay_order->save(['pay_status' => 1]);
-                        if($pay_order['pay_event'] == 'order'){
-                            //商品订单更改订单状态
-                            $order = new Order();
-                            $order->payOkOrder($orderInfo, $pay_type);
+        $weixinPay = new WeiXinPay();
+        $result = $weixinPay->chargeNotify();
+        if ($result['code'] == 1) {
+            $data = $result['data'];
+            $order = model('Order')->where('order_no', $data['out_trade_no'])->find();
+            if ($order['order_status'] == 0) {
+                if($data['pay_result'] == 0){
+//                    用户标识	openid	是	String(128)	用户在商户 appid 下的唯一标识
+//                    交易类型	trade_type	是	String(32)	pay.weixin.app
+//                    支付结果	pay_result	是	Int	支付结果：0—成功；其它—失败
+//                    支付结果信息	pay_info	否	String(64)	支付结果信息，支付成功时为空
+//                    平台订单号	transaction_id	是	String(32)	平台交易号
+//                    第三方支付单	out_transaction_id	否	String(32)	如：微信支付单号，支付宝支付单号
+//                    商户订单号	out_trade_no	是	String(32)	商户系统内部的定单号，32个字符内、可包含字母
+//                    总金额	total_fee	是	Int	总金额，以分为单位，不允许包含任何字、符号
+//                    现金支付金额	cash_fee	否	Int	现金支付金额订单现金支付金额，详见支付金额
+//                    货币种类	fee_type	否	String(8)	货币类型，符合 ISO 4217 标准的三位字母代码，默认人民币：CNY
+//                    附加信息	attach	否	String(127)	商家数据包，原样返回预下单时自定义数据
+//                    付款银行	bank_type	是	String(16)	银行类型
+//                    支付完成时间	time_end	是	String(14)	支付完成时间，格式为yyyyMMddHHmmss，如2009年12月27日9点10分10秒表示为20091227091010。时区为GMT+8 beijing。该时间取自平台服务器
+                    if($data['total_fee'] == $order['order_money']*100){
+                        //订单支付成功
+                        $res = $order->save([
+                            'pay_type'=>1,
+                            'pay_status'=>1,
+                            'order_status'=>1,
+                            'pay_time'=>$data['time_end'],
+                            'transaction_id'=>$data['transaction_id'],
+                            'out_transaction_id'=>$data['out_transaction_id']
+                        ]);
+                        if(!$res){
+                            Log::error($order['order_no'].'订单支付成功但处理失败');
                         }
-                        if($pay_order['pay_event'] == 'account'){
-                            //会员充值
-                            $order = new ChargeOrder();
-                            $order->payOkOrder($orderInfo, $pay_type);
-                        }
-
-                    } else {
-                        Log::error('订单已支付');
+                    }else{
+                        Log::error($order['order_no'].'订单支付金额异常');
                     }
+                }else{
+                    Log::error($order['order_no'].'支付异常，'.$data['pay_info']);
                 }
-            } catch (\Exception $e) {
-                Log::error($pay_type.'支付参数错误。'.$e->getMessage());
+            } else {
+                Log::error($order['order_no'] . '订单已支付');
             }
-        }
-        if ($pay_type == 1) {
-            echo 'SUCCESS';
+            echo 'success';
         } else {
-            echo '<xml><return_code><![CDATA[SUCCESS]]></return_code><return_msg><![CDATA[OK]]></return_msg></xml>';
+            Log::error('支付验签失败或参数异常');
+            echo 'fail';
         }
     }
-
-    /**
-     * 格式化支付返回信息
-     * @param $orderInfo
-     * @param $pay_type
-     * @return array
-     */
-    private function formatRes($orderInfo, $pay_type)
-    {
-        $payInfo = [];
-        if ($pay_type == 1) {
-            $payInfo['out_trade_no'] = substr($orderInfo['out_trade_no'], 0, -4);
-            $payInfo['trade_no'] = $orderInfo['trade_no'];
-            $payInfo['total_money'] = $orderInfo['total_amount'];
-//            $payInfo['seller_id'] = $orderInfo['seller_id'];
-        } else if ($pay_type == 2) {
-            $payInfo['out_trade_no'] = substr($orderInfo['out_trade_no'], 0, -4);
-            $payInfo['trade_no'] = $orderInfo['transaction_id'];
-            $payInfo['total_money'] = $orderInfo['total_fee']/100;
-        }
-        return $payInfo;
-    }
-
-
 }

@@ -34,6 +34,7 @@
                     <th width="100">产品名称</th>
                     <th width="100">产品分类</th>
                     <th width="100">是否首页显示</th>
+                    <th width="100">是否热销产品</th>
 
                     <th width="100">操作</th>
                 </tr>
@@ -55,15 +56,18 @@
                         {$good.cate_name}
                     </td>
                     <td class="td-status">
-                        {if condition="$good.is_index eq 1"}
-                        是
-                        {else /}
-                        否
-                        {/if}
+                        <div class="switch switch-small">
+                            <input type="checkbox" onchange="setIndex('{$good.id}', this)" {if condition="$good.is_index eq 1"}checked{/if} />
+                        </div>
+                    </td>
+                    <td class="td-status">
+                        <div class="switch switch-small">
+                            <input type="checkbox" onchange="setHot('{$good.id}', this)" {if condition="$good.is_hot eq 1"}checked{/if} />
+                        </div>
                     </td>
                     <td class="td-manage">
                         <a style="text-decoration:none" class="ml-5"
-                           onClick="product_edit('产品编辑','{:url(\'Product/productEdit\', [\'good_id\'=>$good.id])}')"
+                           onClick="product_edit('产品编辑','{:url(\'Product/productEdit\', [\'product_id\'=>$good.id])}')"
                            href="javascript:;" title="编辑">
                             <i class="Hui-iconfont">&#xe6df;</i>编辑
                         </a>
@@ -86,6 +90,37 @@
         "aaSorting": [[1, "asc"]],//默认第几个排序
         "bStateSave": true,//状态保存
     });
+
+    function setIndex(product_id, o){
+        var is_index = $(o).prop('checked')?1:0;
+        $.post("{:url('setIndex')}", {product_id:product_id, is_index:is_index}, function (res) {
+            if(res.code == 1){
+                layer.msg('操作成功');
+            }else{
+                layer.msg(res.msg);
+                if(is_index == 0){
+                    $(o).prop('checked', false);
+                }else{
+                    $(o).prop('checked', true);
+                }
+            }
+        });
+    }
+    function setHot(product_id, o){
+        var is_index = $(o).prop('checked')?1:0;
+        $.post("{:url('setIndex')}", {product_id:product_id, is_hot:is_index}, function (res) {
+            if(res.code == 1){
+                layer.msg('操作成功');
+            }else{
+                layer.msg(res.msg);
+                if(is_index == 0){
+                    $(o).prop('checked', false);
+                }else{
+                    $(o).prop('checked', true);
+                }
+            }
+        });
+    }
 
     /*产品-添加*/
     function product_add(title, url) {
