@@ -1,0 +1,66 @@
+{include file='pub/header'/}
+<title>新增分类</title>
+</head>
+<body>
+<div class="page-container">
+    <form class="form form-horizontal" id="form-category-add">
+        <input type="hidden" name="parent_id" value="{$pid}"/>
+        <div class="row cl">
+            <label class="form-label col-xs-4 col-sm-2"><span class="c-red">*</span>分类名称：</label>
+            <div class="formControls col-xs-8 col-sm-9">
+                <input type="text" class="input-text" value="" placeholder="" id="name" name="name">
+            </div>
+        </div>
+        <div class="row cl">
+            <div class="col-xs-8 col-sm-9 col-xs-offset-4 col-sm-offset-2">
+                <button class="btn btn-secondary radius" type="submit"><i class="Hui-iconfont">&#xe632;</i> 保存部门
+                </button>
+                <button onClick="layer_close();" class="btn btn-default radius" type="button">
+                    &nbsp;&nbsp;取消&nbsp;&nbsp;
+                </button>
+            </div>
+        </div>
+    </form>
+</div>
+
+
+{include file="pub/footer"/}
+<script type="text/javascript">
+    $(function () {
+        $("#form-category-add").validate({
+            rules: {
+                name: {
+                    required: true
+                }
+            },
+            messages: {
+                name: {
+                    required: '部门名称不能为空'
+                }
+            },
+            onkeyup: false,
+            focusCleanup: true,
+            success: "valid",
+            submitHandler: function (form) {
+                $(form).ajaxSubmit({
+                    type: 'post',
+                    url: '{:url("departmentAdd")}',
+                    success: function (res) {
+                        if (1 == res.code) {
+                            var index = parent.layer.getFrameIndex(window.name);
+                            layer.msg(res.msg, {icon: 6, time: 1000});
+                            setTimeout(function () {
+                                parent.location.reload();
+                                parent.layer.close(index);
+                            }, 1000);
+                        } else {
+                            layer.msg(res.msg, {icon: 5, time: 1000});
+                        }
+                    }
+                });
+            }
+        });
+    });
+</script>
+</body>
+</html>

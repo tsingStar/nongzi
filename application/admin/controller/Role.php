@@ -88,11 +88,11 @@ class Role extends BaseController
             if ($check !== true) {
                 exit_json(-1, $check);
             }
-            $isExist = $this->roleModel->where(['role_name' => $data['role_name'], 'id'=>['neq', $data['id']]])->find();
+            $isExist = $this->roleModel->where(['role_name' => $data['role_name'], 'id' => ['neq', $data['id']]])->find();
             if ($isExist) {
                 exit_json(-1, '角色名称已存在');
             } else {
-                $res = $this->roleModel->allowField(['role_name', 'describe', 'node_id'])->save($data, ['id'=>$data['id']]);
+                $res = $this->roleModel->allowField(['role_name', 'describe', 'node_id'])->save($data, ['id' => $data['id']]);
                 if ($res) {
                     exit_json(1, '角色保存成功');
                 } else {
@@ -122,16 +122,16 @@ class Role extends BaseController
         $roleId = input('roleId');
         $roleName = input('role_name');
         $map = [];
-        if($roleId){
+        if ($roleId) {
             $map['id'] = ['neq', $roleId];
         }
-        if($roleName){
+        if ($roleName) {
             $map['role_name'] = $roleName;
         }
         $r = $this->roleModel->where($map)->find();
-        if($r){
+        if ($r) {
             exit("false");
-        }else{
+        } else {
             exit("true");
         }
     }
@@ -143,7 +143,7 @@ class Role extends BaseController
     function roleDel()
     {
         $roleId = input('post.roleId');
-        if($roleId == 1){
+        if ($roleId == 1) {
             exit_json(-1, '当前角色禁止删除');
         }
         if (!$roleId) {
@@ -156,6 +156,88 @@ class Role extends BaseController
         } else {
             exit_json(-1, '删除失败');
         }
+    }
+
+    /**
+     * 部门管理
+     */
+    public function department()
+    {
+        $department_id = input('department_id') ?: 0;
+        $cateList = model('Department')->where('parent_id', $department_id)->select();
+        $this->assign('cateList', $cateList);
+        if ($department_id) {
+            $this->assign('parentId', $department_id);
+            return $this->fetch('departmentChild');
+        }
+        return $this->fetch();
+    }
+
+    /**
+     * 部门添加
+     * @return mixed
+     */
+    public function departmentAdd()
+    {
+        if (request()->isAjax()) {
+            addAdminOperaLog();
+            $data = input('post.');
+            $res = model('Department')->allowField(true)->save($data);
+            if ($res) {
+                exit_json();
+            } else {
+                exit_json(-1, '保存失败');
+            }
+        }
+        $parentId = input('parentId');
+        $this->assign('pid', $parentId);
+        return $this->fetch();
+    }
+
+    /**
+     * 部门编辑
+     * @throws \think\db\exception\DataNotFoundException
+     * @throws \think\db\exception\ModelNotFoundException
+     * @throws \think\exception\DbException
+     */
+    public function departmentEdit()
+    {
+        if (request()->isAjax()) {
+            addAdminOperaLog();
+            $data = input('post.');
+            $res = model('Department')->allowField(true)->save($data, ['id' => $data['id']]);
+            if ($res) {
+                exit_json();
+            } else {
+                exit_json(-1, '保存失败');
+            }
+        }
+        $cateId = input('department_id');
+        $cate = model('Department')->where('id', 'eq', $cateId)->find();
+        $this->assign('cate', $cate);
+        return $this->fetch();
+    }
+
+    /**
+     * 部门删除
+     */
+    public function departmentDel()
+    {
+        $department_id = input('ids');
+        if(!$department_id>0){
+            exit_json(-1, '参数错误');
+        }
+        $res = model('Department')->where('id', $department_id)->whereOr('parent_id', $department_id)->delete();
+        if($res){
+            exit_json();
+        }else{
+            exit_json(-1,'删除失败');
+        }
+
+
+
+
+        
     }
 
 
