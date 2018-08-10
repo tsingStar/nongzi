@@ -136,7 +136,6 @@ class Role extends BaseController
         }
     }
 
-
     /**
      * 删除角色
      */
@@ -224,20 +223,16 @@ class Role extends BaseController
     public function departmentDel()
     {
         $department_id = input('ids');
-        if(!$department_id>0){
+        if (!$department_id > 0) {
             exit_json(-1, '参数错误');
         }
         $res = model('Department')->where('id', $department_id)->whereOr('parent_id', $department_id)->delete();
-        if($res){
+        if ($res) {
             exit_json();
-        }else{
-            exit_json(-1,'删除失败');
+        } else {
+            exit_json(-1, '删除失败');
         }
 
-
-
-
-        
     }
 
 

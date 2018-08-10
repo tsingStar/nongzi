@@ -24,17 +24,20 @@ class Site extends BaseController
      */
     public function register()
     {
-        $reg = db('web_register')->where('id', 1)->find();
+        $reg = model('WebRegister')->find();
         if(request()->isAjax()){
-            $res = db('web_register')->where('id', 1)->update(['content'=>input('content'), 'title'=>input('title')]);
+            if($reg){
+                $res = $reg->save(input('post.'));
+            }else{
+                $res = model('WebRegister')->save(input('post.'));
+            }
             if($res){
                 exit_json();
             }else{
                 exit_json(-1, '保存失败');
             }
         }
-        $this->assign('title', '用户注册协议');
-        $this->assign('item', $reg);
+        $this->assign('item', $reg['content']);
         return $this->fetch();
         
     }
@@ -44,18 +47,21 @@ class Site extends BaseController
      */
     public function about_us()
     {
-        $reg = db('web_about_us')->where('id', 1)->find();
+        $reg = model('web_about_us')->find();
         if(request()->isAjax()){
-            $res = db('web_about_us')->where('id', 1)->update(['content'=>input('content'), 'title'=>input('title')]);
+            if($reg){
+                $res = $reg->save(input('post.'));
+            }else{
+                $res = model('web_about_us')->save(input('post.'));
+            }
             if($res){
                 exit_json();
             }else{
                 exit_json(-1, '保存失败');
             }
         }
-        $this->assign('title', '关于我们');
-        $this->assign('item', $reg);
-        return $this->fetch('register');
+        $this->assign('item', $reg['content']);
+        return $this->fetch();
 
     }
 
@@ -64,17 +70,20 @@ class Site extends BaseController
      */
     public function contact_us()
     {
-        $reg = db('web_contact_us')->find();
+        $reg = model('web_contact_us')->find();
         if(request()->isAjax()){
-            db('web_contact_us')->where('1=1')->delete();
-            $res = db('web_contact_us')->insert(['telephone'=>input('telephone'), 'complaints_phone'=>input('complaints_phone')]);
+            if($reg){
+                $res = $reg->save(input('post.'));
+            }else{
+                $res = model('web_contact_us')->save(input('post.'));
+            }
             if($res){
                 exit_json();
             }else{
                 exit_json(-1, '保存失败');
             }
         }
-        $this->assign('item', $reg);
+        $this->assign('telephone', $reg['telephone']);
         return $this->fetch();
     }
 

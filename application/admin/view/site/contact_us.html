@@ -6,15 +6,9 @@
 <div class="page-container">
     <form class="form form-horizontal" id="report" method="post" enctype="multipart/form-data">
         <div class="row cl">
-            <label class="form-label col-xs-4 col-sm-2">联系电话：</label>
+            <label class="form-label col-xs-4 col-sm-2">客服电话：</label>
             <div class="formControls col-xs-8 col-sm-9">
-                <input type="text" class="input-text" name="telephone" value="{$item.telephone}"/>
-            </div>
-        </div>
-        <div class="row cl">
-            <label class="form-label col-xs-4 col-sm-2">投诉电话：</label>
-            <div class="formControls col-xs-8 col-sm-9">
-                <input type="text" class="input-text" name="complaints_phone" value="{$item.complaints_phone}"/>
+                <input type="text" class="input-text" name="telephone" value="{$telephone}"/>
             </div>
         </div>
         <div class="row cl">
@@ -35,7 +29,7 @@
             submitHandler: function (form) {
                 $(form).ajaxSubmit({
                     type: 'post',
-                    url: '{:url("Site/contact_us")}',
+                    url: '{:url("contact_us")}',
                     success: function (res) {
                         if (1 == res.code) {
                             layer.msg(res.msg, {icon: 6, time: 1000});
