@@ -54,7 +54,7 @@ return [
     // +----------------------------------------------------------------------
 
     // 默认模块名
-    'default_module' => 'index',
+    'default_module' => 'admin',
     // 禁止访问模块
     'deny_module_list' => ['common'],
     // 默认控制器名
@@ -209,7 +209,7 @@ return [
         // 是否自动开启 SESSION
         'auto_start' => true,
         //SESSION有效期
-        'expire'=>3600,
+//        'expire'=>3600,
     ],
 
     // +----------------------------------------------------------------------
@@ -279,13 +279,18 @@ return [
         'key_path' => __PUBLIC__ . '/apiclient_key.pem'
     ],
     //支付回调地址
-    'notify_url' => __URL__ . '/admin/PayResult',
+    'notify'=>[
+        'weixin'=>__URL__.'admin/PayResult/weixinPay',
+        'ali'=>__URL__.'admin/PayResult/aliPay'
+    ],
     'recommendKey' => 10,   //推荐搜索关键字数量
     'order_status' => [
         '0' => '待支付',
-        '1' => '待收货',
-        '2' => '已完成',
-        '3' => '订单关闭',
+        '1' => '待发货',
+        '2' => '待收货',
+        '3' => '已完成',
+        '4' => '售后',
+        '5' => '已关闭',
     ],
     'pay_type' => [
         '0' => '未支付',

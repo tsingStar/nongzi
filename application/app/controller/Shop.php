@@ -159,6 +159,8 @@ class Shop extends Controller
         $temp = [];
         foreach ($data as $item){
             $temp[$item['cate_parent_id']]['image'] = $item['word_image']?__URL__.$item['word_image']:"";
+            $temp[$item['cate_parent_id']]['cate_id'] = $item['cate_parent_id'];
+            $temp[$item['cate_parent_id']]['cate_name'] = $item['name'];
             $temp[$item['cate_parent_id']]['data'][] = model('Product')->formatOne($item);;
         }
 

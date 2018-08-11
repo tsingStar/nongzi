@@ -179,8 +179,7 @@ class User extends BaseUser
     }
 
 
-    //TODO 小程序专用
-
+    //TODO 待处理
 
     /**
      *  获取账单详情

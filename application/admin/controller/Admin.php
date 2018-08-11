@@ -49,6 +49,11 @@ class Admin extends BaseController
             $map['uname'] = input('get.uname');
         }
         $adminList = $this->adminModel->getAdminList($map);
+        foreach ($adminList as $l){
+            $one_name = model('Department')->where('id', $l['department_pid'])->value('name');
+            $two_name = model('Department')->where('id', $l['department_id'])->value('name');
+            $l['depart'] = $one_name.'-'.$two_name;
+        }
         $this->assign('list', $adminList);
         return $this->fetch();
     }
@@ -74,6 +79,9 @@ class Admin extends BaseController
                 exit_json(-1, '保存失败');
             }
         }else{
+            $dep = model('Department')->select();
+            $dep_list = getTree($dep, 0);
+            $this->assign('dep_list', json_encode($dep_list));
             return $this->fetch();
         }
     }
@@ -90,7 +98,7 @@ class Admin extends BaseController
         if(request()->isAjax()){
             $data = input('post.');
             $data['role_id'] = join(',', $data['role_id']);
-            $res = $this->adminModel->allowField(['role_id', 'uname', 'describe', 'name'])->save($data, ['id'=>$data['id']]);
+            $res = $this->adminModel->allowField(['role_id', 'uname', 'describe', 'name', 'department_id', 'department_pid'])->save($data, ['id'=>$data['id']]);
             if($res){
                 exit_json(1, '保存成功');
             }else{
@@ -99,6 +107,9 @@ class Admin extends BaseController
         }else{
             $admin = $this->adminModel->where('id', 'eq', input('adminId'))->find();
             $roleArr = explode(',', $admin['role_id']);
+            $dep = model('Department')->select();
+            $dep_list = getTree($dep, 0);
+            $this->assign('dep_list', json_encode($dep_list));
             $this->assign('admin', $admin);
             $this->assign('roleArr', $roleArr);
             return $this->fetch();

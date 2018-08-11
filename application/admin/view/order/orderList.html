@@ -49,18 +49,14 @@
             <table class="table table-border table-bordered table-bg table-hover table-sort">
                 <thead>
                 <tr class="text-c">
-                    <th width="50">店铺名称</th>
                     <th width="50">订单编号</th>
                     <th width="60">下单时间</th>
-                    <th width="60">下单会员</th>
+                    <th width="60">下单客户</th>
                     <th width="30">订单状态</th>
-                    <th width="30">配送状态</th>
                     <th width="30">支付方式</th>
-                    <th width="30">订单总金额</th>
+                    <th width="30">商品总金额</th>
+                    <th width="30">运费</th>
                     <th width="60">支付总金额</th>
-                    <th width="60">配送方式</th>
-                    <th width="60">预计配送/到店自提时间</th>
-                    <th width="60">实际配送/到店自提时间</th>
                     <th width="100">操作</th>
                 </tr>
                 </thead>
@@ -72,13 +68,7 @@
                     <td>{$item.create_time}</td>
                     <td>{$item.username}</td>
                     <td>
-                        {if $item.is_apply_refund == 0}
                         {:config('order_status')[$item.order_status]}
-                        {elseif $item.is_apply_refund == 1/}
-                        申请退款
-                        {else/}
-                        已退款
-                        {/if}
                     </td>
                     <td class="is_send">
                         {if $item.is_send == 0}

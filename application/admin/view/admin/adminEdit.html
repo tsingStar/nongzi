@@ -16,6 +16,21 @@
                 <input type="text" class="input-text" value="{$admin.name}" placeholder="" id="name" name="name">
             </div>
         </div>
+
+
+		<div class="row cl">
+			<label class="form-label col-xs-4 col-sm-3"><span class="c-red">*</span>所属部门：</label>
+			<div class="formControls col-xs-8 col-sm-9">
+                <span class="select-box" style="width: 200px;">
+                    <input type="hidden" id="department_pid" name="department_pid">
+                    <select id="department_pid1" class="select" size="1"></select>
+                </span>
+				<span class="select-box" style="width: 200px;">
+                    <select id="department_id" name="department_id" class="select" size="1"></select>
+                </span>
+			</div>
+		</div>
+
 		<div class="row cl">
 			<label class="form-label col-xs-4 col-sm-3"><span class="c-red">*</span>角色：</label>
 			<div class="formControls col-xs-8 col-sm-9">
@@ -45,6 +60,39 @@
 <!--请在下方写此页面业务相关的脚本--> 
 <script type="text/javascript">
     $(function(){
+        var $dep_list = {$dep_list};
+        var opts = '';
+        $.each($dep_list, function(i, v){
+            if({$admin['department_pid']} == v.id){
+                opts += '<option value="'+i+'" selected>'+v.name+'</option>';
+            }else{
+                opts += '<option value="'+i+'">'+v.name+'</option>';
+			}
+        });
+        $("#department_pid1").html(opts);
+        var cateId = $("#department_pid1").val();
+        $("#department_pid").val($dep_list[cateId].id);
+        var opts1= '';
+        $.each($dep_list[cateId].children, function (i1,v1) {
+            if(v1.id == {$admin['department_id']}){
+                opts1 += '<option value="'+v1.id+'" selected>'+v1.name+'</option>';
+            }else{
+                opts1 += '<option value="'+v1.id+'">'+v1.name+'</option>';
+			}
+        });
+        $("#department_id").html(opts1);
+        $("#department_pid1").on('change', function () {
+            var id = $(this).val();
+            $("#department_pid").val($dep_list[id].id);
+            var opts2 = "";
+            $.each($dep_list[id].children, function (i1,v1) {
+                opts2 += '<option value="'+v1.id+'">'+v1.name+'</option>';
+            });
+            $("#department_id").html(opts2);
+        });
+
+
+
         $("#form-admin-edit").validate({
             rules:{
                 uname:{

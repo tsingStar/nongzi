@@ -74,5 +74,34 @@ class Index extends BaseController
         exit_json(1, '退出成功');
     }
 
+    /**
+     * 更改密码
+     */
+    public function changePassword()
+    {
+        if (request()->isAjax()) {
+            $admin_id = session(config('adminKey'));
+            if ($admin_id) {
+                $password = input('password');
+                $new_password = input('new_password');
+                $r = model('Admins')->where('id', $admin_id)->find();
+                if ($r['password'] != md5($password)) {
+                    exit_json(-1, '密码错误');
+                } else {
+                    $res = $r->save(['password' => md5($new_password)]);
+                    if ($res) {
+                        session('admin', null);
+                        exit_json(1, '更改成功');
+                    } else {
+                        exit_json(-1, '更改失败');
+                    }
+                }
+            } else {
+                exit_json(-1, '用户不存在');
+            }
+        }
+        return $this->fetch();
+    }
+
 
 }

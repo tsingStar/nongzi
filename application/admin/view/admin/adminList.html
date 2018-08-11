@@ -9,31 +9,32 @@
 			<input type="text" onfocus="WdatePicker({maxDate:'#F{ $dp.$D(\'datemax\')}'})" id="datemin" name="mintime" class="input-text Wdate" style="width:120px;">
 			-
 			<input type="text" onfocus="WdatePicker({minDate:'#F{ $dp.$D(\'datemin\')}'})" id="datemax" name="maxtime" class="input-text Wdate" style="width:120px;">
-			<input type="text" class="input-text" style="width:250px" placeholder="输入管理员名称" id="uname" name="uname">
+			<input type="text" class="input-text" style="width:250px" placeholder="输入用户名称" id="uname" name="uname">
 			<button type="submit" class="btn btn-success" id="" name=""><i class="Hui-iconfont">&#xe665;</i> 搜用户</button>
 		</div>
 	</form>
 	<div class="cl pd-5 bg-1 bk-gray mt-20">
 		<span class="l">
-			<a href="javascript:;" onclick="admin_add('添加管理员','{:url("Admin/adminAdd")}','800','500')" class="btn btn-primary radius">
-				<i class="Hui-iconfont">&#xe600;</i> 添加管理员
+			<a href="javascript:;" onclick="admin_add('添加用户','{:url(\'adminAdd\')}','800','500')" class="btn btn-primary radius">
+				<i class="Hui-iconfont">&#xe600;</i> 添加用户
 			</a>
 		</span>
 	</div>
 	<table class="table table-border table-bordered table-bg">
 		<thead>
 			<tr>
-				<th scope="col" colspan="9">管理员列表</th>
+				<th scope="col" colspan="9">用户列表</th>
 			</tr>
 			<tr class="text-c">
 				<th width="25"><input type="checkbox" name="" value=""></th>
 				<th width="40">ID</th>
 				<th width="150">用户名</th>
-				<th width="90">管理员名称</th>
-				<th>角色</th>
+				<th width="90">用户名称</th>
+                <th>角色</th>
+                <th>所属部门</th>
 				<th>描述</th>
 				<th width="130">创建时间</th>
-				<th width="100">是否已启用</th>
+				<!--<th width="100">是否已启用</th>-->
 				<th width="100">操作</th>
 			</tr>
 		</thead>
@@ -49,30 +50,31 @@
 						{$roleList[$r]},
 					{/foreach}
 				</td>
-				<td>{$v.describe}</td>
+                <td>{$v.depart}</td>
+                <td>{$v.describe}</td>
 				<td>{$v.create_time}</td>
-				<td class="td-status">
-					{if $v.enable==1}
-					<span class="label label-success radius">已启用</span>
-					{else}
-					<span class="label label-default radius">已禁止</span>
-					{/if}
-				</td>
+				<!--<td class="td-status">-->
+					<!--{if $v.enable==1}-->
+					<!--<span class="label label-success radius">已启用</span>-->
+					<!--{else}-->
+					<!--<span class="label label-default radius">已禁止</span>-->
+					<!--{/if}-->
+				<!--</td>-->
 				<td class="td-manage">
-					{if $v.enable == 1}
-					<a style="text-decoration:none" onClick="admin_stop(this,'{$v.id}')" href="javascript:;" title="停用">
-						<i class="Hui-iconfont">&#xe631;</i>
-					</a>
-					{else}
-					<a style="text-decoration:none" onClick="admin_start(this,'{$v.id}')" href="javascript:;" title="启用">
-						<i class="Hui-iconfont">&#xe615;</i>
-					</a>
-					{/if}
-					<a title="编辑" href="javascript:;" onclick="admin_edit('管理员编辑','{:url("Admin/adminEdit")}?adminId={$v.id}','','800','500')" class="ml-5" style="text-decoration:none">
-						<i class="Hui-iconfont">&#xe6df;</i>
+					<!--{if $v.enable == 1}-->
+					<!--<a style="text-decoration:none" onClick="admin_stop(this,'{$v.id}')" href="javascript:;" title="停用">-->
+						<!--<i class="Hui-iconfont">&#xe631;</i>-->
+					<!--</a>-->
+					<!--{else}-->
+					<!--<a style="text-decoration:none" onClick="admin_start(this,'{$v.id}')" href="javascript:;" title="启用">-->
+						<!--<i class="Hui-iconfont">&#xe615;</i>-->
+					<!--</a>-->
+					<!--{/if}-->
+					<a title="编辑" href="javascript:;" onclick="admin_edit('管理员编辑','{:url(\'Admin/adminEdit\')}?adminId={$v.id}','','800','500')" class="ml-5" style="text-decoration:none">
+						<i class="Hui-iconfont">&#xe6df;</i>编辑
 					</a>
 					<a title="删除" href="javascript:;" onclick="admin_del(this,'{$v.id}')" class="ml-5" style="text-decoration:none">
-						<i class="Hui-iconfont">&#xe6e2;</i>
+						<i class="Hui-iconfont">&#xe6e2;</i>删除
 					</a>
 				</td>
 			</tr>
