@@ -1,0 +1,62 @@
+{include file='pub/header'/}
+<title>退货详情</title>
+</head>
+<body>
+<div class="page-container">
+    <form class="form form-horizontal" id="product_add">
+        <div class="row cl">
+            <label class="form-label col-xs-4 col-sm-2"><span class="c-red">*</span>退货商品详情：</label>
+            <div class="formControls col-xs-8 col-sm-9">
+                <table class="table table-border table-bordered table-bg table-hover">
+                    <thead>
+                    <tr class="text-c">
+                        <td>商品名称</td>
+                        <td>规格</td>
+                        <td>价格</td>
+                        <td>数量</td>
+                        <td>总价</td>
+                    </tr>
+                    </thead>
+                    <tbody>
+                    {foreach $list as $good}
+                    <tr class="text-c">
+                        <td>{$good.name}</td>
+                        <td>{$good.prop_name}</td>
+                        <td>{$good.price}</td>
+                        <td>{$good.num}</td>
+                        <td>{:sprintf("%.2f", $good.price*$good.num)}</td>
+                    </tr>
+                    {/foreach}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+        <div class="row cl">
+            <label class="form-label col-xs-4 col-sm-2"><span class="c-red">*</span>退货地址：</label>
+            <div class="formControls col-xs-8 col-sm-9">
+                <input type="text" class="input-text" name="address">
+            </div>
+        </div>
+        <div class="row cl">
+            <div class="col-xs-8 col-sm-9 col-xs-offset-4 col-sm-offset-2">
+                <a href="javascript:;" class="btn btn-secondary radius" onclick="order_refund()"><i class="Hui-iconfont">&#xe632;</i>确定退货
+                </a>
+            </div>
+        </div>
+    </form>
+</div>
+{include file="pub/footer"/}
+<script>
+    //确定退货
+    function order_refund() {
+
+
+
+
+
+
+    }
+
+</script>
+</body>
+</html>

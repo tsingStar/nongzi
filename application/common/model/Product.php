@@ -75,29 +75,29 @@ class Product extends Model
     public function getListByCateId($cate_id)
     {
 
-        $product = [
-            'id'=>3468,
-            'thumb_img'=>__URL__."/upload/20180730/0f67922f113bff0df803cac8e95a5d7d.png",
-            'name'=>'测试商品',
-            'prop_name'=>'200克*50瓶/箱',
-            'price_comb'=>'260元/箱',
-            'price_one'=>'10元/瓶',
-        ];
-        
-        $list = [];
-        for($i=0;$i<10;$i++){
-            $list[] = $product;
-        }
-        return $list;
+//        $product = [
+//            'id'=>3468,
+//            'thumb_img'=>__URL__."/upload/20180730/0f67922f113bff0df803cac8e95a5d7d.png",
+//            'name'=>'测试商品',
+//            'prop_name'=>'200克*50瓶/箱',
+//            'price_comb'=>'260元/箱',
+//            'price_one'=>'10元/瓶',
+//        ];
+//
+//        $list = [];
+//        for($i=0;$i<10;$i++){
+//            $list[] = $product;
+//        }
+//        return $list;
 
         //TODO 正式上线加载正式数据
 
-//        $list = $this->where('cate_id', $cate_id)->select();
-//        $data = [];
-//        foreach ($list as $l){
-//            $data[] = $this->formatOne($l);
-//        }
-//        return $data;
+        $list = $this->where('cate_id', $cate_id)->select();
+        $data = [];
+        foreach ($list as $l){
+            $data[] = $this->formatOne($l);
+        }
+        return $data;
     }
 
     /**

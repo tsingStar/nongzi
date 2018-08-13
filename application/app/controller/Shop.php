@@ -53,7 +53,7 @@ class Shop extends Controller
      */
     public function getCateIndex()
     {
-        $res = model('product_cate')->where('is_index', 1)->field('id, name, ord, is_index, image')->order('ord desc')->limit(7)->select();
+        $res = model('product_cate')->where('is_index', 1)->field('id, name, ord, is_index, image')->order('ord')->limit(8)->select();
         $list = [];
         foreach ($res as $r) {
             $t = $r;

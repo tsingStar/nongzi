@@ -1,0 +1,46 @@
+{include file='pub/header'/}
+<title>订单详情</title>
+</head>
+<body>
+<div class="page-container">
+    <form class="form form-horizontal" id="product_add" method="post">
+        <input type="hidden" name="order_id" value="{$order['id']}">
+        <div class="row cl">
+            <label class="form-label col-xs-4 col-sm-2"><span class="c-red">*</span>原订单运费：</label>
+            <div class="formControls col-xs-8 col-sm-9">
+                {$order['send_fee']}
+            </div>
+        </div>
+        <div class="row cl">
+            <label class="form-label col-xs-4 col-sm-2"><span class="c-red">*</span>新运费：</label>
+            <div class="formControls col-xs-8 col-sm-9">
+                <input type="number" value="0" name="send_fee" class="input-text" required>
+            </div>
+        </div>
+        <div class="row cl">
+            <div class="col-xs-8 col-sm-9 col-xs-offset-4 col-sm-offset-2">
+                <a href="javascript:;" class="btn btn-secondary radius" onclick="$('form').submit()"><i class="Hui-iconfont">&#xe632;</i>确定配送
+                </a>
+            </div>
+        </div>
+    </form>
+</div>
+{include file="pub/footer"/}
+<script>
+    $(function(){
+        $('form').validate({
+            submitHandler:function (form) {
+                $(form).ajaxSubmit(function (res) {
+                    if(res.code == 1){
+                        parent.location.reload();
+                    }else{
+                        layer.msg(res.msg);
+                    }
+                });
+            }
+        });
+    })
+
+</script>
+</body>
+</html>

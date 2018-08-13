@@ -25,6 +25,7 @@ class Pub extends Controller
 
     public function getVersion()
     {
+
         $version = input('version');
         if ($version == config('version')) {
             exit_json(-1, '当前版本为最新版本');

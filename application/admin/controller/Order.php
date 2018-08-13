@@ -22,17 +22,12 @@ class Order extends BaseController
      */
     public function orderList()
     {
-//        $order = model('order');
-//        $where = [];
-//        $where['shop_id'] = SHOP_ID;
-//        $where['create_time'] = ['gt', strtotime(date('Y-m-d'))];
-//        $order_list = $order->where($where)->select();
-//        $this->assign('list', $order_list);
+        $this->assign('is_admin', 1);
         if (request()->isPost()) {
             $order = model('order');
             $where = [];
             if (input('searchKey') && input('searchValue')) {
-                $where[input('a.searchKey')] = input('searchValue');
+                $where[input('searchKey')] = input('searchValue');
             }
 
             if (input('order_status') !== "") {
@@ -50,7 +45,7 @@ class Order extends BaseController
                     ['elt', strtotime(input('end_time') . '+1 day')]
                 ];
             }
-            $order_list = $order->alias('a')->join('user b', 'a.user_id=b.id')->field('a.*, b.username, b.phone')->where($where)->select();
+            $order_list = $order->alias('a')->join('user b', 'a.user_id=b.id')->field('a.*, b.user_name, b.telephone')->where($where)->select();
             $this->assign('list', $order_list);
             return $this->fetch('orderList');
         }
@@ -59,16 +54,16 @@ class Order extends BaseController
     }
 
     /**
-     * 根据条件获取订单信息
+     * 销售客服订单
      */
-    public function orderData()
+    public function salerOrderList()
     {
-        $order = model('order');
-        $where = [];
+        $vip_code = model('Admins')->where('id', session(config('adminKey')))->value('vip_code');
+        $user_ids = model('User')->where('vip_code', $vip_code)->column('id');
+        $where = ['a.user_id'=>['in', $user_ids]];
         if (input('searchKey') && input('searchValue')) {
-            $where[input('a.searchKey')] = input('searchValue');
+            $where[input('searchKey')] = input('searchValue');
         }
-
         if (input('order_status') !== "") {
             $where['a.order_status'] = input('order_status');
         }
@@ -84,9 +79,44 @@ class Order extends BaseController
                 ['elt', strtotime(input('end_time') . '+1 day')]
             ];
         }
-        $order_list = $order->alias('a')->join('user b', 'a.user_id=b.id')->field('a.*, b.username, b.phone')->where($where)->order('a.create_time desc')->select();
-        $this->assign('list', $order_list);
+        $orderList = model('Order')->alias('a')->join('user b', 'a.user_id=b.id')->field('a.*, b.user_name, b.telephone')->where($where)->select();
+        $this->assign('list', $orderList);
+        $this->assign('is_show', 1);
         return $this->fetch('orderList');
+    }
+
+    /**
+     * 订单配送，订单详情
+     */
+    public function orderSend()
+    {
+        $order_det = model('OrderDet')->where('order_no', input('order_no'))->select();
+        $this->assign('list', $order_det);
+        $this->assign('order_no', input('order_no'));
+        return $this->fetch();
+    }
+
+    /**
+     * 确认订单发货
+     */
+    public function sureSend()
+    {
+        $order_no = input('order_no');
+        $order = model('Order')->where('order_no', $order_no)->find();
+        if ($order) {
+            if ($order['order_status'] == 1) {
+                $res = $order->save(['order_status' => 2, 'send_time' => date('Y-m-d H:i'), 'is_send' => 1]);
+                if ($res) {
+                    exit_json();
+                } else {
+                    exit_json(-1, '操作失败');
+                }
+            } else {
+                exit_json(-1, '订单状态异常');
+            }
+        } else {
+            exit_json(-1, '订单不存在');
+        }
     }
 
     /**
@@ -96,7 +126,7 @@ class Order extends BaseController
     {
         $order_id = input('order_id');
         $order = model('order');
-        $item = $order->alias('a')->join('user b', 'a.user_id=b.id')->field('a.*, b.username, b.phone')->where('a.id', $order_id)->find();
+        $item = $order->alias('a')->join('user b', 'a.user_id=b.id')->field('a.*, b.user_name, b.telephone')->where('a.id', $order_id)->find();
         $order_det = model('order_det');
         $good_list = $order_det->where('order_no', $item['order_no'])->select();
         $this->assign('item', $item);
@@ -104,6 +134,52 @@ class Order extends BaseController
         return $this->fetch();
     }
 
+    /**
+     * 运费调整
+     */
+    public function sendFeeChange()
+    {
+        $order_id = input('order_id');
+        $order = model('Order')->where('id', $order_id)->find();
+        if ($order) {
+            if (request()->isAjax()) {
+                if($order['order_status'] != 0){
+                    exit_json(-1, '订单状态错误');
+                }
+                $send_fee = input('send_fee');
+                $res = $order->save([
+                    'send_fee'=>$send_fee,
+                    'order_money'=>$order['total_money']+$send_fee
+                ]);
+                if($res){
+                    exit_json();
+                }else{
+                    exit_json(-1, '修改失败');
+                }
+            } else {
+                $this->assign('order', $order);
+                return $this->fetch();
+            }
+        } else {
+            exit_json(-1, '订单不存在');
+        }
+    }
+
+    /**
+     * 订单退款
+     */
+    public function orderRefund()
+    {
+        $order_no = input('order_no');
+        $order_refund = model('OrderRefund')->where('order_no', $order_no)->find();
+        $list = model('OrderDet')->whereIn('id', $order_refund['refund_detail'])->select();
+        $this->assign('order_refund', $order_refund);
+        $this->assign('list', $list);
+        return $this->fetch();
+    }
+
+
+    //TODO 待处理
 
 
 
@@ -124,39 +200,39 @@ class Order extends BaseController
             $this->assign('list', $order_list);
             $this->assign('filename', date('Y-m-d') . '.xls');
             $android_num = model('user')->where([
-                'creattime'=>[
-                ['egt', strtotime($start_time)],
-                ['elt', strtotime($end_time . "+1 day")]
-                ],
-                'device'=>'Android'
-            ])->count();
-            $iphone_num = model('user')->where([
-                'creattime'=>[
+                'creattime' => [
                     ['egt', strtotime($start_time)],
                     ['elt', strtotime($end_time . "+1 day")]
                 ],
-                'device'=>'iPhone'
+                'device' => 'Android'
+            ])->count();
+            $iphone_num = model('user')->where([
+                'creattime' => [
+                    ['egt', strtotime($start_time)],
+                    ['elt', strtotime($end_time . "+1 day")]
+                ],
+                'device' => 'iPhone'
             ])->count();
             $active_num = model('order')->where([
-                'create_time'=>[
+                'create_time' => [
                     ['egt', strtotime($start_time)],
                     ['elt', strtotime($end_time . "+1 day")]
                 ]
             ])->group('user_id')->count();
             $reg_data = [
-                'android'=>$android_num,
-                'iphone'=>$iphone_num,
-                'active_num'=>$active_num
+                'android' => $android_num,
+                'iphone' => $iphone_num,
+                'active_num' => $active_num
             ];
             $this->assign('reg_data', $reg_data);
             $shop_list = model('shop')->column('id', 'shopname');
             $amount = [];
-            foreach ($shop_list as $k=>$v){
+            foreach ($shop_list as $k => $v) {
                 $amount["$k"] = model('order')->where([
-                    'pay_status'=>1,
-                    'is_apply_refund'=>['in', [0, 1, 3]],
-                    'shop_id'=>$v,
-                    'create_time'=>[
+                    'pay_status' => 1,
+                    'is_apply_refund' => ['in', [0, 1, 3]],
+                    'shop_id' => $v,
+                    'create_time' => [
                         ['egt', strtotime($start_time)],
                         ['elt', strtotime($end_time . "+1 day")]
                     ]
@@ -166,85 +242,6 @@ class Order extends BaseController
             return $this->fetch('excel');
         }
         return $this->fetch();
-    }
-
-    /**
-     * 配送订单
-     */
-    public function send_order()
-    {
-        $order_id = input('order_id');
-        $order = model('order')->where('id', $order_id)->find();
-        $res = $order->save(['is_send' => 1, 'send_time' => date('Y-m-d H:i:s')]);
-        if ($res) {
-            try {
-                $sixun = new SixunOpera();
-                $order['order_det'] = model('order_det')->where('order_no', $order['order_no'])->select();
-                $sixun->writeOrder($order);
-            } catch (\Exception $e) {
-                Log::error($e->getMessage());
-            }
-            exit_json();
-        } else {
-            exit_json(-1, '操作失败');
-        }
-    }
-
-    /**
-     * 确认收获
-     */
-    public function sure_order()
-    {
-        $order_id = input('order_id');
-        $order = model('order')->where('id', $order_id)->find();
-        if ($order['order_status'] == 1) {
-            $res = $order->save(['order_status' => 2, 'sure_time' => date('Y-m-d H:i:s')]);
-            if ($res) {
-                exit_json();
-            } else {
-                exit_json(-1, '操作失败');
-            }
-        } else {
-            exit_json(-1, '订单状态错误');
-        }
-    }
-
-    /**
-     * 订单打印
-     */
-    public function order_print()
-    {
-        $order_id = input('order_id');
-        $order = model('order')->alias('a')->join('shop b', 'a.shop_id=b.id')->join('user c', 'a.user_id=c.id')->where('a.id', $order_id)->field('a.*, b.address shop_address, b.phone, c.username user_name, c.phone user_phone')->find();
-        $order_det = model('order_det')->where('order_no', $order['order_no'])->select();
-        $order['order_det'] = $order_det;
-        $this->assign('order', $order);
-        return $this->fetch();
-    }
-
-    /**
-     * 当日订单
-     */
-    public function todayList()
-    {
-
-        $order = model('order');
-        $where = [];
-        if (input('searchKey') && input('searchValue')) {
-            $where[input('a.searchKey')] = input('searchValue');
-        }
-
-        if (input('order_status') !== "") {
-            $where['a.order_status'] = input('order_status');
-        }
-        $where['a.create_time'] = [
-            ['egt', strtotime(date('Y-m-d'))],
-            ['elt', strtotime(date('Y-m-d') . '+1 day')]
-        ];
-        $order_list = $order->alias('a')->join('user b', 'a.user_id=b.id')->field('a.*, b.username, b.phone')->where($where)->select();
-        $this->assign('list', $order_list);
-        $this->assign('is_show', 1);
-        return $this->fetch('orderList');
     }
 
 

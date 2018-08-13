@@ -59,7 +59,7 @@ class Order extends BaseUser
             'cart_ids' => $cart_ids,
             'src' => 1,
             'count' => $count,
-            'order_money'=>$send_fee+$total_money
+            'order_money' => $send_fee + $total_money
         ];
         $prepay_id = uniqid(USER_ID);
         $data['prepay_id'] = $prepay_id;
@@ -78,6 +78,9 @@ class Order extends BaseUser
         $num = input('num');
         $p = model('Product')->where('id', $product_id)->find();
         $prop_attr = model('ProductAttr')->where('product_id', $product_id)->where('prop_value_attr', $prop_value)->find();
+        if ($prop_attr['remain'] < $num) {
+            exit_json(-1, '商品库存不足');
+        }
         $total_money = sprintf('%.2f', $num * $prop_attr['price_comb']);
         $pros = [
             [
@@ -102,7 +105,7 @@ class Order extends BaseUser
             'cart_ids' => '',
             'src' => 2,
             'count' => $num,
-            'order_money'=>$send_fee+$total_money
+            'order_money' => $send_fee + $total_money
         ];
         $prepay_id = uniqid(USER_ID);
         $data['prepay_id'] = $prepay_id;
@@ -259,7 +262,7 @@ class Order extends BaseUser
         $orderList = model('Order')->where('user_id', USER_ID)->where('order_status', $order_status)->field('order_no, receiver_name, receiver_telephone, address, remarks, send_fee, order_status, order_money')->limit($offset, $pageNum)->order('create_time desc')->select();
         foreach ($orderList as $order) {
             $order_no = $order['order_no'];
-            $order_det = model('OrderDet')->where('order_no', $order_no)->field('name, thumb_img, prop_value_attr, prop_name, price price_comb, num, price*num total_price, product_id')->select();
+            $order_det = model('OrderDet')->where('order_no', $order_no)->field('id det_id, name, thumb_img, prop_value_attr, prop_name, price price_comb, num, price*num total_price, product_id')->select();
             $order['order_det'] = $order_det;
         }
         exit_json(1, '请求成功', $orderList);
@@ -271,11 +274,99 @@ class Order extends BaseUser
     public function getBuyAndSupply()
     {
         $type = input('type');
-        if($type != 1 && $type != 2){
+        if ($type != 1 && $type != 2) {
             exit_json(-1, '参数错误');
         }
         $list = model('BuySupply')->where('type', $type)->where('user_id', USER_ID)->field('product_name, num, telephone, description, remarks')->select();
         exit_json(1, '请求成功', $list);
+    }
+
+    /**
+     * 确认收获
+     */
+    public function sureOrder()
+    {
+        $order_no = input('order_no');
+        $orderModel = model('order');
+        $order = $orderModel->where('order_no', $order_no)->find();
+        if ($order['order_status'] == 2) {
+            if ($order['user_id'] != USER_ID) {
+                exit_json(-1, '不是当前登陆用户订单');
+            }
+            $order->save(['order_status' => 3, 'sure_time' => date('Y-m-d H:i')]);
+            exit_json();
+        } else {
+            exit_json(-1, '订单状态错误');
+        }
+    }
+
+    /**
+     * 申请退款
+     */
+    public function refundOrder()
+    {
+        $order_no = input('order_no');
+        //退款类型 1 整单  2 单个商品
+        $refund_type = input('refund_type');
+        $refund_detail = input('refund_detail');
+
+        if ($refund_type == 2) {
+            if (count(explode(',', $refund_detail)) < 1) {
+                exit_json(-1, '退货商品不能为空');
+            }
+        }
+        model('Order')->startTrans();
+        model('OrderRefund')->startTrans();
+        $order = model('Order')->where('order_no', $order_no)->find();
+        if ($order) {
+            if ($order['order_status'] == 0 || $order['order_status'] == 5) {
+                exit_json(-1, '订单未支付或订单已关闭');
+            }
+            if ($order['is_apply_refund'] == 1) {
+                exit_json(-1, '申请已提交，等待商家处理');
+            }
+            if ($order['is_apply_refund'] != 0) {
+                exit_json(-1, '退款申请已处理，请联系客服');
+            }
+            $res = $order->save(['order_status' => 4, 'is_apply_refund' => 1]);
+            if ($refund_type == 2) {
+                $c = model('OrderDet')->where('order_no', $order_no)->count();
+                if ($c == count(explode(',', $refund_detail))) {
+                    $refund_type = 1;
+                }
+            }
+            $res1 = model('OrderRefund')->save([
+                'order_no' => $order['order_no'],
+                'refund_type' => $refund_type,
+                'refund_detail' => $refund_detail
+            ]);
+            if ($res && $res1) {
+                model('Order')->commit();
+                model('OrderRefund')->commit();
+                exit_json(1, '申请已提交，等待商家审核');
+            } else {
+                model('Order')->rollback();
+                model('OrderRefund')->commit();
+                exit_json(-1, '系统错误，请联系客服');
+            }
+        } else {
+            exit_json(-1, '订单不存在');
+        }
+    }
+
+    /**
+     * 获取退款详情
+     */
+    public function getRefund()
+    {
+        $order_no = input('order_no');
+        $refund = model('OrderRefund')->where('order_no', $order_no)->find();
+        if ($refund) {
+            exit_json(1, '请求成功', $refund);
+        } else {
+            exit_json(-1, '订单不存在');
+        }
+
     }
 
     //TODO 待处理
@@ -300,24 +391,6 @@ class Order extends BaseUser
         }
     }
 
-    /**
-     * 确认收获
-     */
-    public function sureOrder()
-    {
-        $order_no = input('order_no');
-        $orderModel = model('order');
-        $order = $orderModel->where('order_no', $order_no)->find();
-        if ($order['order_status'] == 1) {
-            if ($order['user_id'] != USER_ID) {
-                exit_json(-1, '不是当前登陆用户订单');
-            }
-            $order->save(['order_status' => 2, 'sure_time' => date('Y-m-d H:i')]);
-            exit_json();
-        } else {
-            exit_json(-1, '订单状态错误');
-        }
-    }
 
     /**
      * 获取申请退款状态
@@ -337,51 +410,6 @@ class Order extends BaseUser
         }
     }
 
-    /**
-     * 申请退款
-     */
-    public function refundOrder()
-    {
-        $order_no = input('order_no');
-        $remarks = input('remarks');
-        $order = model('order')->where('order_no', $order_no)->find();
-        if ($order) {
-            if ($order['order_status'] != 1 || $order['is_send'] == 1) {
-                exit_json(-1, '当前订单不支持线上退款');
-            }
-            if ($order['is_apply_refund'] == 1) {
-                exit_json(-1, '申请已提交，等待商家审核');
-            }
-            if ($order['is_apply_refund'] != 0) {
-                exit_json(-1, '退款申请已处理，请联系客服');
-            }
-            $order->save(['order_status' => 2, 'is_apply_refund' => 1]);
-            model('order_refund')->save([
-                'order_id' => $order['id'],
-                'order_no' => $order['order_no'],
-                'refund_money' => $order['real_cost'],
-                'remarks' => $remarks
-            ]);
-            exit_json(1, '申请已提交，等待商家审核');
-        } else {
-            exit_json(-1, '订单不存在');
-        }
-    }
-
-    /**
-     * 获取退款详情
-     */
-    public function getRefund()
-    {
-        $order_no = input('order_no');
-        $refund = model('order_refund')->where('order_no', $order_no)->find();
-        if ($refund) {
-            exit_json(1, '请求成功', $refund);
-        } else {
-            exit_json(-1, '订单不存在');
-        }
-
-    }
 
     /**
      * 删除订单

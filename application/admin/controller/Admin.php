@@ -72,6 +72,7 @@ class Admin extends BaseController
             if(true !== $check){
                 exit_json(-1, $check);
             }
+            $data['vip_code'] = uniqid();
             $res = $this->adminModel->allowField(true)->isUpdate(false)->save($data);
             if($res){
                 exit_json(1, '保存成功');

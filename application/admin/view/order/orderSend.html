@@ -1,0 +1,57 @@
+{include file='pub/header'/}
+<title>订单详情</title>
+</head>
+<body>
+<div class="page-container">
+    <form class="form form-horizontal" id="product_add">
+        <div class="row cl">
+            <label class="form-label col-xs-4 col-sm-2"><span class="c-red">*</span>商品详情：</label>
+            <div class="formControls col-xs-8 col-sm-9">
+                <table class="table table-border table-bordered table-bg table-hover">
+                    <thead>
+                    <tr class="text-c">
+                        <td>商品名称</td>
+                        <td>规格</td>
+                        <td>价格</td>
+                        <td>数量</td>
+                        <td>总价</td>
+                    </tr>
+                    </thead>
+                    <tbody>
+                    {foreach $list as $good}
+                    <tr class="text-c">
+                        <td>{$good.name}</td>
+                        <td>{$good.prop_name}</td>
+                        <td>{$good.price}</td>
+                        <td>{$good.num}</td>
+                        <td>{:sprintf("%.2f", $good.price*$good.num)}</td>
+                    </tr>
+                    {/foreach}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+        <div class="row cl">
+            <div class="col-xs-8 col-sm-9 col-xs-offset-4 col-sm-offset-2">
+                <a href="javascript:;" class="btn btn-secondary radius" onclick="send_order('{$order_no}')"><i class="Hui-iconfont">&#xe632;</i>确定配送
+                </a>
+            </div>
+        </div>
+    </form>
+</div>
+{include file="pub/footer"/}
+<script>
+    //发货
+    function send_order($order_no){
+        $.post("{:url('sureSend')}", {order_no:$order_no}, function (res) {
+            if(res.code == 1){
+                layer.msg('操作成功');
+                layer_close();
+            }else{
+                layer.msg(res.msg);
+            }
+        });
+    }
+</script>
+</body>
+</html>
