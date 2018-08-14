@@ -10,6 +10,8 @@
 namespace app\admin\controller;
 
 
+use think\Log;
+
 class Order extends BaseController
 {
     protected function _initialize()
@@ -60,7 +62,7 @@ class Order extends BaseController
     {
         $vip_code = model('Admins')->where('id', session(config('adminKey')))->value('vip_code');
         $user_ids = model('User')->where('vip_code', $vip_code)->column('id');
-        $where = ['a.user_id'=>['in', $user_ids]];
+        $where = ['a.user_id' => ['in', $user_ids]];
         if (input('searchKey') && input('searchValue')) {
             $where[input('searchKey')] = input('searchValue');
         }
@@ -143,17 +145,17 @@ class Order extends BaseController
         $order = model('Order')->where('id', $order_id)->find();
         if ($order) {
             if (request()->isAjax()) {
-                if($order['order_status'] != 0){
+                if ($order['order_status'] != 0) {
                     exit_json(-1, '订单状态错误');
                 }
                 $send_fee = input('send_fee');
                 $res = $order->save([
-                    'send_fee'=>$send_fee,
-                    'order_money'=>$order['total_money']+$send_fee
+                    'send_fee' => $send_fee,
+                    'order_money' => $order['total_money'] + $send_fee
                 ]);
-                if($res){
+                if ($res) {
                     exit_json();
-                }else{
+                } else {
                     exit_json(-1, '修改失败');
                 }
             } else {
@@ -172,15 +174,52 @@ class Order extends BaseController
     {
         $order_no = input('order_no');
         $order_refund = model('OrderRefund')->where('order_no', $order_no)->find();
+        if (request()->isAjax()) {
+            $data = input('post.');
+            $data['status'] = 1;
+            $res = $order_refund->save($data);
+            if ($res) {
+                exit_json();
+            } else {
+                exit_json(-1, '操作失败');
+            }
+        }
         $list = model('OrderDet')->whereIn('id', $order_refund['refund_detail'])->select();
         $this->assign('order_refund', $order_refund);
         $this->assign('list', $list);
         return $this->fetch();
     }
 
+    /**
+     * 退款收获
+     */
+    public function getOrder()
+    {
+        $refund_id = input('refund_id');
+        $order = model('OrderRefund')->where('id', $refund_id)->find();
+        if($order){
+            if($order->save(['is_get'=>1])){
+                exit_json();
+            }else{
+                exit_json(-1,'操作失败');
+            }
+        }else{
+            exit_json(-1, '操作失败');
+        }
+    }
+
+    /**
+     * 财务退款列表
+     */
+    public function refundMoney()
+    {
+        $list = model('OrderRefund')->alias('a')->join('Order b', 'a.order_no=b.order_no')->where('a.is_get', 1)->where('a.status', 1)->field('a.*, b.pay_type, b.order_money')->select();
+        $this->assign('list', $list);
+        return $this->fetch();
+    }
+
 
     //TODO 待处理
-
 
 
     /**

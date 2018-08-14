@@ -302,6 +302,10 @@ return [
         '0'=>'店铺配送',
         '1'=>'到店自提'
     ],
-    'version'=>'1.4.1',
-    'download_url'=>__URL__.'/ybt.apk',
+    'xiaochengxu'=>[
+        'app_id'=>'wxb225011076f4415e',
+        'app_secret'=>'2554e8666de05ec6108f095b1a8cc01a'
+    ],
+    'version'=>'V1.1.0',
+    'download_url'=>__URL__.'/nongzi.apk',
 ];

@@ -3,7 +3,7 @@
 </head>
 <body>
 <div class="page-container">
-    <form class="form form-horizontal" id="product_add">
+    <form class="form form-horizontal" method="post">
         <div class="row cl">
             <label class="form-label col-xs-4 col-sm-2"><span class="c-red">*</span>退货商品详情：</label>
             <div class="formControls col-xs-8 col-sm-9">
@@ -34,12 +34,53 @@
         <div class="row cl">
             <label class="form-label col-xs-4 col-sm-2"><span class="c-red">*</span>退货地址：</label>
             <div class="formControls col-xs-8 col-sm-9">
-                <input type="text" class="input-text" name="address">
+                <input type="text" class="input-text" value="{$order_refund.refund_address}" name="refund_address" required>
+            </div>
+        </div>
+        <div class="row cl">
+            <label class="form-label col-xs-4 col-sm-2"><span class="c-red">*</span>退货人：</label>
+            <div class="formControls col-xs-8 col-sm-9">
+                <input type="text" class="input-text" value="{$order_refund.refund_name}" name="refund_name" required>
+            </div>
+        </div>
+        <div class="row cl">
+            <label class="form-label col-xs-4 col-sm-2"><span class="c-red">*</span>退货手机号：</label>
+            <div class="formControls col-xs-8 col-sm-9">
+                <input type="text" class="input-text" value="{$order_refund.refund_telephone}" name="refund_telephone" required>
+            </div>
+        </div>
+        <div class="row cl">
+            <label class="form-label col-xs-4 col-sm-2"><span class="c-red">*</span>收款人信息：</label>
+            <div class="formControls col-xs-8 col-sm-9">
+                {$order_refund.receive_info}
+            </div>
+        </div>
+        <div class="row cl">
+            <label class="form-label col-xs-4 col-sm-2"><span class="c-red">*</span>退货物流单号：</label>
+            <div class="formControls col-xs-8 col-sm-9">
+                {$order_refund.send_no}
+            </div>
+        </div>
+        <div class="row cl">
+            <label class="form-label col-xs-4 col-sm-2"><span class="c-red">*</span>退货状态：</label>
+            <div class="formControls col-xs-8 col-sm-9">
+                {if $order_refund.status eq 1}
+                    退货处理中，等待退款
+                {elseif $order_refund.status eq 2}
+                    退货退款完成
+                {else}
+                    未处理
+                {/if}
+                {if $order_refund.is_get eq 1}
+                    ，退货已收到
+                {/if}
             </div>
         </div>
         <div class="row cl">
             <div class="col-xs-8 col-sm-9 col-xs-offset-4 col-sm-offset-2">
-                <a href="javascript:;" class="btn btn-secondary radius" onclick="order_refund()"><i class="Hui-iconfont">&#xe632;</i>确定退货
+                <a href="javascript:;" class="btn btn-secondary radius" onclick="order_refund()"><i class="Hui-iconfont">&#xe632;</i>同意退货
+                </a>
+                <a href="javascript:;" class="btn btn-secondary radius" onclick="get_order('{$order_refund.id}')"><i class="Hui-iconfont">&#xe632;</i>确认收货
                 </a>
             </div>
         </div>
@@ -47,14 +88,24 @@
 </div>
 {include file="pub/footer"/}
 <script>
+    $(function () {
+       $('form').validate({
+           submitHandler:function (form) {
+               $(form).ajaxSubmit(function(res){
+                   layer.msg(res.msg);
+               })
+           }
+       });
+    });
     //确定退货
     function order_refund() {
-
-
-
-
-
-
+        $('form').submit();
+    }
+    //确认收获
+    function get_order(refund_id){
+        $.post('{:url("getOrder")}', {refund_id:refund_id}, function (res) {
+            layer.msg(res.msg);
+        });
     }
 
 </script>

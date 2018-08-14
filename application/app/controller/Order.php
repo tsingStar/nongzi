@@ -10,8 +10,8 @@
 namespace app\app\controller;
 
 
-use app\common\model\Pay;
 use app\common\model\WeiXinPay;
+use think\Log;
 
 class Order extends BaseUser
 {
@@ -305,6 +305,7 @@ class Order extends BaseUser
      */
     public function refundOrder()
     {
+        Log::error($_POST);
         $order_no = input('order_no');
         //退款类型 1 整单  2 单个商品
         $refund_type = input('refund_type');
@@ -357,16 +358,44 @@ class Order extends BaseUser
     /**
      * 获取退款详情
      */
-    public function getRefund()
+    public function getRefundInfo()
     {
         $order_no = input('order_no');
-        $refund = model('OrderRefund')->where('order_no', $order_no)->find();
+        $refund = model('OrderRefund')->where('order_no', $order_no)->field('id refund_id, refund_address, refund_name, refund_telephone, refund_type, order_no, status, refund_detail')->find();
         if ($refund) {
+            $refund_det = model('OrderDet')->whereIn('id', $refund['refund_detail'])->field('id det_id, name, thumb_img, prop_value_attr, prop_name, price price_comb, num, price*num total_price, product_id')->select();
+            $refund['refund_detail'] = $refund_det;
             exit_json(1, '请求成功', $refund);
         } else {
             exit_json(-1, '订单不存在');
         }
+    }
 
+    /**
+     * 提交退货信息
+     */
+    public function submitRefundInfo()
+    {
+        $refund_id = input('refund_id');
+        $send_no = input('send_no');
+        $receive_info = input('receive_info');
+        $of = model('OrderRefund')->where('id', $refund_id)->find();
+        if ($of) {
+            if ($of['refund_type'] == 2 && $receive_info == "") {
+                exit_json(-1, '部分商品退货需提交收款信息');
+            }
+            $res = $of->save([
+                'send_no' => $send_no,
+                'receive_info' => $receive_info,
+            ]);
+            if ($res) {
+                exit_json();
+            } else {
+                exit_json(-1, '信息提交失败');
+            }
+        } else {
+            exit_json(-1, '退款信息不存在');
+        }
     }
 
     //TODO 待处理

@@ -197,8 +197,8 @@ class Pub extends Controller
      */
     public function loginByWeiXin()
     {
-        $app_id = input('app_id');
-        $app_secret = input('app_secret');
+        $app_id = config('xiaochengxu.app_id');
+        $app_secret = config('xiaochengxu.app_secret');
         $js_code = input('js_code');
         if (!$app_id || !$app_secret || $js_code) {
             exit_json(-1, '参数错误');
@@ -213,9 +213,18 @@ class Pub extends Controller
         if (!session('session_key')) {
             session('session_key', $session_key);
         }
-        exit_json(1, '请求成功', [
-            'open_id' => $open_id
-        ]);
+        $user = model('User')->where('open_id', $open_id)->find();
+        if ($user) {
+            exit_json(1, '请求成功', [
+                'open_id' => $open_id,
+                'status' => 1
+            ]);
+        } else {
+            exit_json(1, '请求成功', [
+                'open_id' => $open_id,
+                'status' => 0
+            ]);
+        }
     }
 
     /**
@@ -223,7 +232,7 @@ class Pub extends Controller
      */
     public function getBindNum()
     {
-        $app_id = input('app_id');
+        $app_id = config('xiaochengxu.app_id');
         $iv = input('iv');
         $encryptedData = input('encryptedData');
         $session_key = session('session_key');

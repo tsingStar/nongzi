@@ -273,5 +273,15 @@ class Shop extends Controller
         }
     }
 
+    /**
+     * 获取客服电话
+     */
+    public function getSevicePhone()
+    {
+        $phone = model('WebContactUs')->value('telephone');
+        exit_json(1, '请求成功', ['phone'=>$phone]);
+
+    }
+
 
 }
