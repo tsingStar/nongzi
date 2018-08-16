@@ -226,6 +226,10 @@ class Role extends BaseController
         if (!$department_id > 0) {
             exit_json(-1, '参数错误');
         }
+        $num = model('Admins')->where('department_pid', $department_id)->whereOr('department_id', $department_id)->count();
+        if($num>0){
+            exit_json(-1,'当前部门下有用户，禁止删除');
+        }
         $res = model('Department')->where('id', $department_id)->whereOr('parent_id', $department_id)->delete();
         if ($res) {
             exit_json();

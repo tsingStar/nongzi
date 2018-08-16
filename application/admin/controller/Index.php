@@ -50,17 +50,42 @@ class Index extends BaseController
      */
     function shouye()
     {
-//        $order_num = model('order')->count();
-//        $order_num_today = model('order')->where(['create_time' => ['between', [strtotime(date('Y-m-d')), strtotime(date('Y-m-d', strtotime('+1 day')))]]])->count();
-//        $order_num_yes = model('order')->where(['create_time' => ['between', [strtotime(date('Y-m-d', strtotime('-1 day'))), strtotime(date('Y-m-d'))]]])->count();
-//        $vip_num = model('user')->count();
-//        $vip_num_today = model('user')->where(['creattime' => ['between', [strtotime(date('Y-m-d')), strtotime(date('Y-m-d', strtotime('+1 day')))]]])->count();
-//        $vip_num_yes = model('user')->where(['creattime' => ['between', [strtotime(date('Y-m-d', strtotime('-1 day'))), strtotime(date('Y-m-d'))]]])->count();
-//        $this->assign('data', ['order_num'=>$order_num, 'order_num_today'=>$order_num_today, 'order_num_yes'=>$order_num_yes,'vip_num'=>$vip_num, 'vip_num_today'=>$vip_num_today, 'vip_num_yes'=>$vip_num_yes]);
-//        $admin = model('admins')->where('id', session('admin_id'))->find();
-//        $this->assign('admin', $admin);
-//        return $this->fetch();
-        echo phpinfo();
+
+        $admin = model('Admins')->where('id', session(config('adminKey')))->find();
+        $role = model('Role')->column('role_name', 'id');
+        $department = model('Department')->column('name', 'id');
+        $this->assign('role', $role);
+        $this->assign('depart', $department);
+        $this->assign('admin', $admin);
+        return $this->fetch();
+    }
+
+    /**
+     * 获取推广二维码
+     */
+    public function getQrcode()
+    {
+        $vip_code = model('Admins')->where('id', session(config('adminKey')))->value('vip_code');
+        $spread_url = "djfkdnfvsnl?vip_code=";
+        require_once VENDOR_PATH.'Qrcode/phpqrcode.php';
+        $file_name = md5(session(config('adminKey'))).'.png';
+        is_dir(__UPLOAD__.'/qrcode') OR mkdir(__UPLOAD__.'/qrcode', 0777, true);
+        $save_path = __UPLOAD__.'/qrcode/'.$file_name;
+        \QRcode::png($spread_url.$vip_code, $save_path, 1, 50);
+        $img_url = __URL__.'/upload/qrcode/'.$file_name;
+        exit_json(1, '请求成功', [
+            'img_url'=>$img_url,
+            'download_url'=>$save_path
+        ]);
+    }
+
+    /**
+     * 下载二维码
+     */
+    public function downQrcode()
+    {
+        $file_name = __UPLOAD__.'/qrcode/'.md5(session(config('adminKey'))).'.png';
+        downfile($file_name);
         exit;
     }
 

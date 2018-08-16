@@ -28,22 +28,74 @@ class Member extends BaseController
         $uname = input('uname');
         $where = [];
         if($start_time && !$end_time){
-            $where['creattime'] = ['egt', $start_time];
+            $where['a.create_time'] = ['egt', $start_time];
         }else if(!$start_time && $end_time){
-            $where['creattime'] = ['elt', $end_time];
+            $where['a.create_time'] = ['elt', $end_time];
         }else if($start_time && $end_time){
-            $where['creattime'] = [
+            $where['a.create_time'] = [
                 ['egt', $start_time],
                 ['elt', $end_time]
             ];
         }
         if($uname){
-            $where['phone|username'] = $uname;
+            $where['a.telephone|a.user_name'] = $uname;
         }
-        $userList = model('user')->where($where)->order('creattime desc')->select();
+        $userList = model('User')->alias('a')->join('Admins b', 'a.vip_code=b.vip_code', 'left')->where($where)->field('a.*, b.name sale_name')->order('a.create_time desc')->select();
         $this->assign('list', $userList);
         return $this->fetch();
     }
+
+    /**
+     * 分配
+     */
+    public function deliver()
+    {
+        if(request()->isAjax()){
+            $id = input('id');
+            $vip_code = input('vip_code');
+            $res = model('User')->save(['vip_code'=>$vip_code], ['id'=>$id]);
+            if($res){
+                exit_json();
+            }else{
+                exit_json(-1, '操作失败');
+            }
+        }
+        $list = model('Admins')->where('vip_code', 'neq', '')->column('name', 'vip_code');
+        $this->assign('list', $list);
+        return $this->fetch();
+
+    }
+
+    /**
+     * 销售客户
+     */
+    public function saleList()
+    {
+        $start_time = strtotime(input('mintime'));
+        $end_time = strtotime(input('maxtime'));
+        $uname = input('uname');
+        $where = ['b.id'=>session(config('adminKey'))];
+        if($start_time && !$end_time){
+            $where['a.create_time'] = ['egt', $start_time];
+        }else if(!$start_time && $end_time){
+            $where['a.create_time'] = ['elt', $end_time];
+        }else if($start_time && $end_time){
+            $where['a.create_time'] = [
+                ['egt', $start_time],
+                ['elt', $end_time]
+            ];
+        }
+        if($uname){
+            $where['a.telephone|a.user_name'] = $uname;
+        }
+        $userList = model('User')->alias('a')->join('Admins b', 'a.vip_code=b.vip_code', 'left')->where($where)->field('a.*, b.name sale_name')->order('a.create_time desc')->select();
+        $this->assign('list', $userList);
+        return $this->fetch();
+        
+    }
+
+
+    //TODO 待处理
 
     /**
      * 更改会员状态

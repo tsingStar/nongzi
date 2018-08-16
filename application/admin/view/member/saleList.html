@@ -33,9 +33,6 @@
             <th>会员名</th>
             <th>手机号</th>
             <th>注册时间</th>
-            <th>邀请码</th>
-            <th>销售</th>
-            <th>操作</th>
         </tr>
         </thead>
         <tbody>
@@ -45,11 +42,6 @@
             <td>{$v.user_name}</td>
             <td>{$v.telephone}</td>
             <td>{$v.create_time}</td>
-            <td>{$v.vip_code}</td>
-            <td>{$v.sale_name}</td>
-            <td>
-                <a class="btn btn-primary radius" href="javascript:;" onclick="deliver('{$v.id}', '{$v.vip_code}')">分配销售</a>
-            </td>
         </tr>
         {/foreach}
         </tbody>
@@ -60,19 +52,6 @@
 <!--请在下方写此页面业务相关的脚本-->
 <script type="text/javascript">
 
-    function deliver(id, code){
-        if(code != ''){
-            layer.confirm('当前客户已有销售客服，是否重新分配？', function () {
-                deli(id);
-            });
-        }else{
-            deli(id);
-        }
-    }
-
-    function deli(id){
-        layer_show('用户名单', '{:url("deliver")}?id='+id);
-    }
 
     $(function () {
         $("table").dataTable();
@@ -80,33 +59,6 @@
     //下载会员信息
     function downloadMember() {
         layer_show('下载订单', "{:url('Member/downloadMember')}", '350', '300');
-    }
-    function member_stop(obj, id) {
-        layer.confirm('确认要停用吗？', function (index) {
-
-            $.post("{:url('Member/changeStatus')}", {id:id, enable:1}, function (res) {
-                if(res.code == 1){
-                    $(obj).parents("tr").find(".td-manage").prepend('<a onClick="member_start(this,id)" href="javascript:;" title="启用" style="text-decoration:none"><i class="Hui-iconfont">&#xe615;</i>启用</a>');
-                    $(obj).parents("tr").find(".td-status").html('<span class="label label-default radius">已禁用</span>');
-                    $(obj).remove();
-                }
-                layer.msg(res.msg, {icon: 6, time: 1000});
-            });
-        });
-    }
-
-    function member_start(obj, id) {
-        layer.confirm('确认要启用吗？', function (index) {
-
-            $.post("{:url('Member/changeStatus')}", {id:id, enable:0}, function (res) {
-                if(res.code == 1){
-                    $(obj).parents("tr").find(".td-manage").prepend('<a onClick="member_stop(this,id)" href="javascript:;" title="停用" style="text-decoration:none"><i class="Hui-iconfont">&#xe631;</i>停用</a>');
-                    $(obj).parents("tr").find(".td-status").html('<span class="label label-success radius">已启用</span>');
-                    $(obj).remove();
-                }
-                layer.msg(res.msg, {icon: 6, time: 1000});
-            });
-        });
     }
 </script>
 </body>

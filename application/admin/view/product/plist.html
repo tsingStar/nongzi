@@ -25,7 +25,7 @@
             </a>
         </div>
         <div class="mt-20">
-            <table class="table table-border table-bordered table-bg table-hover table-sort">
+            <table class="table table-border table-bordered table-bg table-sort">
                 <thead>
                 <tr class="text-c">
                     <th width="40"><input name="" type="checkbox" value=""></th>
@@ -35,13 +35,13 @@
                     <th width="100">产品分类</th>
                     <th width="100">是否首页显示</th>
                     <th width="100">是否热销产品</th>
-
+                    <th width="100">库存状态</th>
                     <th width="100">操作</th>
                 </tr>
                 </thead>
                 <tbody>
                 {foreach $goodsList as $good}
-                <tr class="text-c va-m">
+                <tr class="text-c va-m" {if $good.is_limit eq 1} style="background-color: red;" {/if}>
                     <td><input name="id" type="checkbox" value="{$good.id}"></td>
                     <td>{$good.id}</td>
                     <td>
@@ -60,11 +60,18 @@
                             <input type="checkbox" onchange="setIndex('{$good.id}', this)" {if condition="$good.is_index eq 1"}checked{/if} />
                         </div>
                     </td>
-                    <td class="td-status">
-                        <div class="switch switch-small">
-                            <input type="checkbox" onchange="setHot('{$good.id}', this)" {if condition="$good.is_hot eq 1"}checked{/if} />
-                        </div>
-                    </td>
+                <td class="td-status">
+                    <div class="switch switch-small">
+                        <input type="checkbox" onchange="setHot('{$good.id}', this)" {if condition="$good.is_hot eq 1"}checked{/if} />
+                    </div>
+                </td>
+                <td class="td-status">
+                    {if condition="$good.is_limit eq 1"}
+                    库存不足
+                    {else}
+                    库存正常
+                    {/if}
+                </td>
                     <td class="td-manage">
                         <a style="text-decoration:none" class="ml-5"
                            onClick="product_edit('产品编辑','{:url(\'Product/productEdit\', [\'product_id\'=>$good.id])}')"
@@ -87,7 +94,7 @@
 {include file='pub/footer'/}
 <script type="text/javascript">
     $('.table-sort').dataTable({
-        "aaSorting": [[1, "asc"]],//默认第几个排序
+        "ordering":false,
         "bStateSave": true,//状态保存
     });
 
@@ -108,7 +115,7 @@
     }
     function setHot(product_id, o){
         var is_index = $(o).prop('checked')?1:0;
-        $.post("{:url('setIndex')}", {product_id:product_id, is_hot:is_index}, function (res) {
+        $.post("{:url('setHot')}", {product_id:product_id, is_hot:is_index}, function (res) {
             if(res.code == 1){
                 layer.msg('操作成功');
             }else{

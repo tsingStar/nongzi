@@ -527,4 +527,15 @@ function auto_charset($fContents, $from='gbk', $to='utf-8') {
         return $fContents;
     }
 }
+//下载文件
+function downfile($filename)
+{
+    $file_info = pathinfo($filename);
+    Header( "Content-type:  application/octet-stream ");
+    Header( "Accept-Ranges:  bytes ");
+    Header( "Accept-Length: " .filesize($filename));
+    header( "Content-Disposition:  attachment;  filename= {$file_info['basename']}.".$file_info['extension']);
+    echo file_get_contents($filename);
+    readfile($filename);
+}
 ?>

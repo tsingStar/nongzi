@@ -21,6 +21,8 @@
                 <th width="60">退款类型</th>
                 <th width="30">支付方式</th>
                 <th width="30">订单总金额</th>
+                <th width="30">申请退款详情</th>
+                <th width="30">已退款总金额</th>
                 <th width="60">申请时间</th>
                 <th width="60">最后一次修改时间</th>
                 <th width="30">退款状态</th>
@@ -41,6 +43,20 @@
                 </td>
                 <td>{:config('pay_type')[$item.pay_type]}</td>
                 <td>{$item.order_money}</td>
+                <td>
+                    <table class="table table-bordered table-border">
+                        {foreach $item.refund_detail as $t}
+                            <tr>
+                                <td>{$t['name']}</td>
+                                <td>{$t['prop_name']}</td>
+                                <td>{$t['price']}</td>
+                                <td>{$t['num']}</td>
+                                <td>{:sprintf('%.2f', $t['num']*$t['price'])}</td>
+                            </tr>
+                        {/foreach}
+                    </table>
+                </td>
+                <td>{$item.refund_money}</td>
                 <td>{$item.create_time}</td>
                 <td>{$item.update_time}</td>
                 <td>
@@ -78,8 +94,10 @@
      */
     function backMoney(id, refund_type){
         layer.confirm('确认退款？', function () {
+            // layer.msg('维护中。。。');
+            // return ;
             if(refund_type == '1'){
-                $.post('{:url("backMoney")}', {id, id}, function (res) {
+                $.post('{:url("backMoney")}', {id:id}, function (res) {
                     if(res.code == 1){
                         layer.msg('退款成功');
                     }else{
@@ -87,10 +105,9 @@
                     }
                 });
             }else{
-                layer_show('退款信息补全', '{:url("backMoneyInfo")}?refund_id='+id);
+                layer_show('退款信息补全', '{:url("addRefundInfo")}?refund_id='+id);
             }
         });
-
 
 
 

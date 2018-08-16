@@ -1,0 +1,82 @@
+﻿{include file='pub/header'/}
+<title>订单列表</title>
+</head>
+
+<body class="pos-r">
+<nav class="breadcrumb">{$breadNav} <a class="btn btn-success radius r" style="line-height:1.6em;margin-top:3px"
+                                       href="javascript:location.replace(location.href);" title="刷新"><i
+        class="Hui-iconfont">&#xe68f;</i></a></nav>
+    <div class="page-container">
+        <div class="mt-20">
+            <table class="table table-border table-bordered table-bg table-hover table-sort">
+                <thead>
+                <tr class="text-c">
+                    <th width="60">创建时间</th>
+                    <th width="60">客户名称</th>
+                    <th width="30">客服名称</th>
+                    <th width="30">商品名称</th>
+                    <th width="30">数量</th>
+                    <th width="30">联系电话</th>
+                    <th width="60">描述</th>
+                    <th width="60">备注</th>
+                    <th width="60">图片</th>
+                    <th width="100">状态</th>
+                </tr>
+                </thead>
+                <tbody>
+                {foreach $list as $item}
+                <tr class="text-c va-m">
+                    <td>{$item.create_time}</td>
+                    <td>{$item.user_name}</td>
+                    <td>{$item.sale_name}</td>
+                    <td>{$item.product_name}</td>
+                    <td>{$item.num}</td>
+                    <td>{$item.telephone}</td>
+                    <td>{$item.description}</td>
+                    <td>{$item.remarks}</td>
+                    <td>
+                        <button class="btn-primary radius btn" type="button" onclick="image('{$item.image}')">查看</button>
+                    </td>
+                    <td>
+                        <div class="switch switch-small">
+                            <input type="checkbox" disabled checked="{$item.status==1}" />
+                        </div>
+                    </td>
+                </tr>
+                {/foreach}
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+{include file='pub/footer'/}
+<script type="text/javascript">
+    $('.table-sort').dataTable({
+        // "aaSorting": [[1, "desc"]],//默认第几个排序
+        "bStateSave": true,//状态保存
+        // "aoColumnDefs": [
+        //     {"orderable": false, "aTargets": [8]}// 制定列不参与排序
+        // ],
+    });
+    //查看图片
+    function image($image) {
+        if($image == ""){
+            layer.msg('暂无图片');
+        }else{
+            var imgsurl = $image.split(',');
+            var content = '';
+            $.each(imgsurl, function (i, v) {
+                content += "<img style='' src='" + v + "'/>";
+            });
+            var index = layer.open({
+                type: 1,
+                title: '图片详情',
+                content: content
+            });
+            layer.full(index);
+        }
+    }
+
+</script>
+</body>
+</html>

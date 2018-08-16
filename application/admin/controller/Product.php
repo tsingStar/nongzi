@@ -148,6 +148,14 @@ class Product extends BaseController
         } else {
             $goodsList = model('Product')->order('ord desc, id desc')->select();
         }
+        foreach ($goodsList as $item){
+            $num = model('ProductAttr')->where('product_id', $item['id'])->where('remain < limit_remain')->count();
+            if($num>0){
+                $item['is_limit'] = 1;
+            }else{
+                $item['is_limit'] = 0;
+            }
+        }
         $this->assign('goodsList', $goodsList);
         return $this->fetch();
     }

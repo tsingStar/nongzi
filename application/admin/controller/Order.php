@@ -10,6 +10,7 @@
 namespace app\admin\controller;
 
 
+use app\common\model\WeiXinPay;
 use think\Log;
 
 class Order extends BaseController
@@ -197,13 +198,13 @@ class Order extends BaseController
     {
         $refund_id = input('refund_id');
         $order = model('OrderRefund')->where('id', $refund_id)->find();
-        if($order){
-            if($order->save(['is_get'=>1])){
+        if ($order) {
+            if ($order->save(['is_get' => 1])) {
                 exit_json();
-            }else{
-                exit_json(-1,'操作失败');
+            } else {
+                exit_json(-1, '操作失败');
             }
-        }else{
+        } else {
             exit_json(-1, '操作失败');
         }
     }
@@ -213,9 +214,67 @@ class Order extends BaseController
      */
     public function refundMoney()
     {
-        $list = model('OrderRefund')->alias('a')->join('Order b', 'a.order_no=b.order_no')->where('a.is_get', 1)->where('a.status', 1)->field('a.*, b.pay_type, b.order_money')->select();
+        $list = model('OrderRefund')->alias('a')->join('Order b', 'a.order_no=b.order_no')->where('a.is_get', 1)->field('a.*, b.pay_type, b.order_money, b.refund_money')->select();
+        foreach ($list as $item){
+            $od = model('OrderDet')->whereIn('id', $item['refund_detail'])->select();
+            $item['refund_detail'] = $od;
+        }
         $this->assign('list', $list);
         return $this->fetch();
+    }
+
+    /**
+     * 直接退款
+     */
+    public function backMoney()
+    {
+        $refund_id = input('id');
+        $refund = model('OrderRefund')->where('id', $refund_id)->find();
+        if($refund['status'] != 1 || $refund['is_get'] != 1){
+            exit_json(-1, '订单状态错误');
+        }else{
+            if($refund['refund_type'] == 1){
+
+                //整单退
+                $order = model('Order')->where('order_no', $refund['order_no'])->find();
+                //退款参数
+                $orderInfo = [
+
+                ];
+                $weixin = new WeiXinPay();
+                $res = $weixin->refund($orderInfo);
+                if($res){
+                    $order->save(['refund_money'=>$order['order_money']]);
+                }
+                exit_json();
+            }else{
+                exit_json(-1,' 参数错误');
+            }
+        }
+    }
+
+    /**
+     * 增加退款附加信息
+     */
+    public function addRefundInfo()
+    {
+        $refund_id = input('refund_id');
+        $refund = model('OrderRefund')->where('id', $refund_id)->find();
+        if(request()->isAjax()){
+            if($refund['status'] != 1){
+                exit_json(-1, '退款已处理,无需重复处理');
+            }
+            $image = input('image');
+            $pay_time  = input('pay_time');
+            $refund_money  = input('refund_money');
+            $refund->save(['image'=>$image, 'pay_time'=>$pay_time, 'status'=>2]);
+            $order = model('Order')->where('order_no', $refund['order_no'])->find();
+            $order->save(['refund_money'=>$refund_money]);
+            exit_json();
+        }else{
+            $this->assign('item', $refund);
+            return $this->fetch();
+        }
     }
 
 
