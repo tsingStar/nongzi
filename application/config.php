@@ -255,8 +255,8 @@ return [
         'tempId'=>'8730'
     ],
     'sitename' => '大镰刀农业',
-    'shopkey' => 'shop_id',
-    'adminkey' => 'admin_id',
+    'shopKey' => 'shop_id',
+    'adminKey' => 'admin_id',
     'default_img' => __URL__ . '/default_img.jpg',
     'rongyunKey' => '',
     'rongyunSecret' => '',
