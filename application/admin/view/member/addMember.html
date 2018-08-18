@@ -1,0 +1,46 @@
+{include file='pub/header'/}
+<title></title>
+</head>
+<body>
+<div class="page-container">
+    <form class="form form-horizontal" action="" target="_blank" id="open_time" method="post" enctype="multipart/form-data">
+        <div class="row cl">
+            <label class="form-label col-xs-4 col-sm-2">客户名：</label>
+            <div class="formControls col-xs-8 col-sm-9">
+                <input name="user_name" type="text" class="input-text" required>
+            </div>
+        </div>
+        <div class="row cl">
+            <label class="form-label col-xs-4 col-sm-2">手机号：</label>
+            <div class="formControls col-xs-8 col-sm-9">
+                <input name="telephone" type="text" class="input-text" required>
+            </div>
+        </div>
+        <div class="row cl">
+            <div class="col-xs-8 col-sm-9 col-xs-offset-4 col-sm-offset-2">
+                <button class="btn btn-secondary radius" type="submit"><i class="Hui-iconfont Hui-iconfont-save"></i>添加
+                </button>
+            </div>
+        </div>
+    </form>
+</div>
+
+
+{include file="pub/footer"/}
+<script type="text/javascript">
+    $(function () {
+        $("#open_time").validate({
+            submitHandler:function (form) {
+                $(form).ajaxSubmit(function(res){
+                    if(res.code == 1){
+                        parent.location.reload();
+                    }else{
+                        layer.msg(res.msg);
+                    }
+                })
+            }
+        });
+    });
+</script>
+</body>
+</html>

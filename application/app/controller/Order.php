@@ -207,12 +207,12 @@ class Order extends BaseUser
             exit_json(-1, '订单状态不支持支付');
         }
 
-        if ($orderInfo->getData('create_time') < time() - 30 * 60) {
-            $orderInfo->save(['order_status' => 5]);
-            exit_json(-1, '订单超时');
-        }
+//        if ($orderInfo->getData('create_time') < time() - 30 * 60) {
+//            $orderInfo->save(['order_status' => 5]);
+//            exit_json(-1, '订单超时');
+//        }
         $order = model('Order')->where('order_no', $order_no)->find();
-        //pay_type 支付方式   1 威富通 微信支付  2 支付宝
+        //pay_type 支付方式   1 威富通 微信支付  2 支付宝 3  小程序支付
         if ($order['order_status'] != 0) {
             exit_json(-1, '订单不可支付');
         }
@@ -223,13 +223,24 @@ class Order extends BaseUser
         ];
         if ($pay_type == 1) {
             $pay_data = [
+
+//                $inputObj->SetBody($orderInfo['subject']);
+//            $inputObj->SetDetail($orderInfo['body']);
+//            $inputObj->SetOut_trade_no($orderInfo['out_trade_no']);
+//            $inputObj->SetTotal_fee($orderInfo['total_amount'] * 100);
+//            $inputObj->SetNotify_url($notify_url);
+//            $inputObj->SetTrade_type($orderInfo['trade_type']);
+
                 'out_trade_no' => $order['order_no'],
                 'body' => "订单支付",
                 'total_fee' => $order['order_money'] * 100,
-                'mch_create_ip' => getIp()
+                'mch_create_ip' => getIp(),
+                'subject'=>'订单支付',
+                'total_amount'=>$order['order_money'],
+                'trade_type'=>'APP'
             ];
             $weixin = new WeiXinPay();
-            $result = $weixin->createPrePayOrder($pay_data);
+            $result = $weixin->createPrePayOrder($pay_data, config('notify.weixin'));
             if (isset($result['status'])) {
                 exit_json(-1, '系统错误，稍后重试');
             } else {
@@ -242,8 +253,23 @@ class Order extends BaseUser
 
 
         } else if ($pay_type == 3) {
-            $result = [];
-            $pay_info['xcxpay'] = $result;
+            $pay_data = [
+                'out_trade_no' => $order['order_no'],
+                'body' => "订单支付",
+                'total_fee' => $order['order_money'] * 100,
+                'mch_create_ip' => getIp(),
+                'subject'=>'订单支付',
+                'total_amount'=>$order['order_money'],
+                'trade_type'=>'JSAPI'
+            ];
+            $pay_data['open_id'] = model('User')->where('id', USER_ID)->value('open_id');
+            $weixin = new WeiXinPay();
+            $result = $weixin->createPrePayOrder($pay_data, config('notify.weixin'));
+            if (isset($result['status'])) {
+                exit_json(-1, '系统错误，稍后重试');
+            } else {
+                $pay_info['xcxpay'] = $result;
+            }
         } else {
             exit_json(-1, '参数错误');
         }
@@ -266,6 +292,21 @@ class Order extends BaseUser
             $order['order_det'] = $order_det;
         }
         exit_json(1, '请求成功', $orderList);
+    }
+
+    /**
+     * 获取订单详情
+     */
+    public function getOrderDetail()
+    {
+        $order_no = input('order_no');
+        $order = model('Order')->where('order_no', $order_no)->field('order_no, receiver_name, receiver_telephone, address, remarks, send_fee, order_status, order_money')->find();
+        if(!$order){
+            exit_json(-1, '订单不存在');
+        }
+        $order['order_det'] = model('OrderDet')->where('order_no', $order_no)->field('id det_id, name, thumb_img, prop_value_attr, prop_name, price price_comb, num, price*num total_price, product_id')->select();
+        exit_json(1, '请求成功', $order);
+
     }
 
     /**

@@ -33,7 +33,8 @@ class PayResult extends Controller
     {
         $weixinPay = new WeiXinPay();
         $result = $weixinPay->chargeNotify();
-        if ($result['code'] == 1) {
+        //威富通支付回调
+        /*if ($result['code'] == 1) {
             $data = $result['data'];
             $order = model('Order')->where('order_no', $data['out_trade_no'])->find();
             if ($order['order_status'] == 0) {
@@ -77,6 +78,74 @@ class PayResult extends Controller
         } else {
             Log::error('支付验签失败或参数异常');
             echo 'fail';
+        }*/
+
+        if ($result === false) {
+            Log::error('支付验签失败或参数异常');
+
+        } else {
+            //原生微信支付回调
+            if ($result['result_code'] == 'SUCCESS') {
+                $order_no = $result['out_trade_no'];
+                $transaction_id = $result['transaction_id'];
+                $order = model('Order')->where('order_no', $order_no)->find();
+                if (!$order) {
+                    if ($order['order_money'] * 100 == $result['total_fee']) {
+                        if ($result['trade_type'] == 'APP') {
+                            $pay_type = 1;
+                        } else {
+                            $pay_type = 3;
+                        }
+                        $order->save(['out_transaction_id' => $transaction_id, 'pay_type' => $pay_type, 'pay_status' => 1, 'pay_time' => $result['time_end']]);
+                        try{
+                            $this->orderSolve($order_no);
+                        } catch (\Exception $e){
+                            Log::error('库存处理异常'.$order_no);
+                        }
+                    } else {
+                        Log::error('支付金额错误' . $order_no);
+                    }
+                } else {
+                    Log::error('订单不存在' . $order_no);
+                }
+            } else {
+                Log::error('支付失败，订单号：' . $result['out_trade_no']);
+            }
         }
+        echo '<xml><return_code><![CDATA[SUCCESS]]></return_code><return_msg><![CDATA[OK]]></return_msg></xml>';
+
+    }
+
+    /**
+     * 订单支付库存处理
+     * @param $order_no
+     */
+    public function orderSolve($order_no)
+    {
+        $order_det = model('OrderDet')->where('order_no', $order_no)->select();
+        foreach ($order_det as $item) {
+            model('ProductAttr')->where('product_id', $item['product_id'])->where('prop_value_attr', $item['prop_value_attr'])->setDec('remain', $item['num']);
+        }
+    }
+
+    /**
+     * 格式化支付返回信息
+     * @param $orderInfo
+     * @param $pay_type
+     * @return array
+     */
+    private function formatRes($orderInfo, $pay_type)
+    {
+        $payInfo = [];
+        if ($pay_type == 1) {
+            $payInfo['order_no'] = $orderInfo['out_trade_no'];
+            $payInfo['out_transaction_id'] = $orderInfo['trade_no'];
+            $payInfo['order_money'] = $orderInfo['total_amount'];
+        } else if ($pay_type == 2) {
+            $payInfo['order_no'] = $orderInfo['out_trade_no'];
+            $payInfo['out_transaction_id'] = $orderInfo['transaction_id'];
+            $payInfo['order_money'] = $orderInfo['total_fee'] / 100;
+        }
+        return $payInfo;
     }
 }

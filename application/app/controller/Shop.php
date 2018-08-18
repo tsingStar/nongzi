@@ -236,25 +236,28 @@ class Shop extends Controller
         $telephone = input('telephone');
         $description = input('description');
         $remarks = input('remarks');
-
-        $img = request()->file('image');
-        Log::error($img);
+        $image_url = input('image_url');
         $type = input('type');
-        $img_url = [];
-        if(is_array($img)){
-            foreach ($img as $item) {
-                $info = $item->move(__UPLOAD__);
+        if(isset($image_url)){
+            $image = "";
+        }else{
+            $img = request()->file('image');
+            $img_url = [];
+            if(is_array($img)){
+                foreach ($img as $item) {
+                    $info = $item->move(__UPLOAD__);
+                    $saveName = $info->getSaveName();
+                    $path = "/upload/" . $saveName;
+                    $img_url[] = $path;
+                }
+            }else{
+                $info = $img->move(__UPLOAD__);
                 $saveName = $info->getSaveName();
                 $path = "/upload/" . $saveName;
                 $img_url[] = $path;
             }
-        }else{
-            $info = $img->move(__UPLOAD__);
-            $saveName = $info->getSaveName();
-            $path = "/upload/" . $saveName;
-            $img_url[] = $path;
+            $image = join(',', $img_url);
         }
-        $image = join(',', $img_url);
         $data = [
             'user_id'=>input('user_id'),
             'product_name'=>$product_name,

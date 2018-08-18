@@ -239,7 +239,12 @@ class Order extends BaseController
                 $order = model('Order')->where('order_no', $refund['order_no'])->find();
                 //退款参数
                 $orderInfo = [
-
+                    'trade_no'=>$order['out_transaction_id'],
+                    'refund_id'=>$refund['id'],
+                    'total_money'=>$order['order_money'],
+                    'refund_money'=>$order['order_money'],
+                    'shop_id'=>session(config('adminKey')),
+                    'pay_status'=>$order['pay_status']
                 ];
                 $weixin = new WeiXinPay();
                 $res = $weixin->refund($orderInfo);

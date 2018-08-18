@@ -13,6 +13,7 @@ namespace app\app\controller;
 use app\common\model\SendSms;
 use app\common\model\User;
 use think\Controller;
+use think\Log;
 
 class Pub extends Controller
 {
@@ -200,11 +201,12 @@ class Pub extends Controller
         $app_id = config('xiaochengxu.app_id');
         $app_secret = config('xiaochengxu.app_secret');
         $js_code = input('js_code');
-        if (!$app_id || !$app_secret || $js_code) {
+        if (!$app_id || !$app_secret || !$js_code) {
             exit_json(-1, '参数错误');
         }
         $res = file_get_contents("https://api.weixin.qq.com/sns/jscode2session?appid=$app_id&secret=$app_secret&js_code=$js_code&grant_type=authorization_code");
         $res = json_decode($res, true);
+        Log::error($res);
         if (!$res['openid']) {
             exit_json(-1, '参数错误');
         }
@@ -217,12 +219,14 @@ class Pub extends Controller
         if ($user) {
             exit_json(1, '请求成功', [
                 'open_id' => $open_id,
-                'status' => 1
+                'status' => 1,
+                'user_info'=>model('User')->formatOne($user['id'])
             ]);
         } else {
             exit_json(1, '请求成功', [
                 'open_id' => $open_id,
-                'status' => 0
+                'status' => 0,
+                'user_info'=>null
             ]);
         }
     }
@@ -280,6 +284,28 @@ class Pub extends Controller
             } else {
                 exit_json(-1, '注册失败');
             }
+        }
+
+    }
+
+    /**
+     * 小程序上传图片
+     */
+    public function uploadImage()
+    {
+        $file = request()->file('file');
+        if ($file) {
+            $info = $file->move(__UPLOAD__);
+            if ($info) {
+                $saveName = $info->getSaveName();
+                $path = "/upload/" . $saveName;
+                exit_json(1, '操作成功', ['image_url'=>__URL__.$path]);
+            } else {
+                // 上传失败获取错误信息
+                exit_json(-1, $file->getError());
+            }
+        }else{
+            exit_json(-1, '文件不存在');
         }
 
     }

@@ -271,10 +271,10 @@ return [
         'public_key_path' => __PUBLIC__ . '/rsa_public_key.pem'
     ],
     'weixin' => [
-        'app_id' => "",
-        'mch_id' => "",   /*微信申请成功之后邮件中的商户id*/
-        'api_key' => "",    /*在微信商户平台上自己设定的api密钥 32位*/
-        'app_secret' => '',   //公众号支付
+        'app_id' => "wx3295551e5d4979cf",
+        'mch_id' => "1490951862",   /*微信申请成功之后邮件中的商户id*/
+        'api_key' => "50F97ECD3CE0A9C8232EA065C614AE71",    /*在微信商户平台上自己设定的api密钥 32位*/
+        'app_secret' => 'b9489044bb4496362dbe96ad594dc345',   //公众号支付
         'cert_path' => __PUBLIC__ . '/apiclient_cert.pem',
         'key_path' => __PUBLIC__ . '/apiclient_key.pem'
     ],
@@ -296,7 +296,7 @@ return [
         '0' => '未支付',
         '1' => '支付宝',
         '2' => '微信',
-        '3' => '余额'
+        '3' => '小程序'
     ],
     'dispatch_type'=>[
         '0'=>'店铺配送',
@@ -304,7 +304,9 @@ return [
     ],
     'xiaochengxu'=>[
         'app_id'=>'wxb225011076f4415e',
-        'app_secret'=>'2554e8666de05ec6108f095b1a8cc01a'
+        'app_secret'=>'2554e8666de05ec6108f095b1a8cc01a',
+        'mch_id'=>'1324685701',
+        'api_key'=>'dea2d27952eea90485b00ead22279644'
     ],
     'version'=>'V1.1.0',
     'download_url'=>__URL__.'/nongzi.apk',

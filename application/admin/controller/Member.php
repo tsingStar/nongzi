@@ -27,17 +27,17 @@ class Member extends BaseController
         $end_time = strtotime(input('maxtime'));
         $uname = input('uname');
         $where = [];
-        if($start_time && !$end_time){
+        if ($start_time && !$end_time) {
             $where['a.create_time'] = ['egt', $start_time];
-        }else if(!$start_time && $end_time){
+        } else if (!$start_time && $end_time) {
             $where['a.create_time'] = ['elt', $end_time];
-        }else if($start_time && $end_time){
+        } else if ($start_time && $end_time) {
             $where['a.create_time'] = [
                 ['egt', $start_time],
                 ['elt', $end_time]
             ];
         }
-        if($uname){
+        if ($uname) {
             $where['a.telephone|a.user_name'] = $uname;
         }
         $userList = model('User')->alias('a')->join('Admins b', 'a.vip_code=b.vip_code', 'left')->where($where)->field('a.*, b.name sale_name')->order('a.create_time desc')->select();
@@ -50,13 +50,13 @@ class Member extends BaseController
      */
     public function deliver()
     {
-        if(request()->isAjax()){
+        if (request()->isAjax()) {
             $id = input('id');
             $vip_code = input('vip_code');
-            $res = model('User')->save(['vip_code'=>$vip_code], ['id'=>$id]);
-            if($res){
+            $res = model('User')->save(['vip_code' => $vip_code], ['id' => $id]);
+            if ($res) {
                 exit_json();
-            }else{
+            } else {
                 exit_json(-1, '操作失败');
             }
         }
@@ -74,24 +74,47 @@ class Member extends BaseController
         $start_time = strtotime(input('mintime'));
         $end_time = strtotime(input('maxtime'));
         $uname = input('uname');
-        $where = ['b.id'=>session(config('adminKey'))];
-        if($start_time && !$end_time){
+        $where = ['b.id' => session(config('adminKey'))];
+        if ($start_time && !$end_time) {
             $where['a.create_time'] = ['egt', $start_time];
-        }else if(!$start_time && $end_time){
+        } else if (!$start_time && $end_time) {
             $where['a.create_time'] = ['elt', $end_time];
-        }else if($start_time && $end_time){
+        } else if ($start_time && $end_time) {
             $where['a.create_time'] = [
                 ['egt', $start_time],
                 ['elt', $end_time]
             ];
         }
-        if($uname){
+        if ($uname) {
             $where['a.telephone|a.user_name'] = $uname;
         }
         $userList = model('User')->alias('a')->join('Admins b', 'a.vip_code=b.vip_code', 'left')->where($where)->field('a.*, b.name sale_name')->order('a.create_time desc')->select();
         $this->assign('list', $userList);
         return $this->fetch();
-        
+
+    }
+
+    /**
+     * 添加客户
+     */
+    public function addMember()
+    {
+        if (request()->isAjax()) {
+            $telephone = input('telephone');
+            $user = model('User')->where('telephone', $telephone)->find();
+            if ($user) {
+                exit_json(-1, '当前手机号已注册');
+            } else {
+                $res = model('User')->save(['user_name' => input('user_name'), 'telephone' => $telephone]);
+                if ($res) {
+                    exit_json();
+                } else {
+                    exit_json(-1, '添加失败');
+                }
+            }
+        } else {
+            return $this->fetch();
+        }
     }
 
 
@@ -104,10 +127,10 @@ class Member extends BaseController
     {
         $id = input('id');
         $enable = input('enable');
-        $res = model('user')->save(['status'=>$enable], ['id'=>$id]);
-        if($res){
+        $res = model('user')->save(['status' => $enable], ['id' => $id]);
+        if ($res) {
             exit_json(1, '更新成功');
-        }else{
+        } else {
             exit_json(1, '更新失败');
         }
     }
@@ -139,7 +162,7 @@ class Member extends BaseController
     {
         $where = [];
         $uname = input('uname');
-        if($uname){
+        if ($uname) {
             $where['b.phone|b.username'] = $uname;
         }
         $list = model('money_log')->alias('a')->join('user b', 'a.user_id=b.id')->field('a.*, b.username, b.phone')->where($where)->order('create_time desc')->select();
