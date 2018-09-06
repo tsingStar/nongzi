@@ -32,6 +32,33 @@
             </div>
         </div>
         <div class="row cl">
+            <label class="form-label col-xs-4 col-sm-2"><span class="c-red">*</span>退款类型：</label>
+            <div class="formControls col-xs-8 col-sm-9">
+                {if $order_refund.refund_type eq 1}
+                整单
+                {else/}
+                部分商品
+                {/if}
+            </div>
+        </div>
+        {if $order_refund.refund_type eq 1}
+        <div class="row cl">
+            <label class="form-label col-xs-4 col-sm-2"><span class="c-red">*</span>退款内容：</label>
+            <div class="formControls col-xs-8 col-sm-9">
+                <select name="refund_content">
+                    <option value="1" {if $order_refund.refund_content eq 1}selected{/if}>货物+运费</option>
+                    <option value="2" {if $order_refund.refund_content eq 2}selected{/if}>货物</option>
+                </select>
+            </div>
+        </div>
+        {/if}
+        <div class="row cl">
+            <label class="form-label col-xs-4 col-sm-2"><span class="c-red">*</span>退款备注：</label>
+            <div class="formControls col-xs-8 col-sm-9">
+                <textarea name="remarks" class="textarea">{$order_refund.remarks}</textarea>
+            </div>
+        </div>
+        <div class="row cl">
             <label class="form-label col-xs-4 col-sm-2"><span class="c-red">*</span>退货地址：</label>
             <div class="formControls col-xs-8 col-sm-9">
                 <input type="text" class="input-text" value="{$order_refund.refund_address}" name="refund_address" required>
@@ -78,10 +105,14 @@
         </div>
         <div class="row cl">
             <div class="col-xs-8 col-sm-9 col-xs-offset-4 col-sm-offset-2">
+                {if $order_refund.refund_telephone eq ""}
                 <a href="javascript:;" class="btn btn-secondary radius" onclick="order_refund()"><i class="Hui-iconfont">&#xe632;</i>同意退货
                 </a>
+                {/if}
+                {if $order_refund.is_get neq 1}
                 <a href="javascript:;" class="btn btn-secondary radius" onclick="get_order('{$order_refund.id}')"><i class="Hui-iconfont">&#xe632;</i>确认收货
                 </a>
+                {/if}
             </div>
         </div>
     </form>

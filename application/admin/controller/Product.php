@@ -44,6 +44,9 @@ class Product extends BaseController
             if ($prop) {
                 $res = $prop->save($data);
             } else {
+                if ($prop['prop_name'] == input('prop_name')) {
+                    exit_json(-1, '商品属性已存在，请勿重复添加');
+                }
                 $res = model('PropName')->save($data);
             }
             if ($res) {
@@ -117,6 +120,9 @@ class Product extends BaseController
             if ($prop_value) {
                 $res = $prop_value->save($data);
             } else {
+                if ($prop_value['prop_val'] == input('prop_val')) {
+                    exit_json(-1, '商品属性值已存在, 请勿重复添加');
+                }
                 $res = model('PropValue')->save($data);
             }
             if ($res) {
@@ -143,16 +149,31 @@ class Product extends BaseController
     public function plist()
     {
         $cateId = input('cateId');
-        if ($cateId) {
-            $goodsList = model('Product')->where('cate_id', $cateId)->select();
-        } else {
-            $goodsList = model('Product')->order('ord desc, id desc')->select();
+        $status = input('con');
+        $where = [];
+        if (input('name')) {
+            $where['name'] = input('name');
         }
-        foreach ($goodsList as $item){
-            $num = model('ProductAttr')->where('product_id', $item['id'])->where('remain < limit_remain')->count();
-            if($num>0){
+        if ($status == 1) {
+            $where['is_index'] = 1;
+        }
+        if ($status == 2) {
+            $where['is_hot'] = 1;
+        }
+        if ($cateId) {
+            $where['cate_id'] = $cateId;
+            $goodsList = model('Product')->where($where)->select();
+        } else {
+            $goodsList = model('Product')->where($where)->order('ord desc, id desc')->select();
+        }
+        foreach ($goodsList as $k => $item) {
+            $num = model('ProductAttr')->where('product_id', $item['id'])->where('remain <= limit_remain')->count();
+            if ($num > 0) {
                 $item['is_limit'] = 1;
-            }else{
+            } else {
+                if ($status == 3) {
+                    unset($goodsList[$k]);
+                }
                 $item['is_limit'] = 0;
             }
         }
@@ -168,6 +189,12 @@ class Product extends BaseController
         if (request()->isAjax()) {
 
             $data = input('post.');
+            if (!isset($data['prop_attr'])) {
+                exit_json(-1, '商品规格未设置');
+            }
+            if (!isset($data['swiper_img'])) {
+                exit_json(-1, '商品展示轮播图不能为空');
+            }
             $prop = $data['prop'];
             $prop_attr = $data['prop_attr'];
             $data['swiper_img'] = join(',', $data['swiper_img']);
@@ -286,10 +313,10 @@ class Product extends BaseController
             $data = input('post.');
             $prop = $data['prop'];
             $prop_attr = $data['prop_attr'];
-            if(isset($data['swiper_img'])){
+            if (isset($data['swiper_img'])) {
                 $data['swiper_img'] = join(',', $data['swiper_img']);
             }
-            if(!isset($data['thumb_img'])){
+            if (!isset($data['thumb_img'])) {
                 unset($data['thumb_img']);
             }
             model('Product')->startTrans();
@@ -356,27 +383,6 @@ class Product extends BaseController
             } else {
                 exit_json(-1, '商品添加失败');
             }
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
         }
         $cate_parent = model('ProductCate')->where('id', $product['cate_parent_id'])->find();
         $cate = model('ProductCate')->where('id', $product['cate_id'])->find();
@@ -410,18 +416,19 @@ class Product extends BaseController
         $product_id = input('product_id');
         $is_index = input('is_index');
         $pro = model('Product')->where('id', $product_id)->find();
-        if($pro){
-            $r = $pro->save(['is_index'=>$is_index]);
-            if($r){
+        if ($pro) {
+            $r = $pro->save(['is_index' => $is_index]);
+            if ($r) {
                 exit_json();
-            }else{
+            } else {
                 exit_json(-1, '设置失败');
             }
-        }else{
+        } else {
             exit_json(-1, '商品不存在');
         }
 
     }
+
     /**
      * 设为热销
      */
@@ -430,20 +437,18 @@ class Product extends BaseController
         $product_id = input('product_id');
         $is_index = input('is_hot');
         $pro = model('Product')->where('id', $product_id)->find();
-        if($pro){
-            $r = $pro->save(['is_hot'=>$is_index]);
-            if($r){
+        if ($pro) {
+            $r = $pro->save(['is_hot' => $is_index]);
+            if ($r) {
                 exit_json();
-            }else{
+            } else {
                 exit_json(-1, '设置失败');
             }
-        }else{
+        } else {
             exit_json(-1, '商品不存在');
         }
 
     }
-
-
 
 
     //TODO 待处理

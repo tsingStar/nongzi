@@ -21,6 +21,13 @@ class Pub extends Controller
         $this->assign('sitename', config('sitename'));
     }
 
+    public function getCode()
+    {
+        $id = input('id');
+        echo getRandStr($id, 5, 'nongzi');
+        exit();
+    }
+
     /**
      * 后台用户登陆
      * @return \think\response\View

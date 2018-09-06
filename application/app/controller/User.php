@@ -124,6 +124,9 @@ class User extends BaseUser
     public function getDefaultAddress()
     {
         $address = model('UserAddress')->field('id address_id, user_name, user_telephone, province, city, county, address, is_default')->where('user_id', USER_ID)->where('is_default', 1)->find();
+        if(!$address){
+            $address = new \stdClass();
+        }
         exit_json(1, '请求成功', $address);
     }
 

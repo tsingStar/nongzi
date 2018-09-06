@@ -27,11 +27,14 @@ class Order extends Model
      */
     public function checkBuyNum($product_id, $num)
     {
-        return ['code'=>1, 'msg'=>''];
-
+        $total_num = \model('OrderDet')->where('user_id', USER_ID)->where('product_id', $product_id)->sum('num');
+        $limit = \model('Product')->where('id', $product_id)->find();
+        if($limit['limit_num']>0 && $total_num+$num>$limit['limit_num']){
+            return ['code'=>-1, 'msg'=>'当前商品限购'.$limit['limit_num'].'件'];
+        }else{
+            return ['code'=>1, 'msg'=>''];
+        }
     }
-
-
 
     //TODO 待处理
 

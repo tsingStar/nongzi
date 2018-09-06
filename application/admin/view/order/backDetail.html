@@ -29,12 +29,6 @@
                 <input type="text" class="input-text" name="refund_money" required>
             </div>
         </div>
-        <div class="row cl">
-            <label class="form-label col-xs-4 col-sm-2"><span class="c-red">*</span>退款备注：</label>
-            <div class="formControls col-xs-8 col-sm-9">
-                {$item.remarks}
-            </div>
-        </div>
         {/if}
 
         {if $item.refund_type eq 1}
@@ -53,51 +47,31 @@
         <div class="row cl">
             <label class="form-label col-xs-4 col-sm-2"><span class="c-red">*</span>退款凭证：</label>
             <div class="formControls col-xs-8 col-sm-9">
-                <div class="uploader-thum-container">
-                    <div id="fileList" class="uploader-list">
-                    </div>
-                    <div id="filePicker">选择图片</div>
-                </div>
+                <img src="{$item.image}" style="width: 300px;" alt="">
+                <!--<div class="uploader-thum-container">-->
+                    <!--<div id="fileList" class="uploader-list">-->
+                    <!--</div>-->
+                    <!--<div id="filePicker">选择图片</div>-->
+                <!--</div>-->
             </div>
         </div>
         <div class="row cl">
             <label class="form-label col-xs-4 col-sm-2"><span class="c-red">*</span>退款日期：</label>
             <div class="formControls col-xs-8 col-sm-9">
-                <input type="text" class="input-text Wdate" onfocus="WdatePicker()" onclick="WdatePicker()" name="pay_time" required>
+                <!--<input type="text" class="input-text Wdate" onfocus="WdatePicker()" onclick="WdatePicker()" name="pay_time" required>-->
+                {$item.pay_time}
             </div>
         </div>
         <div class="row cl">
             <label class="form-label col-xs-4 col-sm-2"></label>
             <div class="formControls col-xs-8 col-sm-9">
-                <button class="btn btn-primary radius" type="submit">确认退款</button>
+                <button class="btn btn-primary radius" onclick="layer_close()" type="button">确认</button>
             </div>
         </div>
     </form>
 </div>
 {include file="pub/footer"/}
 <script>
-    $(function () {
-        uploadImage($("#fileList"), null, $("#refund_form"), "image");
-        $("#refund_form").validate({
-            submitHandler:function (form) {
-                var img = $("input[name='image']");
-                if(typeof img == 'undefined' || img.val() == ""){
-                    layer.msg('退款凭证不能为空');
-                    return ;
-                }
-                $(form).ajaxSubmit(function(res){
-                    if(res.code == 1){
-                        layer.closeAll();
-                        parent.location.reload();
-                    }else{
-                        layer.msg(res.msg);
-                    }
-                })
-            }
-        })
-
-    })
-
 </script>
 </body>
 </html>

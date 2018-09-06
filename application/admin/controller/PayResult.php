@@ -10,12 +10,7 @@
 namespace app\admin\controller;
 
 
-use app\common\model\ChargeOrder;
-use app\common\model\Order;
-use app\common\model\Pay;
-use app\common\model\PayOrder;
 use app\common\model\WeiXinPay;
-use MongoDB\Driver\WriteError;
 use think\Controller;
 use think\Log;
 
@@ -31,6 +26,7 @@ class PayResult extends Controller
      */
     public function weixinPay()
     {
+        Log::error(file_get_contents('php://input'));
         $weixinPay = new WeiXinPay();
         $result = $weixinPay->chargeNotify();
         //威富通支付回调
@@ -89,14 +85,14 @@ class PayResult extends Controller
                 $order_no = $result['out_trade_no'];
                 $transaction_id = $result['transaction_id'];
                 $order = model('Order')->where('order_no', $order_no)->find();
-                if (!$order) {
-                    if ($order['order_money'] * 100 == $result['total_fee']) {
+                if ($order) {
+                    if ((float)$order['order_money'] * 100 == $result['total_fee']) {
                         if ($result['trade_type'] == 'APP') {
                             $pay_type = 1;
                         } else {
                             $pay_type = 3;
                         }
-                        $order->save(['out_transaction_id' => $transaction_id, 'pay_type' => $pay_type, 'pay_status' => 1, 'pay_time' => $result['time_end']]);
+                        $order->save(['out_transaction_id' => $transaction_id, 'pay_type' => $pay_type, 'pay_status' => 1, 'pay_time' => $result['time_end'], 'order_status'=>1]);
                         try{
                             $this->orderSolve($order_no);
                         } catch (\Exception $e){
@@ -125,6 +121,7 @@ class PayResult extends Controller
         $order_det = model('OrderDet')->where('order_no', $order_no)->select();
         foreach ($order_det as $item) {
             model('ProductAttr')->where('product_id', $item['product_id'])->where('prop_value_attr', $item['prop_value_attr'])->setDec('remain', $item['num']);
+            model('Product')->where('id', $item['product_id'])->setInc('sell_num', $item['num']);
         }
     }
 

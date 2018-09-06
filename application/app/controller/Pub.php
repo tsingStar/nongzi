@@ -10,8 +10,10 @@
 namespace app\app\controller;
 
 
+use app\admin\model\Admins;
 use app\common\model\SendSms;
 use app\common\model\User;
+use app\common\model\WeiXinPay;
 use think\Controller;
 use think\Log;
 
@@ -23,7 +25,6 @@ class Pub extends Controller
 
     }
 
-
     public function getVersion()
     {
 
@@ -33,6 +34,12 @@ class Pub extends Controller
         } else {
             exit_json(1, '有新版本', ['url' => config('download_url'), 'version' => config('version')]);
         }
+    }
+
+
+    public function test()
+    {
+
     }
 
     /**
@@ -65,9 +72,9 @@ class Pub extends Controller
     public function loginByCode()
     {
         $telephone = input('telephone');
-        $code = input('code');
-        $vcode = model('SmsLog')->where(['create_time' => ['gt', time() - 30], 'status' => 0, 'telephone' => $telephone, 'type' => 3])->value('code');
-        if ($code != $vcode) {
+        $code = input('code') ? input('code') : input('password');
+        $vcode = model('SmsLog')->where(['create_time' => ['gt', time() - 120], 'status' => 0, 'telephone' => $telephone, 'type' => 3, 'code' => $code])->find();
+        if (!$vcode) {
             exit_json(-1, '验证码错误');
         }
         $userModel = new User();
@@ -84,15 +91,26 @@ class Pub extends Controller
     {
         $telephone = input('telephone');
         $password = input('password');
+        $tp = test_password($password);
+        if ($tp['code'] === 0) {
+            exit_json(-1, $tp['msg']);
+        }
         $vcode = input('code');
-        $vip_code = input('vip_code');
+        $vip_code = input('vip_code') ? input('vip_code') : "";
+        if ($vip_code) {
+            $adm = new Admins();
+            $admin = $adm->where('vip_code', $vip_code)->find();
+            if (!$admin) {
+                exit_json(-1, '请输入合法有效的邀请码');
+            }
+        }
         $user = model('user')->where('telephone', $telephone)->find();
         if ($user) {
             exit_json(-1, '手机号已注册');
         } else {
 
-            $sms = model('SmsLog')->where(['create_time' => ['gt', time() - 30], 'status' => 0, 'telephone' => $telephone, 'type' => 1])->find();
-            if ($sms['code'] != $vcode) {
+            $sms = model('SmsLog')->where(['create_time' => ['gt', time() - 120], 'status' => 0, 'telephone' => $telephone, 'type' => 1, 'code' => $vcode])->find();
+            if (!$sms) {
                 exit_json(-1, '验证码错误');
             }
             $res = model('user')->isUpdate(false)->save(['telephone' => $telephone, 'password' => md5($password), 'vip_code' => $vip_code, 'user_name' => uniqid()]);
@@ -115,8 +133,8 @@ class Pub extends Controller
         if (!$data['telephone'] || !$data['code']) {
             exit_json(-1, '参数错误');
         }
-        $sms = model('SmsLog')->where(['create_time' => ['gt', time() - 30], 'status' => 0, 'telephone' => $data['telephone'], 'type' => 2])->find();
-        if ($sms['code'] != $data['code']) {
+        $sms = model('SmsLog')->where(['create_time' => ['gt', time() - 120], 'status' => 0, 'telephone' => $data['telephone'], 'type' => 2, 'code' => $data['code']])->find();
+        if (!$sms) {
             exit_json(-1, '验证码错误');
         } else {
             $sms->save(['status' => 1]);
@@ -133,8 +151,15 @@ class Pub extends Controller
     public function resetPassword()
     {
         $data = input('post.');
+        $tp = test_password($data['password']);
+        if ($tp['code'] === 0) {
+            exit_json(-1, $tp['msg']);
+        }
         $userModel = new User();
         $user = $userModel->where(['telephone' => $data['telephone']])->find();
+        if (!$user) {
+            exit_json(-1, '用户不存在');
+        }
         $res = $user->save(['password' => md5($data['password'])]);
         if ($res) {
             exit_json(1, '重置密码成功');
@@ -158,7 +183,7 @@ class Pub extends Controller
         $user = model('user')->where('telephone', $telephone)->find();
         switch ($sendType) {
             case 1:
-                if ($user) {
+                if ($user && $user['open_id']) {
                     exit_json(-1, '手机号已注册过');
                 }
                 break;
@@ -177,11 +202,12 @@ class Pub extends Controller
                 if ($lock) {
                     exit_json(-1, '手机号已被绑定');
                 }
+                break;
             default:
                 exit_json(-1, '参数错误');
         }
         $code = rand(100000, 999999);
-        $remain_time = '30秒';
+        $remain_time = '2分钟';
         $content = urlencode("$code##$remain_time");
         $sendSms = new SendSms($telephone, config('sms.tempId'), $content);
         $res = $sendSms->sendVcode();
@@ -194,39 +220,46 @@ class Pub extends Controller
     }
 
     /**
-     * 微信小程序登陆
+     * 微信小程序授权
      */
     public function loginByWeiXin()
     {
+//        Log::error(file_get_contents('php://input'));
+        $js_code = input('js_code');
         $app_id = config('xiaochengxu.app_id');
         $app_secret = config('xiaochengxu.app_secret');
-        $js_code = input('js_code');
         if (!$app_id || !$app_secret || !$js_code) {
             exit_json(-1, '参数错误');
         }
         $res = file_get_contents("https://api.weixin.qq.com/sns/jscode2session?appid=$app_id&secret=$app_secret&js_code=$js_code&grant_type=authorization_code");
         $res = json_decode($res, true);
-        Log::error($res);
         if (!$res['openid']) {
             exit_json(-1, '参数错误');
         }
         $session_key = $res['session_key'];
         $open_id = $res['openid'];
-        if (!session('session_key')) {
-            session('session_key', $session_key);
+
+        $os = db('os')->where('open_id', $open_id)->find();
+        if ($os) {
+            db('os')->where('open_id', $open_id)->update(['session_key' => $session_key]);
+        } else {
+            db('os')->insert(['open_id' => $open_id, 'session_key' => $session_key]);
         }
+//        if (!session('session_key')) {
+//            session('session_key', $session_key);
+//        }
         $user = model('User')->where('open_id', $open_id)->find();
         if ($user) {
             exit_json(1, '请求成功', [
                 'open_id' => $open_id,
                 'status' => 1,
-                'user_info'=>model('User')->formatOne($user['id'])
+                'user_info' => model('User')->formatOne($user['id'])
             ]);
         } else {
             exit_json(1, '请求成功', [
                 'open_id' => $open_id,
                 'status' => 0,
-                'user_info'=>null
+                'user_info' => null
             ]);
         }
     }
@@ -239,7 +272,8 @@ class Pub extends Controller
         $app_id = config('xiaochengxu.app_id');
         $iv = input('iv');
         $encryptedData = input('encryptedData');
-        $session_key = session('session_key');
+        $open_id = input('open_id');
+        $session_key = db('os')->where('open_id', $open_id)->value('session_key');
         include VENDOR_PATH . 'WeiXin/wxBizDataCrypt.php';
         $pc = new \WXBizDataCrypt($app_id, $session_key);
         $errCode = $pc->decryptData($encryptedData, $iv, $data);
@@ -257,22 +291,34 @@ class Pub extends Controller
      */
     public function registByWeiXin()
     {
+//        Log::error(file_get_contents('php://input'));
         $telephone = input('telephone');
         $vcode = input('code');
-        $vip_code = input('vip_code');
+        $vip_code = input('vip_code') ? input('vip_code') : "";
         $user_name = input('user_name');
         $head_img = input('head_img');
         $open_id = input('open_id');
+        if ($vip_code) {
+            $adm = new Admins();
+            $admin = $adm->where('vip_code', $vip_code)->find();
+            if (!$admin) {
+                exit_json(-1, '请输入合法有效的邀请码');
+            }
+        }
         $user = model('user')->where('telephone', $telephone)->find();
-        $sms = model('SmsLog')->where(['create_time' => ['gt', time() - 30], 'status' => 0, 'telephone' => $telephone, 'type' => 1])->find();
-        if ($sms['code'] != $vcode) {
+        $sms = model('SmsLog')->where(['create_time' => ['gt', time() - 120], 'status' => 0, 'telephone' => $telephone, 'type' => 1, 'code' => $vcode])->find();
+        if (!$sms) {
             exit_json(-1, '验证码错误');
         }
         if ($user) {
             if ($user['open_id']) {
                 exit_json(-1, '手机号已被绑定过，请重新绑定');
             }
-            $user->save(['head_img' => $head_img, 'open_id' => $open_id, 'user_name' => $user_name]);
+            $data = ['head_img' => $head_img, 'open_id' => $open_id, 'user_name' => $user_name];
+            if (!$user['vip_code']) {
+                $data['vip_code'] = $vip_code;
+            }
+            $user->save($data);
             $user_id = $user->getAttr('id');
             exit_json(1, '注册成功', model('user')->formatOne($user_id));
         } else {
@@ -299,15 +345,37 @@ class Pub extends Controller
             if ($info) {
                 $saveName = $info->getSaveName();
                 $path = "/upload/" . $saveName;
-                exit_json(1, '操作成功', ['image_url'=>__URL__.$path]);
+                exit_json(1, '操作成功', ['image_url' => __URL__ . $path]);
             } else {
                 // 上传失败获取错误信息
                 exit_json(-1, $file->getError());
             }
-        }else{
+        } else {
             exit_json(-1, '文件不存在');
         }
 
+    }
+
+    /**
+     * 关于我们
+     */
+    public function aboutUs()
+    {
+        $content = model('WebAboutUs')->value('content');
+        exit_json(1, '请求成功', [
+            'content' => $content
+        ]);
+    }
+
+    /**
+     * 用户协议
+     */
+    public function userDeal()
+    {
+        $content = model('WebRegister')->value('content');
+        exit_json(1, '请求成功', [
+            'content' => $content
+        ]);
     }
 
 

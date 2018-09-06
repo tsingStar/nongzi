@@ -81,6 +81,10 @@ class Order extends BaseUser
         if ($prop_attr['remain'] < $num) {
             exit_json(-1, '商品库存不足');
         }
+        $total_num = model('OrderDet')->where('user_id', USER_ID)->where('product_id', $product_id)->sum('num');
+        if($p['limit_num']>0 && $p['limit_num']<$total_num+$num){
+            exit_json(-1,'商品数量大于限购数量，当前商品限购'.$p['limit_num']);
+        }
         $total_money = sprintf('%.2f', $num * $prop_attr['price_comb']);
         $pros = [
             [
@@ -145,6 +149,8 @@ class Order extends BaseUser
                 'order_money' => $data['total_money'] + $data['send_fee']
             ];
             //订单详情信息
+            $flag = true;
+            $tips = "";
             $order_detail = [];
             foreach ($data['products'] as $item) {
                 $temp = [
@@ -158,7 +164,16 @@ class Order extends BaseUser
                     'prop_name' => $item['prop_name'],
                     'thumb_img' => $item['thumb_img'],
                 ];
+                $prop_attr = model('ProductAttr')->where('product_id', $item['product_id'])->where('prop_value_attr', $item['prop_value_attr'])->find();
+                if ($prop_attr['remain']<$item['num']){
+                    $flag=false;
+                    $tips .= $item['name'].';';
+                }
                 $order_detail[] = $temp;
+            }
+            if (!$flag){
+                exit_json(-1, $tips.'商品库存不足');
+
             }
             try {
                 $res = model('Order')->save($order_data);
@@ -169,7 +184,7 @@ class Order extends BaseUser
                     }
                     model('Order')->commit();
                     model('OrderDet')->commit();
-                    cache(USER_ID . 'order');
+                    cache(USER_ID . 'order', null);
                     exit_json(1, '订单生成成功', [
                         'order_no' => $order_no
                     ]);
@@ -241,6 +256,9 @@ class Order extends BaseUser
             ];
             $weixin = new WeiXinPay();
             $result = $weixin->createPrePayOrder($pay_data, config('notify.weixin'));
+            if($result === false){
+                exit_json(-1, '订单已处理，请联系管理员');
+            }
             if (isset($result['status'])) {
                 exit_json(-1, '系统错误，稍后重试');
             } else {
@@ -285,11 +303,13 @@ class Order extends BaseUser
         $page = input('page') ? input('page') : 0;
         $pageNum = input('pageNum') ? input('pageNum') : 10;
         $offset = $page * $pageNum;
-        $orderList = model('Order')->where('user_id', USER_ID)->where('order_status', $order_status)->field('order_no, receiver_name, receiver_telephone, address, remarks, send_fee, order_status, order_money')->limit($offset, $pageNum)->order('create_time desc')->select();
+//        $orderList = model('Order')->where('user_id', USER_ID)->where('order_status', $order_status)->field('order_no, receiver_name, receiver_telephone, address, remarks, send_fee, order_status, order_money, create_time')->limit($offset, $pageNum)->order('create_time desc')->select();
+        $orderList = model('Order')->alias('a')->join('OrderRefund b', 'a.order_no=b.order_no', 'left')->where('a.user_id', USER_ID)->where('a.order_status', $order_status)->field('a.order_no, a.receiver_name, a.receiver_telephone, a.address, a.remarks, a.send_fee, a.order_status, a.order_money, a.create_time, b.status refund_status')->limit($offset, $pageNum)->order('a.create_time desc')->select();
         foreach ($orderList as $order) {
             $order_no = $order['order_no'];
             $order_det = model('OrderDet')->where('order_no', $order_no)->field('id det_id, name, thumb_img, prop_value_attr, prop_name, price price_comb, num, price*num total_price, product_id')->select();
             $order['order_det'] = $order_det;
+            $order['refund_status'] = is_null($order['refund_status'])?-1:$order['refund_status'];
         }
         exit_json(1, '请求成功', $orderList);
     }
@@ -300,7 +320,7 @@ class Order extends BaseUser
     public function getOrderDetail()
     {
         $order_no = input('order_no');
-        $order = model('Order')->where('order_no', $order_no)->field('order_no, receiver_name, receiver_telephone, address, remarks, send_fee, order_status, order_money')->find();
+        $order = model('Order')->where('order_no', $order_no)->field('order_no, receiver_name, receiver_telephone, address, remarks, send_fee, order_status, order_money, create_time')->find();
         if(!$order){
             exit_json(-1, '订单不存在');
         }
@@ -360,6 +380,9 @@ class Order extends BaseUser
         model('Order')->startTrans();
         model('OrderRefund')->startTrans();
         $order = model('Order')->where('order_no', $order_no)->find();
+        if($order['user_id'] != USER_ID){
+            exit_json(-1,'订单与当前登陆用户不匹配');
+        }
         if ($order) {
             if ($order['order_status'] == 0 || $order['order_status'] == 5) {
                 exit_json(-1, '订单未支付或订单已关闭');
@@ -371,16 +394,25 @@ class Order extends BaseUser
                 exit_json(-1, '退款申请已处理，请联系客服');
             }
             $res = $order->save(['order_status' => 4, 'is_apply_refund' => 1]);
-            if ($refund_type == 2) {
-                $c = model('OrderDet')->where('order_no', $order_no)->count();
-                if ($c == count(explode(',', $refund_detail))) {
-                    $refund_type = 1;
+//            if ($refund_type == 2) {
+//                $c = model('OrderDet')->where('order_no', $order_no)->count();
+//                if ($c == count(explode(',', $refund_detail))) {
+//                    $refund_type = 1;
+//                }
+//            }
+            if($refund_type == 1){
+                $od = model('OrderDet')->where('order_no', $order_no)->select();
+                $det = [];
+                foreach ($od as $o){
+                    $det[] = $o['id'];
                 }
+                $refund_detail = join(',', $det);
             }
             $res1 = model('OrderRefund')->save([
                 'order_no' => $order['order_no'],
                 'refund_type' => $refund_type,
-                'refund_detail' => $refund_detail
+                'refund_detail' => $refund_detail,
+                'remarks'=>input('remarks')
             ]);
             if ($res && $res1) {
                 model('Order')->commit();
@@ -403,9 +435,11 @@ class Order extends BaseUser
     {
         $order_no = input('order_no');
         $refund = model('OrderRefund')->where('order_no', $order_no)->field('id refund_id, refund_address, refund_name, refund_telephone, refund_type, order_no, status, refund_detail')->find();
+        $time = model('Order')->where('order_no', $order_no)->value('create_time');
         if ($refund) {
             $refund_det = model('OrderDet')->whereIn('id', $refund['refund_detail'])->field('id det_id, name, thumb_img, prop_value_attr, prop_name, price price_comb, num, price*num total_price, product_id')->select();
             $refund['refund_detail'] = $refund_det;
+            $refund['create_time'] = $time;
             exit_json(1, '请求成功', $refund);
         } else {
             exit_json(-1, '订单不存在');
@@ -424,6 +458,9 @@ class Order extends BaseUser
         if ($of) {
             if ($of['refund_type'] == 2 && $receive_info == "") {
                 exit_json(-1, '部分商品退货需提交收款信息');
+            }
+            if($of['send_no'] != ""){
+                exit_json(-1,'退货信息已提交,请勿重复提交');
             }
             $res = $of->save([
                 'send_no' => $send_no,

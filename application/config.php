@@ -149,7 +149,7 @@ return [
     // +----------------------------------------------------------------------
 
     // 异常页面的模板文件
-    'exception_tmpl' => THINK_PATH . 'tpl' . DS . 'think_exception.tpl',
+    'exception_tmpl' => THINK_PATH . 'tpl' . DS . '404.tpl',
 
     // 错误显示信息,非调试模式有效
     'error_message' => '页面错误！请稍后再试～',
@@ -271,17 +271,17 @@ return [
         'public_key_path' => __PUBLIC__ . '/rsa_public_key.pem'
     ],
     'weixin' => [
-        'app_id' => "wx3295551e5d4979cf",
-        'mch_id' => "1490951862",   /*微信申请成功之后邮件中的商户id*/
-        'api_key' => "50F97ECD3CE0A9C8232EA065C614AE71",    /*在微信商户平台上自己设定的api密钥 32位*/
+        'app_id' => "wx53e95af02a13f9b0",
+        'mch_id' => "1512425511",   /*微信申请成功之后邮件中的商户id*/
+        'api_key' => "325064d0ef6ed0ce0c8a1971293cd9a5",    /*在微信商户平台上自己设定的api密钥 32位*/
         'app_secret' => 'b9489044bb4496362dbe96ad594dc345',   //公众号支付
         'cert_path' => __PUBLIC__ . '/apiclient_cert.pem',
         'key_path' => __PUBLIC__ . '/apiclient_key.pem'
     ],
     //支付回调地址
     'notify'=>[
-        'weixin'=>__URL__.'admin/PayResult/weixinPay',
-        'ali'=>__URL__.'admin/PayResult/aliPay'
+        'weixin'=>__URL__.'/admin/PayResult/weixinPay',
+        'ali'=>__URL__.'/admin/PayResult/aliPay'
     ],
     'recommendKey' => 10,   //推荐搜索关键字数量
     'order_status' => [
@@ -294,8 +294,8 @@ return [
     ],
     'pay_type' => [
         '0' => '未支付',
-        '1' => '支付宝',
-        '2' => '微信',
+        '1' => '微信',
+        '2' => '支付宝',
         '3' => '小程序'
     ],
     'dispatch_type'=>[
@@ -306,8 +306,10 @@ return [
         'app_id'=>'wxb225011076f4415e',
         'app_secret'=>'2554e8666de05ec6108f095b1a8cc01a',
         'mch_id'=>'1324685701',
-        'api_key'=>'dea2d27952eea90485b00ead22279644'
+        'api_key'=>'dea2d27952eea90485b00ead22279644',
+        'cert_path' => __PUBLIC__ . '/apiclient_cert_wapp.pem',
+        'key_path' => __PUBLIC__ . '/apiclient_key_wapp.pem'
     ],
-    'version'=>'V1.1.0',
+    'version'=>'V1.0',
     'download_url'=>__URL__.'/nongzi.apk',
 ];

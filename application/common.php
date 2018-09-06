@@ -108,6 +108,24 @@ function test_tel($telephone)
 }
 
 /**
+ * 校验密码的合法性
+ * @param $password
+ * @param $len
+ * @param $preg
+ * @return array
+ */
+function test_password($password, $len = 6, $preg = "/^(?![^a-zA-Z]+$)(?!\D+$)/")
+{
+    if(strlen($password)<$len){
+        return ['code'=>0, 'msg'=>'密码不足'.$len.'位'];
+    }
+    if(!preg_match($preg, $password)){
+        return ['code'=>0, 'msg'=>'密码必须为数字和字母，不包含特殊字符'];
+    }
+    return ['code'=>1];
+}
+
+/**
  * 遍历指定目录下所有文件
  * @param $path
  * @return array
@@ -313,7 +331,8 @@ function get_millisecond()
  * @param $name
  * @return bool|string
  */
-function uploadImg(){
+function uploadImg()
+{
     $file = request()->file('file');
     if ($file) {
         $info = $file->move(__UPLOAD__);
@@ -325,11 +344,10 @@ function uploadImg(){
             // 上传失败获取错误信息
             return false;
         }
-    }else{
+    } else {
         return false;
     }
 }
-
 
 
 /**
@@ -349,15 +367,29 @@ function excel($header, $data, $filename)
 function arr_unique($arr)
 {
     $data = [];
-    foreach ($arr as $a){
+    foreach ($arr as $a) {
         $data[] = json_encode($a);
     }
     $data = array_unique($data);
     $list = [];
-    foreach ($data as $t){
+    foreach ($data as $t) {
         $list[] = json_decode($t, true);
     }
     return $list;
+}
+
+/**
+ * 获取随机字符串
+ * @param $id
+ * @param int $length
+ * @param null $salt
+ * @return bool|string
+ */
+function getRandStr($id, $length = 5, $salt = null)
+{
+    $str = \Hashids\Hashids::instance($length, $salt);
+    $code = $str->encode($id);
+    return $code;
 }
 
 

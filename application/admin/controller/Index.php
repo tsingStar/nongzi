@@ -66,7 +66,7 @@ class Index extends BaseController
     public function getQrcode()
     {
         $vip_code = model('Admins')->where('id', session(config('adminKey')))->value('vip_code');
-        $spread_url = "djfkdnfvsnl?vip_code=";
+        $spread_url = __URL__."/index/Index/app?vip_code=";
         require_once VENDOR_PATH.'Qrcode/phpqrcode.php';
         $file_name = md5(session(config('adminKey'))).'.png';
         is_dir(__UPLOAD__.'/qrcode') OR mkdir(__UPLOAD__.'/qrcode', 0777, true);

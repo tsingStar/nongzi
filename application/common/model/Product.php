@@ -44,6 +44,20 @@ class Product extends Model
     public function formatOneDetail($product)
     {
         $data = $product;
+        //富文本处理
+        $content = $data['mob_detail'];
+        preg_match_all('/<img(.*?)>/', $content, $match);
+        $imgs = $match[0];
+        //取出img标签的src属性
+        foreach($imgs as $k=>$v){
+            preg_match('/<img.+src=\"?(.+\.(jpg|jpeg|gif|bmp|bnp|png))\"?.+>/i', $v, $res);
+            $img_url = __URL__.$res[1];
+            $content = str_replace($res[1], $img_url, $content);
+        }
+        $data['mob_detail'] = $content;
+        //富文本处理结束
+
+
         $data['thumb_img'] = __URL__.$data['thumb_img'];
         $sw = explode(',', $data['swiper_img']);
         $swiper_img = [];

@@ -15,7 +15,6 @@ use think\Model;
 class Swiper extends Model
 {
     protected $autoWriteTimestamp = true;
-    protected $updateTime = false;
 
     protected function initialize()
     {

@@ -49,6 +49,7 @@
             <td>{$v.sale_name}</td>
             <td>
                 <a class="btn btn-primary radius" href="javascript:;" onclick="deliver('{$v.id}', '{$v.vip_code}')">分配销售</a>
+                <a href="javascript:;" class="btn btn-primary radius" onclick="userDetail('{$v.id}')"><i class="Hui-iconfont Hui-iconfont-list"></i>查看详情</a>
             </td>
         </tr>
         {/foreach}
@@ -62,6 +63,9 @@
     //添加客户
     function addMember() {
         layer_show('添加客户', '{:url("addMember")}');
+    }
+    function userDetail(id){
+        layer_show('客户详情', '{:url("userDetail")}?id='+id);
     }
 
     function deliver(id, code){

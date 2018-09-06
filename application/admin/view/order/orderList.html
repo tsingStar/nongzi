@@ -12,11 +12,11 @@
                 查询类型：
                 <select name="searchKey" style="width:auto" class="select-box">
                     <option value="">未选择</option>
-                    <option value="a.order_no">订单编号</option>
-                    <option value="b.user_name">客户姓名</option>
+                    <option value="a.order_no" {if input('searchKey') eq 'a.order_no'}selected{/if}>订单编号</option>
+                    <option value="b.user_name" {if input('searchKey') eq 'b.user_name'}selected{/if}>客户姓名</option>
                 </select>
                 查询条件：
-                <input type="text" name="searchValue" style="width:250px" class="input-text"/>
+                <input type="text" name="searchValue" {if input('searchKey') neq ''}value="{:input('searchValue')}"{/if} style="width:250px" class="input-text"/>
                 订单状态：
                 <select name="order_status" style="width: auto;" class="select-box">
                     <option value="">全部</option>
@@ -36,11 +36,11 @@
         </div>
         <div class="cl pd-5 bg-1 bk-gray mt-20">
             {if !isset($is_show)}
-            <span class="l">
-                <a class="btn btn-primary radius" onclick="downloadOrder()" href="javascript:;">
-                    <i class="Hui-iconfont">&#xe640;</i> 下载订单
-                </a>
-            </span>
+            <!--<span class="l">-->
+                <!--<a class="btn btn-primary radius" onclick="downloadOrder()" href="javascript:;">-->
+                    <!--<i class="Hui-iconfont">&#xe640;</i> 下载订单-->
+                <!--</a>-->
+            <!--</span>-->
             {/if}
         </div>
         <div class="mt-20">
@@ -72,7 +72,12 @@
                     <td>{:config('pay_type')[$item.pay_type]}</td>
                     <td>{$item.total_money}</td>
                     <td>{$item.send_fee}</td>
-                    <td>{$item.order_money}</td>
+                    <td>
+                        {$item.order_money}
+                        {if $item.refund_money gt 0}
+                        (已退款{$item.refund_money}元)
+                        {/if}
+                    </td>
                     <td>{$item.send_time}</td>
                     <td>{$item.sure_time}</td>
                     <td class="td-manage">
@@ -82,18 +87,24 @@
                             <i class="Hui-iconfont">&#xe623;</i>发货
                         </a>
                         {/if}
+                        {if $item.order_status eq 0}
                         <a style="text-decoration:none" class="ml-5" onClick="send_fee_change('{$item.id}')"
                            href="javascript:;" title="运费调整">
                             <i class="Hui-iconfont">&#xe623;</i>运费调整
                         </a>
+                        {/if}
                         <a style="text-decoration:none" class="ml-5" onClick="order_detail('{$item.id}')"
                            href="javascript:;" title="订单详情">
                             <i class="Hui-iconfont">&#xe623;</i>订单详情
                         </a>
                         {if $item.is_apply_refund eq 1}
                         <a style="text-decoration:none" class="ml-5" onClick="order_refund('{$item.order_no}')"
-                           href="javascript:;" title="退货处理">
-                            <i class="Hui-iconfont">&#xe623;</i>退货处理
+                           href="javascript:;" title="退货处理详情">
+                            <i class="Hui-iconfont">&#xe623;</i>退货处理详情
+                        </a>
+                        <a style="text-decoration:none" class="ml-5" onClick="order_refuse('{$item.order_no}', this)"
+                           href="javascript:;" title="取消退货">
+                            <i class="Hui-iconfont">&#xe623;</i>取消退货
                         </a>
                         {/if}
                     </td>
@@ -113,7 +124,18 @@
             {"orderable": false, "aTargets": [8]}// 制定列不参与排序
         ],
     });
-
+    
+    function order_refuse(order_no, o){
+        layer.confirm("确认取消退货?", function () {
+            $.post("{:url('Order/order_refuse')}", {order_no:order_no}, function (res) {
+                if(res.code == 1){
+                    $(o).prev().remove();
+                    $(o).remove();
+                }
+                layer.msg(res.msg);
+            });
+        });
+    }
     //下载订单
     function downloadOrder() {
         layer_show('下载订单', "{:url('Order/downloadOrder')}", '350', '300');

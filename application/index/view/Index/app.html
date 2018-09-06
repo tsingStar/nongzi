@@ -1,0 +1,157 @@
+<!DOCTYPE html>
+<!-- saved from url=(0041)https://atc789.com/settlement/login/login -->
+<html>
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+<title>app下载</title>
+<meta name="viewport" content="width=device-width, initial-scale=1">
+    <style>
+        /* CSS Document */
+        *{ margin:0; padding:0;}
+        body{ font-size:14px; font-family:Arial, Helvetica, sans-serif,"微软雅黑"; color:#333;}
+        body,ul,li,p,input,img,h1,h2,h3,h4,h5,h6,p{ margin:0; padding:0;}
+        input,img{ border:none;}
+        ul,li,ol{ list-style:none;}
+        a{font-family:Arial, Helvetica, sans-serif,"微软雅黑","宋体","黑体"; color:#333; text-decoration:none;}
+        a:hover{ color:#000; text-decoration:none;}
+        i{ font-style:normal; font-weight:normal;}
+        .clear{ clear:both; overflow:hidden;}
+        .mid{ width:1000px; height:auto; margin:0 auto;}
+
+        /*  app  */
+        .wrapper{background:url("__STATIC__/images/app_bg.png") no-repeat center; background-size:100% auto;
+            width:100%; height:100%; position:fixed; overflow: hidden; }
+        .wraps{ height:100%; position:relative}
+        .logo{position: absolute;left: 0;right: 0;top:15%; text-align:center; }
+        .logo-img{ width:70%;}
+        .plea{ position: absolute;left: 0;right: 0;top:35%;background:rgba(255,255,255,.3); padding:5%; width:65%;
+            margin:0 auto; border-radius:10px;}
+        .plea span{ display:block; width:70%; height:35px; border-radius:5px; line-height:35px;
+            background:rgba(255,255,255,.7); color:#666; float:left; text-indent:1em;}
+        .plea a{ display:block; width:25%; height:35px; border-radius:5px; line-height:35px; text-align:center;
+            background:#a8e67e; color:#000; float:right;}
+        .plea p{ color:#333; clear:both; padding-top:10px;}
+        .main-content{position: absolute;left: 0;right: 0;top:62%;}
+        .and, .ios{ display:block; width:55%; height:50px; line-height:50PX; border-radius:10px;
+            color:#fff; margin:0 auto 30px; border:2px solid #fff; text-align:center}
+        .and img, .ios img{ vertical-align:middle;}
+        .banben{position: absolute;left: 0;right: 0;top:90%; color:#fff; text-align:center;}
+        .weixin-tip {
+            display: none;
+            position: fixed;
+            left: 0;
+            top: 0;
+            bottom: 0;
+            background: rgba(0, 0, 0, 0.8);
+            filter: alpha(opacity=80);
+            height: 100%;
+            width: 100%;
+            z-index: 100;
+        }
+
+        .weixin-tip p {
+            text-align: center;
+            margin-top: 10%;
+            padding: 0 5%;
+        }
+    </style>
+</head>
+<body>
+
+    <div class="wrapper">   
+        <div class="wraps"> 
+          <div class="logo"><img src="__STATIC__/images/logo.png" class="logo-img" ></div>
+          <div class="plea">
+              <span>邀请码：<p id="con" style="display: inline" data-clipboard-text="1">{$vip_code}</p></span><a id="copy">复制</a>
+            <p>特别提醒：点击上方复制邀请码，下载APP。注册填写邀请码，系统提供专属您的销售经理为您提供全程优质服务！</p>
+          </div>
+          <div class="main-content">
+              <a href="###" data-url="https://shop.qiangnongzi.com/nongzi.apk" onclick="down(this)" class="and">
+                <img src="__STATIC__/images/and.png">
+                Android版下载
+              </a>
+              <a href="###" class="ios" data-url="" onclick="down(this)">
+                <img src="__STATIC__/images/ios.png">
+                iphone版下载
+              </a>
+          </div>
+          <div class="banben">版本号 v1.0</div>
+        </div>   
+    </div>
+    <div class="weixin-tip" onclick="$(this).hide()" style="width: 100%;">
+        <p>
+            <img src="__STATIC__/images/w_tip.png" alt="微信打开" style="width: 100%;"/>
+        </p>
+    </div>
+
+</body>
+<script src="__STATIC__/lib/clipboard/clipboard.js"></script>
+<script src="__STATIC__/lib/jquery/1.9.1/jquery.js"></script>
+<script>
+    var clipboard = new ClipboardJS('#copy', {
+        target: function() {
+            return document.querySelector('#con');
+        }
+    });
+    clipboard.on('success', function(e) {
+        console.log(e);
+        alert('复制成功');
+    });
+    clipboard.on('error', function(e) {
+        alert('222');
+        console.log(e);
+    });
+</script>
+<script language="javascript">
+    window.onload = function() {
+        var u = navigator.userAgent;
+        if (u.indexOf('Android') > -1 || u.indexOf('Linux') > -1) { //安卓手机
+            //                    alert("安卓手机");
+        } else if (u.indexOf('iPhone') > -1) { //苹果手机
+            //                    alert("苹果手机");
+        } else if (u.indexOf('Windows Phone') > -1) { //winphone手机
+            alert("WindowsPhone暂未推出。");
+            // window.location.href = "mobile/index.html";
+        } else if (u.indexOf('Windows NT') > -1) { //Windows电脑
+            alert("请用手机浏览器访问。");
+            //                    window.location.href = "https://itunes.apple.com/us/app/ya-da-yun/id1072053485?l=zh&ls=1&mt=8";
+        }
+        //                var vU=JSON.stringify(u);
+        //                alert(vU);
+    }
+        var winHeight = $(window).height();
+
+        function is_weixin() {
+            var ua = navigator.userAgent.toLowerCase();
+            if (ua.match(/MicroMessenger/i) == "micromessenger") {
+                return true;
+            } else {
+                return false;
+            }
+        }
+        function down(o){
+            var isWeixin = is_weixin();
+            if (isWeixin) {
+                $(".weixin-tip").css("height", winHeight);
+                $(".weixin-tip").show();
+            }else{
+                var url = $(o).data('url');
+                if(url == ""){
+                    alert('正在玩命开发中。。。');
+                    return;
+                }
+                window.location.href=url;
+            }
+        }
+</script>
+<script>
+    var _hmt = _hmt || [];
+    (function() {
+        var hm = document.createElement("script");
+        hm.src = "https://hm.baidu.com/hm.js?556bd09e2491dbf6bca1187fe697f21c";
+        var s = document.getElementsByTagName("script")[0];
+        s.parentNode.insertBefore(hm, s);
+    })();
+</script>
+
+</html>

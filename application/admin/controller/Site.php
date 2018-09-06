@@ -107,7 +107,8 @@ class Site extends BaseController
         if (request()->isAjax()) {
             $image = input('image');
             $ord = input('ord');
-            $res = model('swiper')->save(['image' => $image, 'ord' => $ord]);
+            $product_id = input('product_id');
+            $res = model('swiper')->save(['image' => $image, 'ord' => $ord, 'product_id'=>$product_id]);
             if ($res) {
                 exit_json();
             } else {
@@ -164,7 +165,11 @@ class Site extends BaseController
             if ($count > config('recommendKey')) {
                 exit_json(-1, '推荐搜索关键字最多' . config('recommendKey') . '个');
             }
-            $keywords->save(['keywords' => $keywords1]);
+            if($keywords){
+                $keywords->save(['keywords' => $keywords1]);
+            }else{
+                model('keywords')->save(['keywords' => $keywords1]);
+            }
             exit_json();
         } else {
             $this->assign('keystring', $keywords['keywords']);

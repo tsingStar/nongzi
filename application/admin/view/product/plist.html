@@ -5,10 +5,11 @@
 <div>
     <div class="page-container">
         <div class="text-c">
-            商品名称：<input type="text" name="" id="" placeholder=" 商品名称" style="width:250px" class="input-text">
-            商品货号：<input type="text" name="" id="" placeholder=" 商品货号" style="width:250px" class="input-text">
-            <button name="" id="" class="btn btn-success" type="submit"><i class="Hui-iconfont">&#xe665;</i> 搜商品
+            <form action="">
+            商品名称：<input type="text" name="name" id="" placeholder=" 商品名称" style="width:250px" class="input-text">
+            <button name="" class="btn btn-success" type="submit"><i class="Hui-iconfont">&#xe665;</i> 搜商品
             </button>
+            </form>
         </div>
         <div class="cl pd-5 bg-1 bk-gray mt-20">
             <span class="l">
@@ -17,6 +18,15 @@
                 </a>
                 <a class="btn btn-primary radius" onclick="product_add('添加商品','productAdd.html')" href="javascript:;">
                     <i class="Hui-iconfont">&#xe600;</i> 添加商品
+                </a>
+                <a href="javascript:;" class="btn btn-primary radius" onclick="listCon(1)">
+                    <i class="Hui-iconfont Hui-iconfont-search"></i>首页推荐
+                </a>
+                <a href="javascript:;" class="btn btn-primary radius" onclick="listCon(2)">
+                    <i class="Hui-iconfont Hui-iconfont-search"></i>热销商品
+                </a>
+                <a href="javascript:;" class="btn btn-primary radius" onclick="listCon(3)">
+                    <i class="Hui-iconfont Hui-iconfont-search"></i>库存不足
                 </a>
             </span>
             <a class="btn btn-success radius r" style="line-height:1.6em;margin-top:3px"
@@ -56,14 +66,14 @@
                         {$good.cate_name}
                     </td>
                     <td class="td-status">
-                        <div class="switch switch-small">
+                        <!--<div class="switch switch-small">-->
                             <input type="checkbox" onchange="setIndex('{$good.id}', this)" {if condition="$good.is_index eq 1"}checked{/if} />
-                        </div>
+                        <!--</div>-->
                     </td>
                 <td class="td-status">
-                    <div class="switch switch-small">
+                    <!--<div class="switch switch-small">-->
                         <input type="checkbox" onchange="setHot('{$good.id}', this)" {if condition="$good.is_hot eq 1"}checked{/if} />
-                    </div>
+                    <!--</div>-->
                 </td>
                 <td class="td-status">
                     {if condition="$good.is_limit eq 1"}
@@ -97,6 +107,11 @@
         "ordering":false,
         "bStateSave": true,//状态保存
     });
+
+
+    function listCon(status) {
+        location.href = location.origin+location.pathname+"?con="+status;
+    }
 
     function setIndex(product_id, o){
         var is_index = $(o).prop('checked')?1:0;

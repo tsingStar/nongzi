@@ -33,6 +33,7 @@
             <th>会员名</th>
             <th>手机号</th>
             <th>注册时间</th>
+            <th>操作</th>
         </tr>
         </thead>
         <tbody>
@@ -42,6 +43,9 @@
             <td>{$v.user_name}</td>
             <td>{$v.telephone}</td>
             <td>{$v.create_time}</td>
+            <td>
+                <a href="javascript:;" class="btn btn-primary radius" onclick="userDetail('{$v.id}')"><i class="Hui-iconfont Hui-iconfont-list"></i>查看详情</a>
+            </td>
         </tr>
         {/foreach}
         </tbody>
@@ -53,6 +57,9 @@
 <script type="text/javascript">
 
 
+    function userDetail(id){
+        layer_show('客户详情', '{:url("userDetail")}?id='+id);
+    }
     $(function () {
         $("table").dataTable();
     })

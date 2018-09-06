@@ -10,6 +10,7 @@
 namespace app\app\controller;
 
 
+use app\admin\model\Admins;
 use think\Controller;
 use think\Log;
 
@@ -33,13 +34,14 @@ class Shop extends Controller
      */
     public function getSwiper()
     {
-        $list = model('swiper')->field('id, image, ord')->order('ord desc')->select();
+        $list = model('swiper')->field('id, image, ord, product_id')->order('ord')->select();
         $data = [];
         foreach ($list as $l) {
             $t = [];
             $t['id'] = $l['id'];
             $t['image'] = __URL__ . $l['image'];
             $t['ord'] = $l['ord'];
+            $t['product_id'] = $l['product_id'];
             $data[] = $t;
         }
         exit_json(1, '请求成功', $data);
@@ -68,16 +70,24 @@ class Shop extends Controller
      */
     public function getCatesAndProducts()
     {
-
-        $cate = model('ProductCate')->field('id, name, ord, parent_id')->order('ord desc')->select();
+        $cate = model('ProductCate')->field('id, name, ord, parent_id')->order('ord')->select();
         $list = getTree($cate, 0, 'parent_id');
+        $data = [];
         foreach ($list as $l) {
-            foreach ($l['children'] as $item) {
+            $temp = [];
+            foreach ($l['children'] as $key=>$item) {
                 $cate_id = $item['id'];
                 $item['children'] = model('Product')->getListByCateId($cate_id);
+                if(count($item['children'])>0){
+                    $temp[] = $item;
+                }
+            }
+            if(count($temp)>0){
+                $l['children'] = $temp;
+                $data[] = $l;
             }
         }
-        exit_json(1, '请求成功', $list);
+        exit_json(1, '请求成功', $data);
     }
 
     /**
@@ -160,7 +170,7 @@ class Shop extends Controller
         foreach ($data as $item){
             $temp[$item['cate_parent_id']]['image'] = $item['word_image']?__URL__.$item['word_image']:"";
             $temp[$item['cate_parent_id']]['cate_id'] = $item['cate_parent_id'];
-            $temp[$item['cate_parent_id']]['cate_name'] = $item['name'];
+            $temp[$item['cate_parent_id']]['cate_name'] = $item['cate_name'];
             $temp[$item['cate_parent_id']]['data'][] = model('Product')->formatOne($item);;
         }
 
@@ -192,7 +202,7 @@ class Shop extends Controller
         }
         $where = '1 = 1';
         for ($i = 0; $i < mb_strlen($keywords, 'utf-8'); $i++) {
-            $where .= " and name like '%" . mb_substr($keywords, $i, 1, 'utf-8') . "%' ";
+            $where .= " and (name like '%" . mb_substr($keywords, $i, 1, 'utf-8') . "%') or (bname like '%" . mb_substr($keywords, $i, 1, 'utf-8') . "%') ";
         }
         $data = $this->productList($where);
         exit_json(1, '请求成功', $data);
@@ -239,24 +249,28 @@ class Shop extends Controller
         $image_url = input('image_url');
         $type = input('type');
         if(isset($image_url)){
-            $image = "";
+            $image = $image_url;
         }else{
             $img = request()->file('image');
-            $img_url = [];
-            if(is_array($img)){
-                foreach ($img as $item) {
-                    $info = $item->move(__UPLOAD__);
+            if($img){
+                $img_url = [];
+                if(is_array($img)){
+                    foreach ($img as $item) {
+                        $info = $item->move(__UPLOAD__);
+                        $saveName = $info->getSaveName();
+                        $path = "/upload/" . $saveName;
+                        $img_url[] = $path;
+                    }
+                }else{
+                    $info = $img->move(__UPLOAD__);
                     $saveName = $info->getSaveName();
                     $path = "/upload/" . $saveName;
                     $img_url[] = $path;
                 }
+                $image = join(',', $img_url);
             }else{
-                $info = $img->move(__UPLOAD__);
-                $saveName = $info->getSaveName();
-                $path = "/upload/" . $saveName;
-                $img_url[] = $path;
+                $image = "";
             }
-            $image = join(',', $img_url);
         }
         $data = [
             'user_id'=>input('user_id'),
@@ -281,7 +295,19 @@ class Shop extends Controller
      */
     public function getSevicePhone()
     {
+        $user_id = input('user_id');
         $phone = model('WebContactUs')->value('telephone');
+        if($user_id){
+            $user = model('User')->where('id', $user_id)->find();
+            $vip_code = $user['vip_code'];
+            if($vip_code){
+                $admin = new Admins();
+                $phone1 = $admin->where('vip_code', $vip_code)->value('telephone');
+                if($phone1){
+                    $phone = $phone1;
+                }
+            }
+        }
         exit_json(1, '请求成功', ['phone'=>$phone]);
 
     }

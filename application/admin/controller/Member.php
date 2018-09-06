@@ -117,6 +117,19 @@ class Member extends BaseController
         }
     }
 
+    /**
+     * 用户详情
+     */
+    public function userDetail()
+    {
+        $id = input('id');
+        $user = model('User')->where('id', $id)->find();
+        $user['sale_name'] = model('Admins')->where('vip_code', $user['vip_code'])->value('name');
+        $user['address'] = model('UserAddress')->where('user_id', $id)->select();
+        $this->assign('user', $user);
+        return $this->fetch();
+    }
+
 
     //TODO 待处理
 

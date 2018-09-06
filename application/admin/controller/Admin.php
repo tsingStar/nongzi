@@ -72,9 +72,11 @@ class Admin extends BaseController
             if(true !== $check){
                 exit_json(-1, $check);
             }
-            $data['vip_code'] = uniqid();
             $res = $this->adminModel->allowField(true)->isUpdate(false)->save($data);
             if($res){
+                $id = $this->adminModel->getLastInsID();
+                $vip_code = getRandStr($id, 5, 'nongzi');
+                model('Admins')->save(['vip_code'=>$vip_code], ['id'=>$id]);
                 exit_json(1, '保存成功');
             }else{
                 exit_json(-1, '保存失败');
@@ -99,7 +101,7 @@ class Admin extends BaseController
         if(request()->isAjax()){
             $data = input('post.');
             $data['role_id'] = join(',', $data['role_id']);
-            $res = $this->adminModel->allowField(['role_id', 'uname', 'describe', 'name', 'department_id', 'department_pid'])->save($data, ['id'=>$data['id']]);
+            $res = $this->adminModel->allowField(['role_id', 'uname', 'describe', 'name', 'department_id', 'department_pid', 'telephone'])->save($data, ['id'=>$data['id']]);
             if($res){
                 exit_json(1, '保存成功');
             }else{

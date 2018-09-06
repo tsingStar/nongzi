@@ -1,0 +1,64 @@
+{include file='pub/header'/}
+<title></title>
+</head>
+<body>
+<div class="page-container">
+    <form class="form form-horizontal" action="" target="_blank" id="open_time" method="post" enctype="multipart/form-data">
+        <div class="row cl">
+            <label class="form-label col-xs-4 col-sm-2">客户名：</label>
+            <div class="formControls col-xs-8 col-sm-9">
+                {$user.user_name}
+            </div>
+        </div>
+        <div class="row cl">
+            <label class="form-label col-xs-4 col-sm-2">手机号：</label>
+            <div class="formControls col-xs-8 col-sm-9">
+                {$user.telephone}
+            </div>
+        </div>
+        <div class="row cl">
+            <label class="form-label col-xs-4 col-sm-2">头像：</label>
+            <div class="formControls col-xs-8 col-sm-9">
+                <img src="{$user.head_img}" alt="" style="width: 120px;">
+            </div>
+        </div>
+        <div class="row cl">
+            <label class="form-label col-xs-4 col-sm-2">邀请码：</label>
+            <div class="formControls col-xs-8 col-sm-9">
+                {$user.vip_code}
+            </div>
+        </div>
+        <div class="row cl">
+            <label class="form-label col-xs-4 col-sm-2">绑定客服：</label>
+            <div class="formControls col-xs-8 col-sm-9">
+                {$user.sale_name}
+            </div>
+        </div>
+        <div class="row cl">
+            <label class="form-label col-xs-4 col-sm-2">常用地址：</label>
+            <div class="formControls col-xs-8 col-sm-9">
+                <table class="table table-bordered table-border text-c">
+                    <tr>
+                        <td>姓名</td>
+                        <td>电话</td>
+                        <td>地址</td>
+                    </tr>
+                    {foreach $user.address as $item}
+                    <tr>
+                        <td>{$item.user_name}</td>
+                        <td>{$item.user_telephone}</td>
+                        <td>{$item.province}-{$item.city}-{$item.county}-{$item.address}</td>
+                    </tr>
+                    {/foreach}
+
+
+                </table>
+            </div>
+        </div>
+    </form>
+</div>
+
+
+{include file="pub/footer"/}
+</body>
+</html>

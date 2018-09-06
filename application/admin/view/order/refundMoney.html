@@ -8,6 +8,15 @@
         class="Hui-iconfont">&#xe68f;</i></a></nav>
 <div class="page-container">
     <div class="text-c">
+        <form action="" method="get">
+            订单状态：
+            <select name="status" class="select-box" style="width: auto;">
+                <option value="">--请选择--</option>
+                <option value="1">未处理</option>
+                <option value="2">已处理</option>
+            </select>
+            <button type="submit" class="btn btn-primary">查询</button>
+        </form>
 
     </div>
     <div class="cl pd-5 bg-1 bk-gray mt-20">
@@ -26,6 +35,7 @@
                 <th width="60">申请时间</th>
                 <th width="60">最后一次修改时间</th>
                 <th width="30">退款状态</th>
+                <th width="30">退款备注</th>
                 <th width="100">操作</th>
             </tr>
             </thead>
@@ -66,11 +76,23 @@
                     已处理
                     {/if}
                 </td>
+                <td>
+                    {$item.remarks}
+                </td>
                 <td class="td-manage">
+                    {if $item.status neq 2}
                     <a style="text-decoration:none" class="ml-5" onClick="backMoney('{$item.id}', '{$item.refund_type}')"
                        href="javascript:;" title="确认退款">
                         <i class="Hui-iconfont">&#xe623;</i>确认退款
                     </a>
+                    {else/}
+                        退款已处理
+                    {/if}
+                    <a style="text-decoration:none" class="ml-5" onClick="backDetail('{$item.id}', '{$item.refund_type}')"
+                       href="javascript:;" title="退款详情">
+                        <i class="Hui-iconfont">&#xe623;</i>查看退款详情
+                    </a>
+
                 </td>
             </tr>
             {/foreach}
@@ -90,23 +112,30 @@
     });
 
     /**
+     * 退款详情
+     */
+    function backDetail(id){
+        layer_show('退款详情', '{:url("backDetail")}?refund_id='+id);
+    }
+
+    /**
      * 确认退款
      */
     function backMoney(id, refund_type){
         layer.confirm('确认退款？', function () {
             // layer.msg('维护中。。。');
             // return ;
-            if(refund_type == '1'){
-                $.post('{:url("backMoney")}', {id:id}, function (res) {
-                    if(res.code == 1){
-                        layer.msg('退款成功');
-                    }else{
-                        layer.msg(res.msg);
-                    }
-                });
-            }else{
+            // if(refund_type == '1'){
+            //     $.post('{:url("backMoney")}', {id:id}, function (res) {
+            //         if(res.code == 1){
+            //             layer.msg('退款成功');
+            //         }else{
+            //             layer.msg(res.msg);
+            //         }
+            //     });
+            // }else{
                 layer_show('退款信息补全', '{:url("addRefundInfo")}?refund_id='+id);
-            }
+            // }
         });
 
 
