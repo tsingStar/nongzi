@@ -201,9 +201,17 @@ class Shop extends Controller
             exit_json(-1, '关键字不能为空');
         }
         $where = '1 = 1';
+        $where1 = '';
+        $where2 = '';
         for ($i = 0; $i < mb_strlen($keywords, 'utf-8'); $i++) {
-            $where .= " and (name like '%" . mb_substr($keywords, $i, 1, 'utf-8') . "%') or (bname like '%" . mb_substr($keywords, $i, 1, 'utf-8') . "%') ";
+            $where1 .= " name like '%" . mb_substr($keywords, $i, 1, 'utf-8') . "%'";
+            $where2 .= " bname like '%" . mb_substr($keywords, $i, 1, 'utf-8') . "%' ";
+            if($i<mb_strlen($keywords, 'utf-8')-1){
+                $where1 .= " and";
+                $where2 .= " and";
+            }
         }
+        $where .= " and ($where1) or ($where2)";
         $data = $this->productList($where);
         exit_json(1, '请求成功', $data);
     }

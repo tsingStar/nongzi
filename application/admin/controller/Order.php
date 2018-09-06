@@ -268,6 +268,7 @@ class Order extends BaseController
     {
         $refund_id = input('refund_id');
         $refund = model('OrderRefund')->where('id', $refund_id)->find();
+        $refund['refund_money'] = model('Order')->where('order_no', $refund['order_no'])->value("refund_money");
         $this->assign('item', $refund);
         return $this->fetch();
     }
@@ -295,10 +296,11 @@ class Order extends BaseController
 //                $refund->save(['status' => 2, 'image' => $image, 'pay_time' => $pay_time]);
 //            }
 //            //退款查询结束
+            if ($refund_money > $order['order_money']) {
+                exit_json(-1, ' 退款金额不能大于订单总金额');
+            }
             if ($refund['refund_type'] == 1) {
-                if ($refund_money > $order['order_money']) {
-                    exit_json(-1, ' 退款金额不能大于订单总金额');
-                }
+
                 //整单退
                 //退款参数
                 if($refund['refund_content'] == 1){
@@ -321,10 +323,10 @@ class Order extends BaseController
                 }
                 exit_json();
             } else {
-                $money = model('OrderDet')->whereIn('id', $refund['refund_detail'])->sum('num*price');
-                if ($refund_money > $money) {
-                    exit_json(-1, ' 退款金额不能大于申请退货商品总金额');
-                }
+//                $money = model('OrderDet')->whereIn('id', $refund['refund_detail'])->sum('num*price');
+//                if ($refund_money > $money) {
+//                    exit_json(-1, ' 退款金额不能大于申请退货商品总金额');
+//                }
                 $refund->save(['image' => $image, 'pay_time' => $pay_time, 'status' => 2]);
                 $order->save(['refund_money' => $refund_money]);
                 exit_json();
