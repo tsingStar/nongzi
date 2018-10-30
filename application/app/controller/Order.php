@@ -226,16 +226,17 @@ class Order extends BaseUser
 //            $orderInfo->save(['order_status' => 5]);
 //            exit_json(-1, '订单超时');
 //        }
-        $order = model('Order')->where('order_no', $order_no)->find();
+
         //pay_type 支付方式   1 威富通 微信支付  2 支付宝 3  小程序支付
-        if ($order['order_status'] != 0) {
-            exit_json(-1, '订单不可支付');
-        }
         $pay_info = [
             'wxpay' => "",
             'alipay' => "",
             'xcxpay' => ""
         ];
+        $order_no1 = getOrderNo();
+        $orderInfo->save(["order_no"=>$order_no1]);
+        model("OrderDet")->save(["order_no"=>$order_no1], ["order_no"=>$order_no]);
+        $order = model('Order')->where('order_no', $order_no1)->find();
         if ($pay_type == 1) {
             $pay_data = [
 

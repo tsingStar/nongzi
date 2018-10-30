@@ -253,17 +253,19 @@ class Order extends BaseController
                 ];
                 $weixin = new WeiXinPay();
                 $res = $weixin->refund($orderInfo);
-                if ($res) {
-                    $order->save(['refund_money' => $order['order_money']]);
-                    $refund->save(['status' => 2]);
+                if ($res['code']) {
+                    $order->save(['refund_money' => $refund_money]);
+                    $refund->save(['status' => 2, 'image' => $image, 'pay_time' => $pay_time]);
+                    exit_json(1, $res['msg']);
+                }else{
+//                    exit_json(-1, $res['msg']);
+                    exit_json(-1, "退款失败");
                 }
-                exit_json();
             } else {
                 exit_json(-1, ' 参数错误');
             }
         }
     }
-
     public function backDetail()
     {
         $refund_id = input('refund_id');
@@ -287,20 +289,13 @@ class Order extends BaseController
             $pay_time = input('pay_time');
             $order = model('Order')->where('order_no', $refund['order_no'])->find();
             $refund_money = input('refund_money');
-            $weixin = new WeiXinPay();
-
-//            //退款订单查询
-//            $qr = $weixin->queryRefund($refund_id);
-//            if($qr){
-//                $order->save(['refund_money' => $order['order_money']]);
-//                $refund->save(['status' => 2, 'image' => $image, 'pay_time' => $pay_time]);
-//            }
-//            //退款查询结束
             if ($refund_money > $order['order_money']) {
                 exit_json(-1, ' 退款金额不能大于订单总金额');
             }
             if ($refund['refund_type'] == 1) {
-
+                //if ($refund_money > $order['order_money']) {
+                //    exit_json(-1, ' 退款金额不能大于订单总金额');
+                //}
                 //整单退
                 //退款参数
                 if($refund['refund_content'] == 1){
@@ -314,27 +309,51 @@ class Order extends BaseController
                     'total_money' => $order['order_money'],
                     'refund_money' => $refund_money,
                     'shop_id' => session(config('adminKey')),
-                    'pay_type' => $order['pay_type']
+                    'pay_status' => $order['pay_type']
                 ];
+                $weixin = new WeiXinPay();
                 $res = $weixin->refund($orderInfo);
-                if ($res) {
-                    $order->save(['refund_money' => $refund_money]);
+                if ($res['code']) {
+                    $order->save(['refund_money' => $refund_money, "is_apply_refund"=>2]);
                     $refund->save(['status' => 2, 'image' => $image, 'pay_time' => $pay_time]);
+                    exit_json(1, $res['msg']);
+                }else{
+                    exit_json(-1, $res['msg']);
+//                    exit_json(-1, "退款失败");
                 }
-                exit_json();
             } else {
-//                $money = model('OrderDet')->whereIn('id', $refund['refund_detail'])->sum('num*price');
-//                if ($refund_money > $money) {
-//                    exit_json(-1, ' 退款金额不能大于申请退货商品总金额');
-//                }
+                //$money = model('OrderDet')->whereIn('id', $refund['refund_detail'])->sum('num*price');
+                //if ($refund_money > $money) {
+                //    exit_json(-1, ' 退款金额不能大于申请退货商品总金额');
+                //}
                 $refund->save(['image' => $image, 'pay_time' => $pay_time, 'status' => 2]);
-                $order->save(['refund_money' => $refund_money]);
+                $order->save(['refund_money' => $refund_money, "is_apply_refund"=>2]);
                 exit_json();
             }
         } else {
             $this->assign('item', $refund);
             return $this->fetch();
         }
+    }
+
+
+    public function ok_refund()
+    {
+        $order_no = input("order_no");
+        $money = input("money");
+        $order = model('Order')->where('order_no', $order_no)->find();
+        $refund = model('OrderRefund')->where('order_no', $order_no)->find();
+        $res1 = $order->save(["refund_money"=>$money, "is_apply_refund"=>2]);
+        $res2 = $refund->save([
+            "pay_time"=>date("Y-m-d"),
+            "status"=>2
+        ]);
+        if($res1 && $res2){
+            exit_json();
+        }else{
+            exit_json(-1, '处理失败');
+        }
+
     }
 
     /**
@@ -344,8 +363,10 @@ class Order extends BaseController
     {
         $order_no = input('order_no');
         $order = model('Order')->where('order_no', $order_no)->find();
-        if($order['is_send'] == 1){
+        if($order['is_send'] == 1 && $order['sure_time'] == ""){
             $res1 = $order->save(['order_status'=>2, 'is_apply_refund'=>0]);
+        }else if($order['is_send'] == 1 && $order['sure_time'] != ""){
+            $res1 = $order->save(['order_status'=>3, 'is_apply_refund'=>0]);
         }else{
             $res1 = $order->save(['order_status'=>1, 'is_apply_refund'=>0]);
         }
@@ -356,7 +377,6 @@ class Order extends BaseController
             exit_json(-1, '处理失败');
         }
     }
-
 
     //TODO 待处理
 

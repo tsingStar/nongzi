@@ -67,7 +67,14 @@
                     <td>{$item.create_time}</td>
                     <td>{$item.user_name}</td>
                     <td>
+                        {if $item.refund_money eq $item.order_money || $item.refund_money eq $item.total_money}
+                        已退款
+                        {else}
                         {:config('order_status')[$item.order_status]}
+                        {if $item.refund_money gt 0}
+                        (已部分退款)
+                        {/if}
+                        {/if}
                     </td>
                     <td>{:config('pay_type')[$item.pay_type]}</td>
                     <td>{$item.total_money}</td>
@@ -102,6 +109,10 @@
                            href="javascript:;" title="退货处理详情">
                             <i class="Hui-iconfont">&#xe623;</i>退货处理详情
                         </a>
+                        <a style="text-decoration:none" class="ml-5" onClick="ok_refund('{$item.order_no}', this)"
+                           href="javascript:;" title="已做线下退款处理">
+                            <i class="Hui-iconfont">&#xe623;</i>已做线下退款处理
+                        </a>
                         <a style="text-decoration:none" class="ml-5" onClick="order_refuse('{$item.order_no}', this)"
                            href="javascript:;" title="取消退货">
                             <i class="Hui-iconfont">&#xe623;</i>取消退货
@@ -124,11 +135,34 @@
             {"orderable": false, "aTargets": [8]}// 制定列不参与排序
         ],
     });
+
+    function ok_refund(order_no, o){
+        layer.prompt({
+            formType: 0,
+            value: '',
+            title: "确认订单已线下退款？请填写退款金额"
+        }, function (val, index) {
+            if(typeof val != "number"){
+                layer.msg("请输入有效金额");
+            }else{
+                $.post("{:url('Order/ok_refund')}", {order_no: order_no, money: val},function (res) {
+                    if(res.code == 1){
+                        $(o).prev().remove();
+                        $(o).next().remove();
+                        $(o).remove();
+                    }
+                    layer.msg(res.msg);
+                    layer.close(index);
+                });
+            }
+        })
+    }
     
     function order_refuse(order_no, o){
         layer.confirm("确认取消退货?", function () {
             $.post("{:url('Order/order_refuse')}", {order_no:order_no}, function (res) {
                 if(res.code == 1){
+                    $(o).prev().remove();
                     $(o).prev().remove();
                     $(o).remove();
                 }

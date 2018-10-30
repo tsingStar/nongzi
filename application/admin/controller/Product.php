@@ -450,6 +450,22 @@ class Product extends BaseController
 
     }
 
+    /**
+     * 上下架商品
+     */
+    public function upAndDown()
+    {
+        $id = input("id");
+        $is_up = input("is_up");
+        $res = model("Product")->where("id", $id)->find()->save(["is_up"=>$is_up]);
+        if($res){
+            exit_json();
+        }else{
+            exit_json(-1, "操作失败");
+        }
+        
+    }
+
 
     //TODO 待处理
 

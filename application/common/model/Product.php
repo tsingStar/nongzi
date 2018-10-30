@@ -45,6 +45,15 @@ class Product extends Model
     {
         $data = $product;
         //富文本处理
+        /*$content = $data['mob_detail'];
+        $preg = '/<img.*?src=[\"|\']?\/(.*?)[\"|\']?\s.*?>/i';
+        preg_match_all($preg, $content, $data1);
+        foreach ($data1[1] as $item){
+            $img_url = __URL__.'/'.$item;
+            $content = str_replace('/'.$item, $img_url, $content);
+        }
+        $data['mob_detail'] = $content;*/
+
         $content = $data['mob_detail'];
         preg_match_all('/<img(.*?)>/', $content, $match);
         $imgs = $match[0];
@@ -106,7 +115,7 @@ class Product extends Model
 
         //TODO 正式上线加载正式数据
 
-        $list = $this->where('cate_id', $cate_id)->select();
+        $list = $this->where('cate_id', $cate_id)->where("is_up", 1)->select();
         $data = [];
         foreach ($list as $l){
             $data[] = $this->formatOne($l);
@@ -122,7 +131,8 @@ class Product extends Model
      */
     public function getInfo($product_id)
     {
-        $product = self::get($product_id);
+//        $product = self::get($product_id);
+        $product = $this->where("id", $product_id)->where("is_up", 1)->find();
         if(!$product){
             exit_json(-1, '商品不存在');
         }

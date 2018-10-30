@@ -98,6 +98,7 @@ class Shop extends Controller
         $cate_parent_id = input('cate_id');
         $where = [];
         $where['cate_parent_id'] = $cate_parent_id;
+        $where["is_up"] = 1;
         $data = $this->productList($where);
         exit_json(1, '请求成功', $data);
     }
@@ -165,7 +166,7 @@ class Shop extends Controller
      */
     public function getProductIndex()
     {
-        $data = model('Product')->alias('a')->join('ProductCate b', 'a.cate_parent_id=b.id')->where('a.is_index', 1)->field('a.*, b.word_image')->order('a.ord desc')->select();
+        $data = model('Product')->alias('a')->join('ProductCate b', 'a.cate_parent_id=b.id')->where('a.is_index', 1)->where("a.is_up", 1)->field('a.*, b.word_image')->order('a.ord desc')->select();
         $temp = [];
         foreach ($data as $item){
             $temp[$item['cate_parent_id']]['image'] = $item['word_image']?__URL__.$item['word_image']:"";
@@ -187,6 +188,7 @@ class Shop extends Controller
     public function getHotProducts()
     {
         $where['is_hot'] = 1;
+        $where["is_up"] = 1;
         $data = $this->productList($where);
         exit_json(1, '请求成功', $data);
     }
@@ -212,6 +214,7 @@ class Shop extends Controller
             }
         }
         $where .= " and ($where1) or ($where2)";
+        $where .= " and is_up=1";
         $data = $this->productList($where);
         exit_json(1, '请求成功', $data);
     }
@@ -236,7 +239,7 @@ class Shop extends Controller
 
         $pro = model('Product')->where('id', $product_id)->find();
         $cate_id = $pro['cate_id'];
-        $pros = model('Product')->where('cate_id', $cate_id)->order('ord desc')->select();
+        $pros = model('Product')->where('cate_id', $cate_id)->where("is_up", 1)->order('ord desc')->select();
         $data = [];
         foreach ($pros as $item){
             $data[] = model('Product')->formatOne($item);

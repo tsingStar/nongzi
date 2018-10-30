@@ -23,7 +23,7 @@
 	<table class="table table-border table-bordered table-bg">
 		<thead>
 			<tr>
-				<th scope="col" colspan="9">用户列表</th>
+				<th scope="col" colspan="10">用户列表</th>
 			</tr>
 			<tr class="text-c">
 				<th width="25"><input type="checkbox" name="" value=""></th>
@@ -32,6 +32,7 @@
 				<th width="90">用户名称</th>
                 <th>角色</th>
                 <th>所属部门</th>
+				<th>邀请码</th>
 				<th>描述</th>
 				<th width="130">创建时间</th>
 				<!--<th width="100">是否已启用</th>-->
@@ -50,7 +51,8 @@
 						{$roleList[$r]},
 					{/foreach}
 				</td>
-                <td>{$v.depart}</td>
+				<td>{$v.depart}</td>
+				<td>{$v.vip_code}</td>
                 <td>{$v.describe}</td>
 				<td>{$v.create_time}</td>
 				<!--<td class="td-status">-->

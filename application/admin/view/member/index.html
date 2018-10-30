@@ -83,7 +83,9 @@
     }
 
     $(function () {
-        $("table").dataTable();
+        $("table").dataTable({
+            "ordering":false
+        });
     })
     //下载会员信息
     function downloadMember() {

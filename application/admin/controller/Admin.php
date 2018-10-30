@@ -72,11 +72,19 @@ class Admin extends BaseController
             if(true !== $check){
                 exit_json(-1, $check);
             }
+            if($data["vip_code"] != ""){
+                $re = model("Admins")->where("vip_code", $data["vip_code"])->find();
+                if($re){
+                    exit_json(-1, "邀请码重复,请重新填写或留空使用系统随机生成");
+                }
+            }
             $res = $this->adminModel->allowField(true)->isUpdate(false)->save($data);
             if($res){
                 $id = $this->adminModel->getLastInsID();
-                $vip_code = getRandStr($id, 5, 'nongzi');
-                model('Admins')->save(['vip_code'=>$vip_code], ['id'=>$id]);
+                if($data["vip_code"] == ""){
+                    $vip_code = getRandStr($id, 5, 'nongzi');
+                    model('Admins')->save(['vip_code'=>$vip_code], ['id'=>$id]);
+                }
                 exit_json(1, '保存成功');
             }else{
                 exit_json(-1, '保存失败');
@@ -101,7 +109,16 @@ class Admin extends BaseController
         if(request()->isAjax()){
             $data = input('post.');
             $data['role_id'] = join(',', $data['role_id']);
-            $res = $this->adminModel->allowField(['role_id', 'uname', 'describe', 'name', 'department_id', 'department_pid', 'telephone'])->save($data, ['id'=>$data['id']]);
+
+            if($data["vip_code"] != ""){
+                $re = model("Admins")->where("vip_code", $data["vip_code"])->where("id", 'neq', $data["id"])->find();
+                if($re){
+                    exit_json(-1, "邀请码重复,请重新填写或留空使用系统随机生成");
+                }
+            }
+            $vip_code = model("Admins")->where("id", $data["id"])->value("vip_code");
+            model("User")->save(["vip_code"=>$data["vip_code"]], ["vip_code"=>$vip_code]);
+            $res = $this->adminModel->allowField(['role_id', 'uname', 'describe', 'name', 'department_id', 'department_pid', 'telephone', 'vip_code'])->save($data, ['id'=>$data['id']]);
             if($res){
                 exit_json(1, '保存成功');
             }else{
