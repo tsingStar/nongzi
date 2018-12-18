@@ -1,12 +1,17 @@
-﻿{include file='pub/header'/}
+{include file='pub/header'/}
 <title>商品列表</title>
+<style>
+    td a{
+        display: inline-block;
+    }
+</style>
 </head>
 <body class="pos-r">
 <div>
     <div class="page-container">
         <div class="text-c">
-            <form action="">
-            商品名称：<input type="text" name="name" id="" placeholder=" 商品名称" style="width:250px" class="input-text">
+            <form action="" method="get">
+            商品名称：<input type="text" name="name" value="{$name||default=''}" id="" placeholder=" 商品名称" style="width:250px" class="input-text">
             <button name="" class="btn btn-success" type="submit"><i class="Hui-iconfont">&#xe665;</i> 搜商品
             </button>
             </form>
@@ -41,11 +46,13 @@
                     <th width="40"><input name="" type="checkbox" value=""></th>
                     <th width="40">ID</th>
                     <th width="60">缩略图</th>
-                    <th width="100">产品名称</th>
-                    <th width="100">产品分类</th>
-                    <th width="100">是否首页显示</th>
-                    <th width="100">是否热销产品</th>
-                    <th width="100">库存状态</th>
+                    <th width="50">产品名称</th>
+                    <th width="50">产品分类</th>
+                    <th width="30">首页显示</th>
+                    <th width="30">热销产品</th>
+                    <th width="50">库存状态</th>
+                    <th width="30">排序</th>
+                    <th width="200">规格</th>
                     <th width="100">操作</th>
                 </tr>
                 </thead>
@@ -82,6 +89,30 @@
                     库存正常
                     {/if}
                 </td>
+                <td>
+                    <input class="input input-text size-MINI" type="text" value="{$good.ord}" onblur="changeOrder(this, '{$good.id}')">
+                </td>
+                <td>
+                    <div>
+                        <table class="table table-border table-bordered">
+                            <tr>
+                                <td width="50">规格</td>
+                                <td width="100">价格</td>
+                                <td width="50">库存</td>
+                                <td width="50">操作</td>
+                            </tr>
+                            {foreach $good.productAttr as $item}
+                            <tr>
+                                <td><span style="font-size: 12px;">{$item.prop_value_name}</span></td>
+                                <td><input style="font-size: 12px;" type="text" class="input input-text price_comb" value="{$item.price_comb}"/></td>
+                                <td><input style="font-size: 12px;" type="text" class="input input-text remain" value="{$item.remain}"/></td>
+                                <td><button type="button" onclick="setProp(this, '{$item.id}')" class="btn btn-primary radius size-MINI">保存</button></td>
+                            </tr>
+                            {/foreach}
+                        </table>
+                    </div>
+
+                </td>
                     <td class="td-manage">
                         <a style="text-decoration:none" class="ml-5"
                            onClick="product_edit('产品编辑','{:url(\'Product/productEdit\', [\'product_id\'=>$good.id])}')"
@@ -92,14 +123,14 @@
                         <a style="text-decoration:none" class="ml-5"
                            onClick="product_down('{$good.id}')"
                            href="javascript:;" title="下架">
-                            商品下架
+                            <i class="Hui-iconfont Hui-iconfont-xiajia"></i>商品下架
                         </a>
                         {/if}
 
                         {if $good.is_up eq 0}
                         <a style="text-decoration:none" class="ml-5"
                            onClick="product_up('{$good.id}')"
-                           href="javascript:;" title="上架">商品上架
+                           href="javascript:;" title="上架"><i class="Hui-iconfont Hui-iconfont-shangjia"></i>商品上架
                         </a>
                         {/if}
 
@@ -112,17 +143,36 @@
                 {/foreach}
                 </tbody>
             </table>
+            {$page}
         </div>
     </div>
 </div>
 
 {include file='pub/footer'/}
 <script type="text/javascript">
-    $('.table-sort').dataTable({
-        "ordering":false,
-        "bStateSave": true,//状态保存
-    });
+    // $('.table-sort').dataTable({
+    //     "ordering":false,
+    //     "bStateSave": true,//状态保存
+    // });
 
+
+    function setProp(o, prop_id){
+        var price_comb = $(o).parent().parent().find(".price_comb").val();
+        var remain = $(o).parent().parent().find(".remain").val();
+        $.post("{:url('Product/setProp')}", {price_comb:price_comb, remain:remain, prop_id:prop_id}, function (res) {
+            layer.msg(res.msg);
+        });
+    }
+
+    function changeOrder(o, pid){
+        var order = parseInt($(o).val());
+        if(typeof order !="number"){
+            order = 0;
+        }
+        $.post('{:url("Product/setOrder")}', {order:order, pid:pid}, function(res){
+            layer.msg("设置成功");
+        });
+    }
     function product_down(id){
         layer.confirm("确定下架该商品？", function () {
             $.post("{:url('upAndDown')}", {id:id, is_up:0}, function (res) {

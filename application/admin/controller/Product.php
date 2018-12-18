@@ -9,6 +9,8 @@
 
 namespace app\admin\controller;
 
+use think\Log;
+
 class Product extends BaseController
 {
     public function __construct()
@@ -150,9 +152,10 @@ class Product extends BaseController
     {
         $cateId = input('cateId');
         $status = input('con');
+        $name = input("name");
         $where = [];
         if (input('name')) {
-            $where['name'] = input('name');
+            $where['name'] = ["like", "%$name%"];
         }
         if ($status == 1) {
             $where['is_index'] = 1;
@@ -162,11 +165,12 @@ class Product extends BaseController
         }
         if ($cateId) {
             $where['cate_id'] = $cateId;
-            $goodsList = model('Product')->where($where)->select();
+            $goodsList = model('Product')->where($where)->paginate(15, false, ["query"=>request()->param()]);
         } else {
-            $goodsList = model('Product')->where($where)->order('ord desc, id desc')->select();
+            $goodsList = model('Product')->where($where)->order('ord desc, id desc')->paginate(15, false, ["query"=>request()->param()]);
         }
         foreach ($goodsList as $k => $item) {
+            $item["productAttr"] = model("ProductAttr")->where('product_id', $item['id'])->select();
             $num = model('ProductAttr')->where('product_id', $item['id'])->where('remain <= limit_remain')->count();
             if ($num > 0) {
                 $item['is_limit'] = 1;
@@ -178,8 +182,50 @@ class Product extends BaseController
             }
         }
         $this->assign('goodsList', $goodsList);
+        $this->assign("page", $goodsList->render());
+        $this->assign("name", $name);
         return $this->fetch();
     }
+
+    /**
+     * 设置商品排序
+     */
+    public function setOrder()
+    {
+        $pid = input("pid");
+        $order = input("order");
+        $p = model("Product")->where("id", $pid)->find();
+        if($p){
+            $p->save(["ord"=>$order]);
+        }
+        exit_json();
+        
+    }
+
+    /**
+     * 设置规格
+     */
+    public function setProp()
+    {
+        $prop_id = input("prop_id");
+        $price_comb = input("price_comb");
+        $remain = input("remain");
+        $prop = model("ProductAttr")->where("id", $prop_id)->find();
+        if($prop){
+            $res = $prop->save([
+                "price_comb"=>$price_comb,
+                "remain"=>$remain
+            ]);
+            if($res){
+                exit_json();
+            }else{
+                exit_json(-1, "保存失败");
+            }
+        }else{
+            exit_json(-1, "保存失败");
+        }
+    }
+
 
     /**
      * 手动添加商品

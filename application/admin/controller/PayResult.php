@@ -82,17 +82,21 @@ class PayResult extends Controller
         } else {
             //原生微信支付回调
             if ($result['result_code'] == 'SUCCESS') {
-                $order_no = $result['out_trade_no'];
+                $order_pre = $result['out_trade_no'];
                 $transaction_id = $result['transaction_id'];
-                $order = model('Order')->where('order_no', $order_no)->find();
-                if ($order) {
-                    if ((float)$order['order_money'] * 100 == $result['total_fee']) {
+                $pre_order = model("OrderPre")->where("order_no_pre", $order_pre)->find();
+                if ($pre_order) {
+                    $pre_order->save(["status"=>1]);
+                    $order = model('Order')->where('order_no', $pre_order["order_no"])->find();
+                    $order_no = $pre_order['order_no'];
+                    //Log::error(((float)$order['order_money']*100).'@'.$result['total_fee']);
+                    if (((float)$order['order_money']) == $result['total_fee']/100) {
                         if ($result['trade_type'] == 'APP') {
                             $pay_type = 1;
                         } else {
                             $pay_type = 3;
                         }
-                        $order->save(['out_transaction_id' => $transaction_id, 'pay_type' => $pay_type, 'pay_status' => 1, 'pay_time' => $result['time_end'], 'order_status'=>1]);
+                        $order->save(['out_transaction_id' => $transaction_id, 'pay_type' => $pay_type, 'pay_status' => 1, 'pay_time' => $result['time_end'], 'order_status'=>1, 'order_no_pre'=>$order_pre]);
                         try{
                             $this->orderSolve($order_no);
                         } catch (\Exception $e){
@@ -102,7 +106,7 @@ class PayResult extends Controller
                         Log::error('支付金额错误' . $order_no);
                     }
                 } else {
-                    Log::error('订单不存在' . $order_no);
+                    Log::error('支付订单不存在' . $order_pre);
                 }
             } else {
                 Log::error('支付失败，订单号：' . $result['out_trade_no']);
