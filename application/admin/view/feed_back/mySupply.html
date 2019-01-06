@@ -1,4 +1,4 @@
-﻿{include file='pub/header'/}
+{include file='pub/header'/}
 <title>订单列表</title>
 </head>
 
@@ -38,9 +38,11 @@
                         <button class="btn-primary radius btn" type="button" onclick="image('{$item.image}')">查看</button>
                     </td>
                     <td>
-                        <div class="switch switch-small">
-                            <input type="checkbox" disabled checked="{$item.status==1}" />
-                        </div>
+                        {if $item.status eq 0}
+                        <button type="button" class="btn btn-primary radius" onclick="solve('{$item.id}')">处理</button>
+                        {else}
+                        <button type="button" disabled class="btn btn-default radius">已处理</button>
+                        {/if}
                     </td>
                 </tr>
                 {/foreach}
@@ -52,11 +54,11 @@
 {include file='pub/footer'/}
 <script type="text/javascript">
     $('.table-sort').dataTable({
-        // "aaSorting": [[1, "desc"]],//默认第几个排序
-        "bStateSave": true,//状态保存
-        // "aoColumnDefs": [
-        //     {"orderable": false, "aTargets": [8]}// 制定列不参与排序
-        // ],
+        "aaSorting": [[0, "desc"]],//默认第几个排序
+        "bStateSave": false,//状态保存
+        "aoColumnDefs": [
+            {"orderable": false, "aTargets": [5,6,7,8,9]}// 制定列不参与排序
+        ],
     });
     //查看图片
     function image($image) {
@@ -75,6 +77,18 @@
             });
             layer.full(index);
         }
+    }
+    //处理
+    function solve(id){
+        layer.confirm('确认处理？', function(){
+            $.post('{:url("solve")}', {id:id}, function(res){
+                if(res.code == 1){
+                    location.reload();
+                }else{
+                    layer.msg(res.msg);
+                }
+            });
+        });
     }
 
 </script>

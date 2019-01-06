@@ -115,7 +115,7 @@ class Product extends Model
 
         //TODO 正式上线加载正式数据
 
-        $list = $this->where('cate_id', $cate_id)->where("is_up", 1)->select();
+        $list = $this->where('cate_id', $cate_id)->where("is_up", 1)->order("ord desc")->select();
         $data = [];
         foreach ($list as $l){
             $data[] = $this->formatOne($l);

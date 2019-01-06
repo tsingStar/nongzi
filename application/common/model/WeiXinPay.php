@@ -135,30 +135,5 @@ class WeiXinPay
         return $res;
     }
 
-    /**
-     * 查询退款状态
-     */
-//    public function queryRefund($refund_id)
-//    {
-//        $inputObj = new \WxPayRefundQuery();
-//        if($order['pay_type'] == 3){
-//            $inputObj->SetMch_id(config('xiaochengxu.mch_id'));
-//            $inputObj->SetAppid(config('xiaochengxu.app_id'));
-//            $is_app = 0;
-//        }else{
-//            $inputObj->SetMch_id(config('weixin.mch_id'));
-//            $inputObj->SetAppid(config('weixin.app_id'));
-//            $is_app = 1;
-//        }
-//        $inputObj->SetRefund_id($refund_id);
-//
-//        $result = \WxPayApi::refundQuery($inputObj, 6, $is_app);
-//        if($result['refund_status_0'] == 'SUCCESS'){
-//            return true;
-//        }else{
-//            return false;
-//        }
-//    }
-
 
 }

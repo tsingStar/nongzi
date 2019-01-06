@@ -24,6 +24,12 @@
         </div>
         {if $item.refund_type eq 2}
         <div class="row cl">
+            <label class="form-label col-xs-4 col-sm-2"><span class="c-red">*</span>客服申请退款金额：</label>
+            <div class="formControls col-xs-8 col-sm-9">
+                <input type="text" class="input-text" disabled>
+            </div>
+        </div>
+        <div class="row cl">
             <label class="form-label col-xs-4 col-sm-2"><span class="c-red">*</span>退款金额：</label>
             <div class="formControls col-xs-8 col-sm-9">
                 <input type="text" class="input-text" name="refund_money" required>

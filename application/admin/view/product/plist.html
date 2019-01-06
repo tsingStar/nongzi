@@ -33,6 +33,15 @@
                 <a href="javascript:;" class="btn btn-primary radius" onclick="listCon(3)">
                     <i class="Hui-iconfont Hui-iconfont-search"></i>库存不足
                 </a>
+                <a href="javascript:;" class="btn btn-primary radius" onclick="listCon(4)">
+                    <i class="Hui-iconfont Hui-iconfont-search"></i>库存充足
+                </a>
+                <a href="javascript:;" class="btn btn-primary radius" onclick="listCon(5)">
+                    <i class="Hui-iconfont Hui-iconfont-search"></i>已上架
+                </a>
+                <a href="javascript:;" class="btn btn-primary radius" onclick="listCon(6)">
+                    <i class="Hui-iconfont Hui-iconfont-search"></i>未上架
+                </a>
             </span>
             <a class="btn btn-success radius r" style="line-height:1.6em;margin-top:3px"
                href="javascript:location.replace(location.href);" title="刷新">
@@ -97,13 +106,15 @@
                         <table class="table table-border table-bordered">
                             <tr>
                                 <td width="50">规格</td>
-                                <td width="100">价格</td>
+                                <td width="100">单价</td>
+                                <td width="100">件价</td>
                                 <td width="50">库存</td>
                                 <td width="50">操作</td>
                             </tr>
                             {foreach $good.productAttr as $item}
                             <tr>
                                 <td><span style="font-size: 12px;">{$item.prop_value_name}</span></td>
+                                <td><input style="font-size: 12px;" type="text" class="input input-text price_one" value="{$item.price_one}"/></td>
                                 <td><input style="font-size: 12px;" type="text" class="input input-text price_comb" value="{$item.price_comb}"/></td>
                                 <td><input style="font-size: 12px;" type="text" class="input input-text remain" value="{$item.remain}"/></td>
                                 <td><button type="button" onclick="setProp(this, '{$item.id}')" class="btn btn-primary radius size-MINI">保存</button></td>
@@ -157,9 +168,10 @@
 
 
     function setProp(o, prop_id){
+        var price_one = $(o).parent().parent().find(".price_one").val();
         var price_comb = $(o).parent().parent().find(".price_comb").val();
         var remain = $(o).parent().parent().find(".remain").val();
-        $.post("{:url('Product/setProp')}", {price_comb:price_comb, remain:remain, prop_id:prop_id}, function (res) {
+        $.post("{:url('Product/setProp')}", {price_comb:price_comb, price_one:price_one, remain:remain, prop_id:prop_id}, function (res) {
             layer.msg(res.msg);
         });
     }

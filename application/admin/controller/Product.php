@@ -163,6 +163,12 @@ class Product extends BaseController
         if ($status == 2) {
             $where['is_hot'] = 1;
         }
+        if($status == 5){
+            $where["is_up"] = 1;
+        }
+        if($status == 6){
+            $where["is_up"] = 0;
+        }
         if ($cateId) {
             $where['cate_id'] = $cateId;
             $goodsList = model('Product')->where($where)->paginate(15, false, ["query"=>request()->param()]);
@@ -173,6 +179,9 @@ class Product extends BaseController
             $item["productAttr"] = model("ProductAttr")->where('product_id', $item['id'])->select();
             $num = model('ProductAttr')->where('product_id', $item['id'])->where('remain <= limit_remain')->count();
             if ($num > 0) {
+                if($status == 4){
+                    unset($goodsList[$k]);
+                }
                 $item['is_limit'] = 1;
             } else {
                 if ($status == 3) {
@@ -209,12 +218,14 @@ class Product extends BaseController
     {
         $prop_id = input("prop_id");
         $price_comb = input("price_comb");
+        $price_one = input("price_one");
         $remain = input("remain");
         $prop = model("ProductAttr")->where("id", $prop_id)->find();
         if($prop){
             $res = $prop->save([
                 "price_comb"=>$price_comb,
-                "remain"=>$remain
+                "remain"=>$remain,
+                'price_one'=>$price_one
             ]);
             if($res){
                 exit_json();

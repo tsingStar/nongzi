@@ -104,7 +104,7 @@ function exit_json($code = 1, $msg = "操作成功", $data = null)
  */
 function test_tel($telephone)
 {
-    return preg_match('/^1[34578]\d{9}$/', $telephone);
+    return preg_match('/^1[345789]\d{9}$/', $telephone);
 }
 
 /**

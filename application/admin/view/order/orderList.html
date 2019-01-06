@@ -1,4 +1,4 @@
-﻿{include file='pub/header'/}
+{include file='pub/header'/}
 <title>订单列表</title>
 </head>
 
@@ -48,6 +48,7 @@
                 <thead>
                 <tr class="text-c">
                     <th width="50">订单编号</th>
+                    <th width="50">支付订单号<br><span style="font-size: 12px;">(作为财务审核订单用)</span></th>
                     <th width="60">下单时间</th>
                     <th width="60">下单客户</th>
                     <th width="30">订单状态</th>
@@ -64,6 +65,7 @@
                 {foreach $list as $item}
                 <tr class="text-c va-m">
                     <td>{$item.order_no}</td>
+                    <td><b style="color: #F83B3C;">{$item.order_no_pre}</b></td>
                     <td>{$item.create_time}</td>
                     <td>{$item.user_name}</td>
                     <td>
@@ -141,10 +143,13 @@
             formType: 0,
             value: '',
             title: "确认订单已线下退款？请填写退款金额"
-        }, function (val, index) {
-            if(typeof val != "number"){
+        }, function (val1, index) {
+        	
+            var val = parseFloat(val1);
+            if(isNaN(val) || val<=0){
                 layer.msg("请输入有效金额");
-            }else{
+                return;
+            }
                 $.post("{:url('Order/ok_refund')}", {order_no: order_no, money: val},function (res) {
                     if(res.code == 1){
                         $(o).prev().remove();
@@ -154,7 +159,7 @@
                     layer.msg(res.msg);
                     layer.close(index);
                 });
-            }
+            
         })
     }
     

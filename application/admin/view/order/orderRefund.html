@@ -41,14 +41,24 @@
                 {/if}
             </div>
         </div>
+        {if $order_refund.refund_type eq 2}
+        <div class="row cl">
+            <label class="form-label col-xs-4 col-sm-2"><span class="c-red">*</span>退款金额：</label>
+            <div class="formControls col-xs-8 col-sm-9">
+                <input type="text" class="input input-text" name="refund_money_kefu" value="{$order_refund.refund_money_kefu}">
+            </div>
+        </div>
+        {/if}
         {if $order_refund.refund_type eq 1}
         <div class="row cl">
             <label class="form-label col-xs-4 col-sm-2"><span class="c-red">*</span>退款内容：</label>
             <div class="formControls col-xs-8 col-sm-9">
-                <select name="refund_content">
-                    <option value="1" {if $order_refund.refund_content eq 1}selected{/if}>货物+运费</option>
-                    <option value="2" {if $order_refund.refund_content eq 2}selected{/if}>货物</option>
-                </select>
+                <span class="select-box">
+                    <select class="select" name="refund_content">
+                        <option value="1" {if $order_refund.refund_content eq 1}selected{/if}>货物+运费</option>
+                        <option value="2" {if $order_refund.refund_content eq 2}selected{/if}>货物</option>
+                   </select>
+                </span>
             </div>
         </div>
         {/if}

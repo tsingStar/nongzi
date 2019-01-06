@@ -226,17 +226,23 @@ class Order extends BaseUser
 //            $orderInfo->save(['order_status' => 5]);
 //            exit_json(-1, '订单超时');
 //        }
-
+        
         //pay_type 支付方式   1 威富通 微信支付  2 支付宝 3  小程序支付
         $pay_info = [
             'wxpay' => "",
             'alipay' => "",
             'xcxpay' => ""
         ];
-        $order_no1 = getOrderNo();
-        $orderInfo->save(["order_no"=>$order_no1]);
-        model("OrderDet")->save(["order_no"=>$order_no1], ["order_no"=>$order_no]);
-        $order = model('Order')->where('order_no', $order_no1)->find();
+        $order_no_pre = getOrderNo().rand(100,999);
+        model("order_pre")->save([
+            "order_no"=>$order_no,
+            "order_no_pre"=>$order_no_pre,
+            "create_time"=>time()
+        ]);
+//        $order_no1 = getOrderNo();
+//        $orderInfo->save(["order_no"=>$order_no1]);
+//        model("OrderDet")->save(["order_no"=>$order_no1], ["order_no"=>$order_no]);
+        $order = model('Order')->where('order_no', $order_no)->find();
         if ($pay_type == 1) {
             $pay_data = [
 
@@ -247,7 +253,7 @@ class Order extends BaseUser
 //            $inputObj->SetNotify_url($notify_url);
 //            $inputObj->SetTrade_type($orderInfo['trade_type']);
 
-                'out_trade_no' => $order['order_no'],
+                'out_trade_no' => $order_no_pre,
                 'body' => "订单支付",
                 'total_fee' => $order['order_money'] * 100,
                 'mch_create_ip' => getIp(),
@@ -273,7 +279,7 @@ class Order extends BaseUser
 
         } else if ($pay_type == 3) {
             $pay_data = [
-                'out_trade_no' => $order['order_no'],
+                'out_trade_no' => $order_no_pre,
                 'body' => "订单支付",
                 'total_fee' => $order['order_money'] * 100,
                 'mch_create_ip' => getIp(),
@@ -395,12 +401,12 @@ class Order extends BaseUser
                 exit_json(-1, '退款申请已处理，请联系客服');
             }
             $res = $order->save(['order_status' => 4, 'is_apply_refund' => 1]);
-//            if ($refund_type == 2) {
-//                $c = model('OrderDet')->where('order_no', $order_no)->count();
-//                if ($c == count(explode(',', $refund_detail))) {
-//                    $refund_type = 1;
-//                }
-//            }
+            //if ($refund_type == 2) {
+            //    $c = model('OrderDet')->where('order_no', $order_no)->count();
+            //    if ($c == count(explode(',', $refund_detail))) {
+            //        $refund_type = 1;
+            //    }
+            //}
             if($refund_type == 1){
                 $od = model('OrderDet')->where('order_no', $order_no)->select();
                 $det = [];

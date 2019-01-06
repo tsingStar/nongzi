@@ -141,7 +141,7 @@ class Shop extends Controller
                 }
                 break;
             default:
-                $products = model('Product')->where($where)->limit($offset, $pageNum)->select();
+                $products = model('Product')->where($where)->order("ord desc")->limit($offset, $pageNum)->select();
                 $data = [];
                 foreach ($products as $p) {
                     $data[] = model('Product')->formatOne($p);
@@ -202,7 +202,7 @@ class Shop extends Controller
         if ($keywords == "") {
             exit_json(-1, '关键字不能为空');
         }
-        $where = '1 = 1';
+        $where = 'is_up = 1';
         $where1 = '';
         $where2 = '';
         for ($i = 0; $i < mb_strlen($keywords, 'utf-8'); $i++) {
@@ -213,8 +213,7 @@ class Shop extends Controller
                 $where2 .= " and";
             }
         }
-        $where .= " and ($where1) or ($where2)";
-        $where .= " and is_up=1";
+        $where .= " and (($where1) or ($where2))";
         $data = $this->productList($where);
         exit_json(1, '请求成功', $data);
     }
