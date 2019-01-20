@@ -26,6 +26,7 @@ class Member extends BaseController
         $start_time = strtotime(input('mintime'));
         $end_time = strtotime(input('maxtime'));
         $uname = input('uname');
+        $param = input("get.");
         $where = [];
         if ($start_time && !$end_time) {
             $where['a.create_time'] = ['egt', $start_time];
@@ -42,6 +43,7 @@ class Member extends BaseController
         }
         $userList = model('User')->alias('a')->join('Admins b', 'a.vip_code=b.vip_code', 'left')->where($where)->field('a.*, b.name sale_name')->order('a.create_time desc')->select();
         $this->assign('list', $userList);
+        $this->assign("param", $param);
         return $this->fetch();
     }
 

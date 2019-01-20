@@ -1,0 +1,40 @@
+{include file='pub/header'/}
+<title>基础统计</title>
+</head>
+<body>
+<nav class="breadcrumb">{$breadNav} <a class="btn btn-success radius r" style="line-height:1.6em;margin-top:3px"
+                                       href="javascript:location.replace(location.href);" title="刷新"><i
+        class="Hui-iconfont">&#xe68f;</i></a></nav>
+<div class="page-container">
+    <table class="table table-border table-bordered table-bg table-sort">
+        <thead>
+        <tr>
+            <th scope="col" colspan="9">联系客服统计</th>
+        </tr>
+        <tr class="text-c">
+            <th width="50">联系客服时间</th>
+            <th width="50">用户名</th>
+            <th width="50">手机号</th>
+        </tr>
+        </thead>
+        <tbody>
+        {foreach $list as $v}
+        <tr class="text-c">
+            <td>{$v.create_time}</td>
+            <td>{$v.user_name}</td>
+            <td>{$v.telephone}</td>
+        </tr>
+        {/foreach}
+        </tbody>
+    </table>
+</div>
+{include file="pub/footer"/}
+
+<!--请在下方写此页面业务相关的脚本-->
+<script type="text/javascript">
+    $('.table-sort').dataTable({
+        "aaSorting": [[0, "desc"]],//默认第几个排序
+    });
+</script>
+</body>
+</html>

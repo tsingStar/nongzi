@@ -1,0 +1,47 @@
+{include file='pub/header'/}
+<title>基础统计</title>
+</head>
+<body>
+<nav class="breadcrumb">{$breadNav} <a class="btn btn-success radius r" style="line-height:1.6em;margin-top:3px"
+                                       href="javascript:location.replace(location.href);" title="刷新"><i
+        class="Hui-iconfont">&#xe68f;</i></a></nav>
+<div class="page-container">
+    <table class="table table-border table-bordered table-bg table-sort">
+        <thead>
+        <tr>
+            <th scope="col" colspan="9">供求触发统计</th>
+        </tr>
+        <tr class="text-c">
+            <th width="50">时间</th>
+            <th width="50">类型</th>
+            <th width="50">用户名</th>
+            <th width="50">手机号</th>
+            <th width="50">供求id</th>
+        </tr>
+        </thead>
+        <tbody>
+        {foreach $list as $v}
+        <tr class="text-c">
+            <td>{$v.create_time}</td>
+            <td>{if $v.type eq 1}求购{else/}供应{/if}</td>
+            <td>{$v.user_name}</td>
+            <td>{$v.telephone}</td>
+            <td>{if $v.supply_id neq ''}<a href="javascript:;" onclick="open_detail('{$v.supply_id}')">{$v.supply_id}</a>{/if}</td>
+        </tr>
+        {/foreach}
+        </tbody>
+    </table>
+</div>
+{include file="pub/footer"/}
+
+<!--请在下方写此页面业务相关的脚本-->
+<script type="text/javascript">
+    $('.table-sort').dataTable({
+        "aaSorting": [[0, "desc"]],//默认第几个排序
+    });
+    function open_detail(order_id) {
+        layer_show("供求详情", "{:url('Statistic/supplyDetail')}?supply_id="+order_id);
+    }
+</script>
+</body>
+</html>

@@ -96,6 +96,16 @@ class Shop extends Controller
     public function getProductsByCateId()
     {
         $cate_parent_id = input('cate_id');
+        $cate = model("CateCollect")->where("cate_id", $cate_parent_id)->where("user_id", $this->user_id )->where("days", date("Y-m-d"))->find();
+        if($cate){
+            $cate->setInc("nums");
+        }else{
+            model("CateCollect")->save([
+                "user_id"=>$this->user_id,
+                "cate_id"=>$cate_parent_id,
+                "days"=>date("Y-m-d")
+            ]);
+        }
         $where = [];
         $where['cate_parent_id'] = $cate_parent_id;
         $where["is_up"] = 1;
@@ -158,6 +168,11 @@ class Shop extends Controller
     {
         $product_id = input('product_id');
         $pro = model('Product')->getInfo($product_id);
+        model("CollectProduct")->save([
+            "user_id"=>$this->user_id,
+            "product_id"=>$product_id,
+            "product_name"=>$pro["name"]
+        ]);
         exit_json(1, '请求成功', $pro);
     }
 
@@ -202,6 +217,10 @@ class Shop extends Controller
         if ($keywords == "") {
             exit_json(-1, '关键字不能为空');
         }
+        model("KeysCollect")->save([
+            "user_id"=>$this->user_id,
+            "keys"=>$keywords
+        ]);
         $where = 'is_up = 1';
         $where1 = '';
         $where2 = '';
@@ -294,6 +313,13 @@ class Shop extends Controller
         ];
         $res = model('BuySupply')->save($data);
         if($res){
+            model("SupplyLog")->save([
+                "user_id"=>input('user_id'),
+                "type"=>$type,
+                "supply_id"=>model("BuySupply")->getLastInsID(),
+                "create_time"=>time(),
+                "update_time"=>time()
+            ]);
             exit_json(1, '提交成功');
         }else{
             exit_json(-1, '提交失败');

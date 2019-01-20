@@ -1,0 +1,46 @@
+{include file='pub/header'/}
+<title>会员列表</title>
+</head>
+<body>
+<nav class="breadcrumb">{$breadNav} <a class="btn btn-success radius r" style="line-height:1.6em;margin-top:3px"
+                                       href="javascript:location.replace(location.href);" title="刷新"><i
+        class="Hui-iconfont">&#xe68f;</i></a></nav>
+<div class="page-container">
+    <table class="table table-border table-bordered table-bg">
+        <thead>
+        <tr>
+            <th scope="col" colspan="9">购物车添加记录</th>
+        </tr>
+        <tr class="text-c">
+            <th>会员 ID</th>
+            <th>会员名</th>
+            <th>手机号</th>
+            <th>商品id</th>
+            <th>商品名称</th>
+            <th>操作时间</th>
+        </tr>
+        </thead>
+        <tbody>
+        {foreach $list as $v}
+        <tr class="text-c">
+            <td>{$v.user_id}</td>
+            <td>{$v.user_name}</td>
+            <td>{$v.telephone}</td>
+            <td>{$v.product_id}</td>
+            <td>{$v.name}</td>
+            <td>{$v.create_time}</td>
+        </tr>
+        {/foreach}
+        </tbody>
+    </table>
+</div>
+{include file="pub/footer"/}
+
+<!--请在下方写此页面业务相关的脚本-->
+<script type="text/javascript">
+    $("table").dataTable({
+        "aaSorting": [[5, "desc"]],//默认第几个排序
+    });
+</script>
+</body>
+</html>

@@ -298,6 +298,10 @@ class Order extends BaseUser
         } else {
             exit_json(-1, '参数错误');
         }
+        model("CollectPay")->save([
+            "order_no"=>$order_no,
+            "user_id"=>USER_ID
+        ]);
         exit_json(1, '请求成功', $pay_info);
     }
 
@@ -330,6 +334,12 @@ class Order extends BaseUser
         $order = model('Order')->where('order_no', $order_no)->field('order_no, receiver_name, receiver_telephone, address, remarks, send_fee, order_status, order_money, create_time')->find();
         if(!$order){
             exit_json(-1, '订单不存在');
+        }
+        $co = model("CollectOrder")->where("order_no", $order_no)->where("day", date("Y-m-d"))->find();
+        if($co){
+            $co->setInc("nums", 1);
+        }else{
+            model("CollectOrder")->save(["order_no"=>$order_no, "day"=>date("Y-m-d"), "nums"=>1, "user_id"=>USER_ID]);
         }
         $order['order_det'] = model('OrderDet')->where('order_no', $order_no)->field('id det_id, name, thumb_img, prop_value_attr, prop_name, price price_comb, num, price*num total_price, product_id')->select();
         exit_json(1, '请求成功', $order);

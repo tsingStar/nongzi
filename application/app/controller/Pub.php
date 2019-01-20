@@ -60,6 +60,13 @@ class Pub extends Controller
             if ($user['password'] != md5($password)) {
                 exit_json(-1, '密码错误');
             }
+            //记录登录日志
+            model("UserLoginLog")->save([
+                "user_id"=>$user["id"],
+                "type"=>input("type"),
+                "create_time"=>time(),
+                "update_time"=>time()
+            ]);
             exit_json(1, '登陆成功', $userModel->formatOne($user['id']));
         } else {
             exit_json(-1, '会员不存在');
@@ -377,6 +384,5 @@ class Pub extends Controller
             'content' => $content
         ]);
     }
-
 
 }

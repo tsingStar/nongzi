@@ -64,6 +64,12 @@ class ShopCart extends BaseUser
                 ]);
             }
             if ($res) {
+                if($num == 1){
+                    model("CollectCart")->save([
+                        "product_id"=>$product_id,
+                        "user_id"=>USER_ID
+                    ]);
+                }
                 exit_json(1, '加入购物车成功');
             } else {
                 exit_json(-1, '加入购物车失败');

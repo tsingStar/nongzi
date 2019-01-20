@@ -92,4 +92,37 @@ class Pub extends Controller
             exit_json(-1, '文件不存在');
         }
     }
+
+    public function excel()
+    {
+        $list = model("Product")->where("is_up", 1)->select();
+        $plist = [];
+        foreach ($list as $item){
+            $prop_list= model("ProductAttr")->where("product_id", $item["id"])->field("prop_value_name, price_one, price_comb")->select();
+//            $prop = [];
+//            foreach ($prop_list as $v){
+//                $t[] = $v['prop_value_name'];
+//                $t[] = $v['price_one'];
+//                $t[] = $v['price_comb'];
+//                $prop[] = $t;
+//            }
+            $t = [
+                $item['id'],
+                $item['name'],
+                $item['bname'],
+                $prop_list
+            ];
+            $plist[] = $t;
+        }
+        $this->assign("list", $plist);
+        return $this->fetch();
+//        $header = [
+//            "产品id",
+//            "产品名称",
+//            "产品别称",
+//            "产品规格详情"
+//        ];
+//        excel($header, $plist, date("Y-m-d"));
+
+    }
 }

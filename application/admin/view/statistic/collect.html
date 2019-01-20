@@ -1,0 +1,238 @@
+{include file='pub/header'/}
+<title>基础统计</title>
+</head>
+<body>
+<nav class="breadcrumb">{$breadNav} <a class="btn btn-success radius r" style="line-height:1.6em;margin-top:3px"
+                                       href="javascript:location.replace(location.href);" title="刷新"><i
+        class="Hui-iconfont">&#xe68f;</i></a></nav>
+<div class="page-container">
+    <form action="" method="get">
+        <div class="text-c"> 日期：
+            <input type="text" value="{$param.mintime || default=''}" onfocus="WdatePicker({maxDate:'#F{ $dp.$D(\'datemax\')}'})" id="datemin" name="mintime"
+                   class="input-text Wdate" style="width:120px;">
+            -
+            <input type="text" value="{$param.maxtime || default=''}" onfocus="WdatePicker({minDate:'#F{ $dp.$D(\'datemin\')}'})" id="datemax" name="maxtime"
+                   class="input-text Wdate" style="width:120px;">
+
+            会员手机号：<input type="text" value="{$param.telephone|| default=''}" name="telephone" class="input-text" style="width: 150px;">
+
+            <button type="submit" class="btn btn-success" id="" name=""><i class="Hui-iconfont">&#xe665;</i> 查询
+            </button>
+        </div>
+    </form>
+    <table class="table table-border table-bordered table-bg table-sort">
+        {if isset($param['telephone']) && $param.telephone neq ''}
+            <thead>
+            <tr>
+                <th scope="col" colspan="9">用户行为分析</th>
+            </tr>
+            <tr class="text-c">
+                <th>客户名称</th>
+                <th>手机号</th>
+                <th>事件</th>
+                <th>次数</th>
+                <th>操作</th>
+            </tr>
+            </thead>
+            <tbody>
+            <tr class="text-c">
+                <td>{$user.user_name}</td>
+                <td>{$user.telephone}</td>
+                <td>登录</td>
+                <td>{$item.login_nums}</td>
+                <td><a href="javascript:;" onclick="checkDetail(1, 1)">查看详情</a></td>
+            </tr>
+            <tr class="text-c">
+                <td>{$user.user_name}</td>
+                <td>{$user.telephone}</td>
+                <td>产品分类访问</td>
+                <td>{$item.cate_nums}</td>
+                <td><a href="javascript:;" onclick="checkDetail(2, 1)">查看详情</a></td>
+            </tr>
+            <tr class="text-c">
+                <td>{$user.user_name}</td>
+                <td>{$user.telephone}</td>
+                <td>产品详情访问</td>
+                <td>{$item.product_nums}</td>
+                <td><a href="javascript:;" onclick="checkDetail(3, 1)">查看详情</a></td>
+            </tr>
+            <tr class="text-c">
+                <td>{$user.user_name}</td>
+                <td>{$user.telephone}</td>
+                <td>产品搜索</td>
+                <td>{$item.keywords_nums}</td>
+                <td><a href="javascript:;" onclick="checkDetail(4, 1)">查看详情</a></td>
+            </tr>
+            <tr class="text-c">
+                <td>{$user.user_name}</td>
+                <td>{$user.telephone}</td>
+                <td>供求访问</td>
+                <td>{$item.supply_nums}</td>
+                <td><a href="javascript:;" onclick="checkDetail(5, 1)">查看详情</a></td>
+            </tr>
+            <tr class="text-c">
+                <td>{$user.user_name}</td>
+                <td>{$user.telephone}</td>
+                <td>客服页面</td>
+                <td>{$item.custom_nums}</td>
+                <td><a href="javascript:;" onclick="checkDetail(6, 1)">查看详情</a></td>
+            </tr>
+            <tr class="text-c">
+                <td>{$user.user_name}</td>
+                <td>{$user.telephone}</td>
+                <td>购物车</td>
+                <td>{$item.cart_nums}</td>
+                <td><a href="javascript:;" onclick="checkDetail(7, 1)">查看详情</a></td>
+            </tr>
+            <tr class="text-c">
+                <td>{$user.user_name}</td>
+                <td>{$user.telephone}</td>
+                <td>订单页访问</td>
+                <td>{$item.order_nums}</td>
+                <td><a href="javascript:;" onclick="checkDetail(8, 1)">查看详情</a></td>
+            </tr>
+            <tr class="text-c">
+                <td>{$user.user_name}</td>
+                <td>{$user.telephone}</td>
+                <td>支付页访问</td>
+                <td>{$item.pay_nums}</td>
+                <td><a href="javascript:;" onclick="checkDetail(9, 1)">查看详情</a></td>
+            </tr>
+            </tbody>
+        {else/}
+            <thead>
+            <tr>
+                <th scope="col" colspan="9">用户行为分析</th>
+            </tr>
+            <tr class="text-c">
+                <th>事件</th>
+                <th>次数</th>
+            </tr>
+            </thead>
+            <tbody>
+            <tr class="text-c">
+                <td>登录</td>
+                <td><a href="javascript:;" onclick="checkDetail1(1, '登录')">{$item.login_nums}</a></td>
+            </tr>
+            <tr class="text-c">
+                <td>产品分类访问</td>
+                <td><a href="javascript:;" onclick="checkDetail1(2, '产品分类访问')">{$item.cate_nums}</a></td>
+            </tr>
+            <tr class="text-c">
+                <td>产品详情访问</td>
+                <td><a href="javascript:;" onclick="checkDetail1(3, '产品详情访问')">{$item.product_nums}</a></td>
+            </tr>
+            <tr class="text-c">
+                <td>产品搜索</td>
+                <td><a href="javascript:;" onclick="checkDetail1(4, '产品搜索')">{$item.keywords_nums}</a></td>
+            </tr>
+            <tr class="text-c">
+                <td>供求访问</td>
+                <td><a href="javascript:;" onclick="checkDetail1(5, '供求访问')">{$item.supply_nums}</a></td>
+            </tr>
+            <tr class="text-c">
+                <td>客服页面</td>
+                <td><a href="javascript:;" onclick="checkDetail1(6, '客服页面')">{$item.custom_nums}</a></td>
+            </tr>
+            <tr class="text-c">
+                <td>购物车</td>
+                <td><a href="javascript:;" onclick="checkDetail1(7, '购物车')">{$item.cart_nums}</a></td>
+            </tr>
+            <tr class="text-c">
+                <td>订单页访问</td>
+                <td><a href="javascript:;" onclick="checkDetail1(8, '订单页访问')">{$item.order_nums}</a></td>
+            </tr>
+            <tr class="text-c">
+                <td>支付页访问</td>
+                <td><a href="javascript:;" onclick="checkDetail1(9, '支付页访问')">{$item.pay_nums}</a></td>
+            </tr>
+            </tbody>
+        {/if}
+    </table>
+</div>
+{include file="pub/footer"/}
+
+<!--请在下方写此页面业务相关的脚本-->
+<script type="text/javascript">
+    // $('.table-sort').dataTable({
+    //     "aaSorting": [[0, "desc"]],//默认第几个排序
+    //     "bStateSave": true,//状态保存
+    // });
+    function checkDetail1(type, title){
+        var start_time = $("input[name='mintime']").val();
+        var end_time = $("input[name='maxtime']").val();
+        var url;
+        switch (type) {
+            case 1:
+                url='{:url("userLogin")}?container=1&start_time='+start_time+'&end_time='+end_time;
+                break;
+            case 2:
+                url='{:url("collectCate")}?container=1&start_time='+start_time+'&end_time='+end_time;
+                break;
+            case 3:
+                url='{:url("productCollect")}?container=1&start_time='+start_time+'&end_time='+end_time;
+                break;
+            case 4:
+                url='{:url("keysCollect")}?container=1&start_time='+start_time+'&end_time='+end_time;
+                break;
+            case 5:
+                url='{:url("supplyCollect")}?container=1&start_time='+start_time+'&end_time='+end_time;
+                break;
+            case 6:
+                url='{:url("kefuCollect")}?container=1&start_time='+start_time+'&end_time='+end_time;
+                break;
+            case 7:
+                url='{:url("cartCollect")}?container=1&start_time='+start_time+'&end_time='+end_time;
+                break;
+            case 8:
+                url='{:url("orderCollect")}?container=1&start_time='+start_time+'&end_time='+end_time;
+                break;
+            case 9:
+                url='{:url("payCollect")}?container=1&start_time='+start_time+'&end_time='+end_time;
+                break;
+        }
+        layer_show(title, url);
+    }
+
+    function checkDetail(type, status){
+        var title = '';
+        switch (type) {
+            case 1:
+                title = "登录详情";
+                break;
+            case 2:
+                title = "产品分类访问详情";
+                break;
+            case 3:
+                title = "产品详情访问详情";
+                break;
+            case 4:
+                title = "产品搜索";
+                break;
+            case 5:
+                title = "供求访问详情";
+                break;
+            case 6:
+                title = "客服页面详情";
+                break;
+            case 7:
+                title = "购物车详情";
+                break;
+            case 8:
+                title = "订单页访问详情";
+                break;
+            case 9:
+                title = "支付页访问详情";
+                break;
+            default:
+                layer.alert("参数错误");
+                return false;
+        }
+        var telephone = $("input[name='telephone']").val();
+        var start_time = $("input[name='mintime']").val();
+        var end_time = $("input[name='maxtime']").val();
+        layer_show(title, '{:url("checkDetail")}?type='+type+'&start_time='+start_time+'&end_time='+end_time+'&telephone='+telephone);
+    }
+</script>
+</body>
+</html>

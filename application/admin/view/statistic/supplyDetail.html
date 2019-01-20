@@ -1,0 +1,97 @@
+{include file='pub/header'/}
+<title>订单列表</title>
+</head>
+
+<body class="pos-r">
+<nav class="breadcrumb"><a class="btn btn-success radius r" style="line-height:1.6em;margin-top:3px"
+                           href="javascript:location.replace(location.href);" title="刷新"><i
+        class="Hui-iconfont">&#xe68f;</i></a></nav>
+<div class="page-container">
+
+    <form class="form form-horizontal" id="report" method="post" enctype="multipart/form-data">
+        <div class="row cl">
+            <label class="form-label col-xs-4 col-sm-2">类别：</label>
+            <div class="formControls col-xs-8 col-sm-9">
+                {if $item.type eq 1}
+                求购
+                {else}
+                供应
+                {/if}
+            </div>
+        </div>
+        <div class="row cl">
+            <label class="form-label col-xs-4 col-sm-2">创建时间：</label>
+            <div class="formControls col-xs-8 col-sm-9">
+                {$item.create_time}
+            </div>
+        </div>
+        <div class="row cl">
+            <label class="form-label col-xs-4 col-sm-2">客户名称：</label>
+            <div class="formControls col-xs-8 col-sm-9">
+                {$item.user_name}
+            </div>
+        </div>
+        <div class="row cl">
+            <label class="form-label col-xs-4 col-sm-2">商品名称：</label>
+            <div class="formControls col-xs-8 col-sm-9">
+                {$item.product_name}
+            </div>
+        </div>
+        <div class="row cl">
+            <label class="form-label col-xs-4 col-sm-2">数量：</label>
+            <div class="formControls col-xs-8 col-sm-9">
+                {$item.num}
+            </div>
+        </div>
+        <div class="row cl">
+            <label class="form-label col-xs-4 col-sm-2">联系电话：</label>
+            <div class="formControls col-xs-8 col-sm-9">
+                {$item.telephone}
+            </div>
+        </div>
+        <div class="row cl">
+            <label class="form-label col-xs-4 col-sm-2">描述：</label>
+            <div class="formControls col-xs-8 col-sm-9">
+                {$item.description}
+            </div>
+        </div>
+        <div class="row cl">
+            <label class="form-label col-xs-4 col-sm-2">备注：</label>
+            <div class="formControls col-xs-8 col-sm-9">
+                {$item.remarks}
+            </div>
+        </div>
+        <div class="row cl">
+            <label class="form-label col-xs-4 col-sm-2">图片：</label>
+            <div class="formControls col-xs-8 col-sm-9">
+                <button class="btn-primary radius btn" type="button" onclick="image('{$item.image}')">查看</button>
+            </div>
+        </div>
+    </form>
+</div>
+
+{include file='pub/footer'/}
+<script type="text/javascript">
+
+    //查看图片
+    function image($image) {
+        if ($image == "") {
+            layer.msg('暂无图片');
+        } else {
+            var imgsurl = $image.split(',');
+            var content = '';
+            $.each(imgsurl, function (i, v) {
+                content += "<img style='width: 300px;' src='" + v + "'/>";
+            });
+            var index = layer.open({
+                type: 1,
+                title: '图片详情',
+                content: content
+            });
+            layer.full(index);
+        }
+    }
+
+</script>
+</body>
+</html>

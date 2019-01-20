@@ -1,0 +1,53 @@
+{include file='pub/header'/}
+<title>会员列表</title>
+</head>
+<body>
+<nav class="breadcrumb">{$breadNav} <a class="btn btn-success radius r" style="line-height:1.6em;margin-top:3px"
+                                       href="javascript:location.replace(location.href);" title="刷新"><i
+        class="Hui-iconfont">&#xe68f;</i></a></nav>
+<div class="page-container">
+    {if !isset($_GET['container'])}
+    <form action="" method="get">
+        <div class="text-c"> 用户名：
+            <input type="text" value="{$param.user_name||default=''}" class="input-text" style="width:250px" placeholder="输入会员/手机号名称" name="user_name">
+            <button type="submit" class="btn btn-success" id="" name=""><i class="Hui-iconfont">&#xe665;</i> 查询
+            </button>
+        </div>
+    </form>
+    {/if}
+    <table class="table table-border table-bordered table-bg">
+        <thead>
+        <tr>
+            <th scope="col" colspan="9">登录记录</th>
+        </tr>
+        <tr class="text-c">
+            <th>会员 ID</th>
+            <th>会员名</th>
+            <th>手机号</th>
+            <th>登录设备</th>
+            <th>登录时间</th>
+        </tr>
+        </thead>
+        <tbody>
+        {foreach $list as $v}
+        <tr class="text-c">
+            <td>{$v.user_id}</td>
+            <td>{$v.user_name}</td>
+            <td>{$v.telephone}</td>
+            <td>{$server[$v.type]}</td>
+            <td>{$v.create_time}</td>
+        </tr>
+        {/foreach}
+        </tbody>
+    </table>
+</div>
+{include file="pub/footer"/}
+
+<!--请在下方写此页面业务相关的脚本-->
+<script type="text/javascript">
+    $("table").dataTable({
+        "aaSorting": [[3, "desc"]],//默认第几个排序
+    });
+</script>
+</body>
+</html>
