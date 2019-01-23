@@ -23,6 +23,18 @@ function set_admin_login($admin)
 }
 
 /**
+ * 获取区域信息
+ */
+function getArea($pid=0){
+    if($pid==0){
+        $list = model("Area")->where("level_type", 1)->field("id, name")->select();
+    }else{
+        $list = model("Area")->where("parent_id", $pid)->field("id, name")->select();
+    }
+    return $list;
+}
+
+/**
  * 获取树级目录
  * @param $a
  * @param $pid
