@@ -1,0 +1,279 @@
+{include file='pub/header'/}
+<title>推广客户列表</title>
+<style>
+    body {
+        background-color: #F7F7F7;
+    }
+
+    .dingbu {
+        line-height: 45px;
+        font-size: 18px;
+        font-weight: bold;
+        background-color: #ffffff;
+    }
+
+    .custom-nav {
+        border-radius: 10px;
+        display: flex;
+        background-color: #FFFFFF;
+    }
+
+    .custom-nav div {
+        line-height: 2rem;
+        height: 2rem;
+        font-size: .8rem;
+    }
+
+    .select-current {
+        color: #2779f2;
+    }
+
+    .custom {
+        background-color: #FFFFFF;
+        border-radius: 10px;
+        padding: .8rem;
+    }
+
+    .custom-name {
+        line-height: 1.2rem;
+        height: 1.2rem;
+        margin: 5px 0 5px 0;
+        font-size: .9rem;
+    }
+
+    .custom-name img {
+        height: 1rem;
+    }
+
+    .custom-detail {
+        line-height: 1.1rem;
+        height: 1.1rem;
+        color: #AEAEAE;
+        margin-left: 1.3rem;
+        font-size: .6rem;
+        margin-bottom: 5px;
+    }
+
+    .custom-shenhe {
+        font-size: .7rem;
+        margin-top: 5px;
+        color: #AEAEAE;
+    }
+
+    .custom-status {
+        line-height: 1.6rem;
+        height: 1.6rem;
+        background-color: #2779f2;
+        color: white;
+        -moz-border-radius-topright: 10px;
+        border-top-right-radius: 10px;
+        border-bottom-left-radius: 50px;
+        margin-top: -0.8rem;
+        margin-right: -0.8rem;
+        font-size: .6rem;
+    }
+
+    .custom-status1 {
+        line-height: 1.6rem;
+        height: 1.6rem;
+        background-color: #cccccc;
+        color: white;
+        -moz-border-radius-topright: 10px;
+        border-top-right-radius: 10px;
+        border-bottom-left-radius: 50px;
+        margin-top: -0.8rem;
+        margin-right: -0.8rem;
+        font-size: .6rem;
+    }
+</style>
+</head>
+<body>
+
+<div class="dingbu col-12 text-c row cl">
+    <div class="l" style="width: 40px;" onclick="history.back()">
+        <i class="Hui-iconfont Hui-iconfont-arrow2-left"></i>
+    </div>
+    <div>
+        推广客户列表
+    </div>
+</div>
+
+<div class="mt-10 ml-20 mr-20 custom-nav radius">
+    <div class="col-3 select-current" style="border-right: 1px solid #E3E3E3;" onclick="changeNav(1, this)">
+        全部客户
+    </div>
+    <div class="col-3" style="border-right: 1px solid #E3E3E3;" onclick="changeNav(2, this)">
+        信息补录
+    </div>
+    <div class="col-3" style="border-right: 1px solid #E3E3E3;" onclick="changeNav(3, this)">
+        未通过
+    </div>
+    <div class="col-3" onclick="changeNav(4, this)">
+        未结算
+    </div>
+</div>
+<div class="custom-list">
+    <div class="mt-10 ml-20 mr-20 custom">
+        <div class="r custom-status">
+            &nbsp;&nbsp;&nbsp;已结算&nbsp;&nbsp;
+        </div>
+        <div class="custom-name">
+            <img src="__STATIC__/agent/list.png" alt=""> 客户姓名 130****8958
+        </div>
+        <div class="custom-detail">
+            <span>注册时间：2018.12.28</span>
+            <span>推广费：870.00</span>
+        </div>
+        <div class="line"></div>
+        <div class="cl custom-shenhe">
+            <span class="l"><b style="font-weight: bold; color: #2779f2;">●</b>&nbsp;信息完整</span>
+            <span class="r"
+                  style="border: 1px solid #2779f2; border-radius: 5px; color: #2779f2;">&nbsp;审核通过&nbsp;</span>
+        </div>
+    </div>
+    <div class="mt-10 ml-20 mr-20 custom">
+        <div class="r custom-status1">
+            &nbsp;&nbsp;&nbsp;未结算&nbsp;&nbsp;
+        </div>
+        <div class="custom-name">
+            <img src="__STATIC__/agent/list.png" alt=""> 客户姓名 130****8958
+        </div>
+        <div class="custom-detail">
+            <span>注册时间：2018.12.28</span>
+            <span>推广费：870.00</span>
+        </div>
+        <div class="line"></div>
+        <div class="cl custom-shenhe">
+            <span onclick="location.href='./saveDetail.html'" class="l" style="color: #2779f2;"><b
+                    style="font-weight: bold; color: #CCCCCC;">●</b>&nbsp;信息补录</span>
+            <span onclick="location.href='./checkDetail.html'" class="r"
+                  style="border: 1px solid #AEAEAE; border-radius: 5px; color: #AEAEAE;">&nbsp;未通过&nbsp;</span>
+        </div>
+    </div>
+    <div class="mt-10 ml-20 mr-20 custom">
+        <div class="r custom-status">
+            &nbsp;&nbsp;&nbsp;已结算&nbsp;&nbsp;
+        </div>
+        <div class="custom-name">
+            <img src="__STATIC__/agent/list.png" alt=""> 客户姓名 130****8958
+        </div>
+        <div class="custom-detail">
+            <span>注册时间：2018.12.28</span>
+            <span>推广费：870.00</span>
+        </div>
+        <div class="line"></div>
+        <div class="cl custom-shenhe">
+            <span class="l"><b style="font-weight: bold; color: #2779f2;">●</b>&nbsp;信息完整</span>
+            <span class="r" style="border: 1px solid #2779f2; border-radius: 5px; color: #2779f2;">&nbsp;审核通过&nbsp;</span>
+        </div>
+    </div>
+    <div class="mt-10 ml-20 mr-20 custom">
+        <div class="r custom-status">
+            &nbsp;&nbsp;&nbsp;已结算&nbsp;&nbsp;
+        </div>
+        <div class="custom-name">
+            <img src="__STATIC__/agent/list.png" alt=""> 客户姓名 130****8958
+        </div>
+        <div class="custom-detail">
+            <span>注册时间：2018.12.28</span>
+            <span>推广费：870.00</span>
+        </div>
+        <div class="line"></div>
+        <div class="cl custom-shenhe">
+            <span class="l"><b style="font-weight: bold; color: #2779f2;">●</b>&nbsp;信息完整</span>
+            <span class="r"
+                  style="border: 1px solid #2779f2; border-radius: 5px; color: #2779f2;">&nbsp;审核通过&nbsp;</span>
+        </div>
+    </div>
+</div>
+<div class="text-c" id="more" onclick="getMore()">
+    加载更多
+</div>
+
+{include file="pub/footer"/}
+<!--请在下方写此页面业务相关的脚本-->
+<script type="text/javascript">
+    var page=0;
+    var status=1;
+
+    function changeNav(type, o) {
+        $(o).siblings().removeClass("select-current");
+        $(o).addClass("select-current");
+        page = 0;
+        status = type;
+        $("#more").html("加载更多");
+        $("#more").bind('click', 'getMore()');
+        $(".custom-list").empty();
+        getMore();
+    }
+    $(function () {
+        $(".custom-list").empty();
+        getMore();
+    });
+
+    function getMore(){
+        $.getJSON("{:url('customData')}", {status: status, page: page}, function (res) {
+            if(res.code == -1){
+                layer.alert("参数错误");
+                return;
+            }
+            var data = res.data;
+            if(data.is_next==0){
+                $("#more").html("已全部加载");
+                $("#more").unbind('click');
+            }else{
+                page++;
+            }
+            var _html='';
+            $.each(data.list, function (i,v) {
+                _html += '<div class="mt-10 ml-20 mr-20 custom">\n';
+                if(v.is_commission == 1){
+                    _html += '<div class="r custom-status">\n' +
+                        '            &nbsp;&nbsp;&nbsp;已结算&nbsp;&nbsp;\n' +
+                        '        </div>';
+                }else{
+                    _html += '        <div class="r custom-status1">\n' +
+                        '            &nbsp;&nbsp;&nbsp;未结算&nbsp;&nbsp;\n' +
+                        '        </div>\n';
+                }
+
+                    _html += '        <div class="custom-name">\n' +
+                    '             <img src="__STATIC__/agent/list.png" alt="">&nbsp;<span style="width: 43%;overflow: hidden; text-overflow: ellipsis;white-space: nowrap;display: inline-block;line-height: 1.2rem; height: 1rem;">'+v.user_name+'</span> <span style="width: 35%; display: inline-block;line-height: 1.2rem;height: 1rem;">'+v.telephone+'</span>\n' +
+                    '        </div>\n' +
+                    '        <div class="custom-detail">\n' +
+                    '            <span>注册时间：'+v.create_time+'</span>\n' +
+                    '            <span>推广费：'+v.spread_money+'</span>\n' +
+                    '        </div>\n' +
+                    '        <div class="line"></div>\n' +
+                    '        <div class="cl custom-shenhe">\n';
+                if(v.is_add_info == 1){
+                    _html += '<span class="l"><b style="font-weight: bold; color: #2779f2;">●</b>&nbsp;信息完整</span>';
+                }else{
+                    _html += '            <span onclick="saveDetail('+v.id+')" class="l" style="color: #2779f2;"><b style="font-weight: bold; color: #CCCCCC;">●</b>&nbsp;信息补录</span>\n';
+                }
+
+                if(v.check_status == 0){
+                    _html += '            <span onclick="checkDetail('+v.id+')" class="r" style="border: 1px solid #AEAEAE; border-radius: 5px; color: #AEAEAE;">&nbsp;待审核&nbsp;</span>\n';
+                }
+                if(v.check_status == 1){
+                    _html += '<span class="r" style="border: 1px solid #2779f2; border-radius: 5px; color: #2779f2;">&nbsp;审核通过&nbsp;</span>';
+                }
+                if(v.check_status == 2){
+                    _html += '<span onclick="checkDetail('+v.id+')" class="r" style="border: 1px solid #2779f2; border-radius: 5px; color: #2779f2;">&nbsp;未通过&nbsp;</span>';
+                }
+                    _html += '        </div>\n' +
+                    '    </div>';
+            });
+            $(".custom-list").append(_html);
+        })
+    }
+
+    function saveDetail(id){
+        location.href = "{:url('saveDetail')}?user_id="+id;
+    }
+    function checkDetail(id){
+        location.href = "{:url('checkDetail')}?user_id="+id;
+    }
+</script>
+</body>
+</html>

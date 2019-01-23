@@ -1,0 +1,69 @@
+{include file='pub/header'/}
+<title>客户订单列表</title>
+<style>
+    body{
+        background-color: #F7F7F7;
+    }
+    .dingbu{
+        line-height: 45px;
+        font-size: 18px;
+        font-weight: bold;
+        background-color: #ffffff;
+    }
+    p{
+        font-size: .5rem;
+        color: #AEAEAE;
+    }
+    .tips{
+        font-size: .5rem;
+        border: 2px solid #FF0000;
+        border-radius: 10px;
+    }
+    .agent-code{
+        border: 1px solid #AEAEAE;
+    }
+</style>
+</head>
+<body>
+
+<div class="dingbu col-12 text-c row cl">
+    <div class="l" style="width: 40px;" onclick="history.back()">
+        <i class="Hui-iconfont Hui-iconfont-arrow2-left"></i>
+    </div>
+    <div>
+        推广二维码
+    </div>
+</div>
+<div class="container col-12 bk-gray text-c">
+    <div class="mt-20">
+        <img src="__STATIC__/agent/code.png" alt="">
+    </div>
+    <div class="mt-15 text-l ml-20">
+        <p style="font-weight: bold;">使用说明：</p>
+        <p>① 客户扫码填写邀请码，下载APP</p>
+        <p>② 如若发现信息有误，扫描错误等问题请及时联系客服</p>
+    </div>
+    <div class="col-12 mt-10 mr-15 text-c pt-10 pb-10">
+        <!--<div class="col-12" style="margin-top: -17px; background-color: #F7F7F7; color: #FF0000;">-->
+            <!--*客户扫码后务必填写邀请码，否则不计入推广名单-->
+        <!--</div>-->
+        <!--<div class="col-10 text-c agent-code radius pt-20 pb-20" style="margin: auto;">-->
+            <!--<div class="row" style="line-height: 20px; height: 20px;">-->
+                <!--<span style="border: 1px solid #AEAEAE; color: #AEAEAE; padding: 5px; border-radius: 5px;">邀请码：000000</span>-->
+                <!--<span style="line-height:20px; height: 20px;background-color: #C4F1A1; padding: 5px; color: #FF0000; border-radius: 5px;">复制</span>-->
+            <!--</div>-->
+            <!--<div class="mt-10" style="color: #17580D;">-->
+                <!--特别提醒：点击上方复制邀请码，下载APP。-->
+                <!--注册填写邀请码，系统提供专属您的销售经理为您提供全程优质服务！-->
+            <!--</div>-->
+        <!--</div>-->
+        <img src="__STATIC__/agent/code_tip.png" style="width: 100%;" alt="">
+    </div>
+</div>
+
+{include file="pub/footer"/}
+<!--请在下方写此页面业务相关的脚本-->
+<script type="text/javascript">
+</script>
+</body>
+</html>

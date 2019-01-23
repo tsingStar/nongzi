@@ -262,6 +262,8 @@ class Product extends BaseController
             $res = model('Product')->allowField(true)->save($data);
             if ($res) {
                 $product_id = model('Product')->getLastInsID();
+
+
                 //规格属性处理
                 $prop_name = [];
                 $prop_value = [];

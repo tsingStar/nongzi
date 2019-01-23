@@ -1,0 +1,156 @@
+{include file='pub/header'/}
+<title>会员列表</title>
+</head>
+<body>
+<nav class="breadcrumb">{$breadNav} <a class="btn btn-success radius r" style="line-height:1.6em;margin-top:3px"
+                                       href="javascript:location.replace(location.href);" title="刷新"><i
+        class="Hui-iconfont">&#xe68f;</i></a></nav>
+<div class="page-container">
+    <div class="mb-15">
+    <form action="" method="get">
+            <input type="text" value="{$param.telephone||default=''}" class="input-text" style="width:250px" placeholder="输入代理商名称/手机号" name="telephone">
+            <button type="submit" class="btn btn-success" id="" name=""><i class="Hui-iconfont">&#xe665;</i> 查询
+            </button>
+    </form>
+    </div>
+    <table class="table table-border table-bordered table-bg">
+        <thead>
+        <tr>
+            <th scope="col" colspan="9">补录信息列表</th>
+        </tr>
+        <tr class="text-c">
+            <th>代理商姓名</th>
+            <th>会员昵称</th>
+            <th>手机号</th>
+            <th>会员名</th>
+            <th>地址</th>
+            <th>门头照片</th>
+            <th>客户注册时间</th>
+            <th>信息完善申请时间</th>
+            <th>操作</th>
+        </tr>
+        </thead>
+        <tbody>
+        {foreach $list as $v}
+        <tr class="text-c">
+            <td>{$v.admin_name}</td>
+            <td>{$v.nick_name}</td>
+            <td>{$v.user_telephone}</td>
+            <td>{$v.user_name}</td>
+            <td>{$v.address}</td>
+            <td>
+                <img onclick="showImg('{$v.img}')" src="{$v.img}" style="width: 200px;" alt="">
+            </td>
+            <td>{$v.regist_time}</td>
+            <td>{$v.create_time}</td>
+            <td>
+                {if $v.is_ok eq 0}
+                <a class="btn btn-primary radius size-MINI" href="javascript:;" onclick="refuse('{$v.id}')">拒绝</a>
+                <a class="btn btn-primary radius size-MINI" href="javascript:;" onclick="agree('{$v.id}')">通过</a>
+                {elseif $v.is_ok eq 1}
+                已通过
+                {elseif $v.is_ok eq 2}
+                已拒绝
+                {/if}
+                {if $v.is_ok eq 1 && $v.is_comp eq 0}
+                <a class="btn btn-primary radius size-MINI" href="javascript:;" onclick="comp('{$v.id}', 1)">结算</a>
+                {/if}
+                {if $v.is_comp eq 1}
+                <a class="btn btn-primary radius size-MINI" href="javascript:;" onclick="comp('{$v.id}', 1)">撤销结算</a>
+                {/if}
+                {if $v.is_comp eq 2}
+                已撤销
+                {/if}
+            </td>
+        </tr>
+        {/foreach}
+        </tbody>
+    </table>
+    {$list->render()}
+</div>
+{include file="pub/footer"/}
+
+<!--请在下方写此页面业务相关的脚本-->
+<script type="text/javascript">
+    function agree(id){
+        layer.confirm("确定审核通过？", function () {
+            $.post('{:url("agree")}', {id:id}, function (res) {
+                if(res.code==1){
+                    location.reload();
+                }else{
+                    layer.msg(res.msg);
+                }
+            });
+        })
+    }
+    //结算
+    function comp(id, status) {
+        var msg = status==1?"确定结算？":"确定取消结算？"
+        layer.confirm(msg, function () {
+            $.post('{:url("comp")}', {id:id, status:status}, function (res) {
+                if(res.code==1){
+                    location.reload();
+                }else{
+                    layer.msg(res.msg);
+                }
+            });
+        })
+    }
+
+
+    function refuse(id){
+        var index = layer.open({
+            title:'提示',
+            type:1,
+            content:'<form class="form form-horizontal" id="form-product-add" enctype="multipart/form-data">\n' +
+                '        <div class="row cl">\n' +
+                '            <label class="form-label col-xs-6 col-sm-4"><span class="c-red">*</span>拒绝原因：</label>\n' +
+                '            <div class="formControls col-xs-5 col-sm-7">\n' +
+                '                <textarea class="textarea" id="reason"></textarea>\n' +
+                '            </div>\n' +
+                '        </div>\n' +
+                '        <div class="row cl">\n' +
+                '        <label class="form-label col-xs-6 col-sm-4"><span class="c-red">*</span>是否可再次申请：</label>\n' +
+                '        <div class="formControls col-xs-5 col-sm-7">\n' +
+                '            <input type="checkbox" id="is_again">\n' +
+                '        </div>\n' +
+                '    </div>\n' +
+                '<div class="row cl">\n' +
+                '<div class="col-xs-8 col-sm-9 col-xs-offset-4 col-sm-offset-2">\n' +
+                '<button class="btn btn-secondary radius" type="button" onclick="refuse1('+id+')"><i class="Hui-iconfont">&#xe632;</i> 确定</button>\n' +
+                '</div>\n' +
+                '</div>' +
+                '    </form>',
+            area:['500px','300px']
+        });
+    }
+
+    function refuse1(id){
+        var reason = $("#reason").val();
+        var is_again = $("#is_again").prop("checked")?1:0;
+        if(reason == ""){
+            layer.msg("拒绝原因不能为空");
+            return;
+        }
+        $.post("{:url('refuse')}", {reason:reason, is_again:is_again, id:id}, function(res){
+        if(res.code == 1){
+            location.reload();
+        }else{
+            layer.msg(res.msg);
+        }
+        });
+    }
+
+
+    function showImg(url){
+        var index = layer.open({
+            title:"门店照片",
+            shadow:true,
+            type:1,
+            content:"<img src='"+url+"' style='margin: auto;'/>"
+        });
+        layer.full(index);
+    }
+</script>
+</body>
+</html>

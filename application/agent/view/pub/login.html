@@ -1,0 +1,156 @@
+<!DOCTYPE HTML>
+<html>
+<head>
+    <meta charset="utf-8">
+    <meta name="renderer" content="webkit|ie-comp|ie-stand">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+    <meta name="viewport"
+          content="width=device-width,initial-scale=1,minimum-scale=1.0,maximum-scale=1.0,user-scalable=no"/>
+    <meta http-equiv="Cache-Control" content="no-siteapp"/>
+    <!--[if lt IE 9]>
+    <script type="text/javascript" src="__STATIC__/lib/html5shiv.js"></script>
+    <script type="text/javascript" src="__STATIC__/lib/respond.min.js"></script>
+    <![endif]-->
+    <link href="__STATIC__/static/h-ui/css/H-ui.min.css" rel="stylesheet" type="text/css"/>
+    <link href="__STATIC__/static/h-ui.admin/css/H-ui.login.css" rel="stylesheet" type="text/css"/>
+    <link href="__STATIC__/static/h-ui.admin/css/style.css" rel="stylesheet" type="text/css"/>
+    <link href="__STATIC__/lib/Hui-iconfont/1.0.8/iconfont.css" rel="stylesheet" type="text/css"/>
+    <link href="/favicon.ico" rel="Shortcut Icon" type="text/css"/>
+    <!--[if IE 6]>
+    <script type="text/javascript" src="__STATIC__/lib/DD_belatedPNG_0.0.8a-min.js"></script>
+    <script>DD_belatedPNG.fix('*');</script>
+    <![endif]-->
+    <title>登录</title>
+    <style>
+        .telephone, .vcode {
+            display: inline-block;
+            line-height: 40px;
+            border: 0;
+            border-bottom: 1px #ccc solid;
+        }
+
+        .dibu {
+            position: absolute;
+            bottom: 0;
+            line-height: 100px;
+            color: #ccc;
+        }
+
+        .btn {
+            display: inline-block;
+            height: 30px;
+            line-height: 40px;
+        }
+    </style>
+</head>
+<body>
+<div class="col-12 text-c">
+    <img class="col-10 mt-30" src="__STATIC__/agent/agent.png" alt="">
+</div>
+<form method="post" id="form_code" class="form_name">
+    <div class="col-12 pd-20 mt-50 text-c">
+        <div class="col-12 text-c">
+            <input type="text" placeholder="请填写手机号码" class="col-12 telephone">
+        </div>
+    </div>
+    <div class="col-12 pd-20 text-c">
+        <div class="col-12 cl text-c">
+            <input type="text" placeholder="请填写验证码" class="vcode col-7 f-l">
+            <button type="button" class="btn btn-primary radius col-2 f-r" data-status="1" onclick="getVcode(this)">获取验证码</button>
+        </div>
+    </div>
+</form>
+<form method="post" id="form_password" style="display: none;" class="form_code">
+    <div class="col-12 pd-20 mt-50 text-c">
+        <div class="col-12 text-c">
+            <input type="text" placeholder="请填写账号" class="col-12 telephone">
+        </div>
+    </div>
+    <div class="col-12 pd-20 text-c">
+        <div class="col-12 cl text-c">
+            <input type="password" placeholder="请填写密码" class="vcode col-12">
+        </div>
+    </div>
+</form>
+<div class="col-12 pd-20 text-c">
+    <div class="col-12 text-c">
+        <button type="button" data-val="1" class="btn btn-primary radius tj" onclick="login()" style="width: 100%; height: 50px; font-size: 20px;">登录</button>
+        <div class="mt-20 form_code" style="display: none;">
+            <span style="color: #ccc;" onclick="changeLoginType(1)">短信验证码登录</span>
+        </div>
+        <div class="mt-20 form_name">
+            <span style="color: #ccc;" onclick="changeLoginType(2)">账号密码登录</span>
+        </div>
+    </div>
+</div>
+<div class="col-12 text-c dibu">
+    进货便宜&nbsp;&nbsp;抢农资网
+</div>
+<script type="text/javascript" src="__STATIC__/lib/jquery/1.9.1/jquery.min.js"></script>
+<script type="text/javascript" src="__STATIC__/lib/layer/2.4/layer.js"></script>
+<script>
+    function changeLoginType(type){
+        if(type == 2){
+            $(".form_name").hide();
+            $(".form_code").show();
+        }
+        if(type == 1){
+            $(".form_code").hide();
+            $(".form_name").show();
+        }
+        $(".tj").data("val", type);
+    }
+
+    /**
+     * 登录
+     */
+    function login(){
+        var type = $(".tj").data("val");
+        if(type == 1){
+            var telephone = $(".form_name").find(".telephone").val();
+            var vcode = $(".form_name").find(".vcode").val();
+
+        }else if(type == 2){
+            var telephone = $(".form_code").find(".telephone").val();
+            var vcode = $(".form_code").find(".vcode").val();
+        }else{
+            layer.alert("参数错误");
+            return;
+        }
+        $.post("{:url('login')}", {type:type, telephone:telephone, vcode:vcode}, function (res) {
+            if(res.code == 1){
+                location.href = "{:url('index/index')}";
+            }else{
+                layer.alert(res.msg);
+            }
+        });
+    }
+
+    function getVcode(o){
+        var st = $(o).data("status");
+        if(st == 2){
+            return;
+        }
+        var telephone = $(".form_name").find(".telephone").val();
+        $.post("{:url('getSms')}", {telephone:telephone}, function (res) {
+            if(res.code == 1){
+                layer.msg("发送成功");
+                $(o).data("status", 2);
+                var sec = 60;
+                var si = setInterval(function () {
+                    $(o).html(sec--+"秒");
+                    if(sec == 0){
+                        $(o).data("status", 1);
+                        $(o).html("获取验证码");
+                        clearInterval(si);
+                    }
+                }, 1000);
+            }else{
+                layer.msg(res.msg);
+            }
+        });
+
+    }
+</script>
+</body>
+</html>

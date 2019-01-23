@@ -66,6 +66,7 @@ class Admin extends BaseController
     {
         if(request()->isAjax()){
             $data = input('post.');
+            $role_id_arr = $data['role_id'];
             $data['role_id'] = join(',', $data['role_id']);
             $data['password'] = md5($data['password']);
             $check = $this->validate($data, 'Admin');
@@ -81,6 +82,13 @@ class Admin extends BaseController
             $res = $this->adminModel->allowField(true)->isUpdate(false)->save($data);
             if($res){
                 $id = $this->adminModel->getLastInsID();
+                if(in_array(15, $role_id_arr)){
+                    model("AgentLog")->save([
+                        "admin_id"=>session("admin_id"),
+                        "name"=>"添加代理商",
+                        "data"=>"代理商id:".$id.";用户名：".$data["uname"].";姓名：".$data["name"]
+                    ]);
+                }
                 if($data["vip_code"] == ""){
                     $vip_code = getRandStr($id, 5, 'nongzi');
                     model('Admins')->save(['vip_code'=>$vip_code], ['id'=>$id]);
@@ -90,11 +98,20 @@ class Admin extends BaseController
                 exit_json(-1, '保存失败');
             }
         }else{
+            $area_province = getArea();
+            $this->assign("province", $area_province);
             $dep = model('Department')->select();
             $dep_list = getTree($dep, 0);
             $this->assign('dep_list', json_encode($dep_list));
             return $this->fetch();
         }
+    }
+
+    public function getArea()
+    {
+        $pid = input("pid");
+        $list = getArea($pid);
+        exit_json(1, "", $list);
     }
 
     /**
@@ -108,6 +125,7 @@ class Admin extends BaseController
     {
         if(request()->isAjax()){
             $data = input('post.');
+            $role_id_arr = $data['role_id'];
             $data['role_id'] = join(',', $data['role_id']);
 
             if($data["vip_code"] != ""){
@@ -118,8 +136,15 @@ class Admin extends BaseController
             }
             $vip_code = model("Admins")->where("id", $data["id"])->value("vip_code");
             model("User")->save(["vip_code"=>$data["vip_code"]], ["vip_code"=>$vip_code]);
-            $res = $this->adminModel->allowField(['role_id', 'uname', 'describe', 'name', 'department_id', 'department_pid', 'telephone', 'vip_code'])->save($data, ['id'=>$data['id']]);
+            $res = $this->adminModel->allowField(['role_id', 'uname', 'describe', 'name', 'department_id', 'department_pid', 'telephone', 'vip_code', 'province_id', 'city_id', 'country_id', 'agent_level', 'person_money', 'first_order'])->save($data, ['id'=>$data['id']]);
             if($res){
+                if(in_array(15, $role_id_arr)){
+                    model("AgentLog")->save([
+                        "admin_id"=>session("admin_id"),
+                        "name"=>"添加代理商",
+                        "data"=>"代理商id:".$data['id'].";用户名：".$data["uname"].";姓名：".$data["name"]
+                    ]);
+                }
                 exit_json(1, '保存成功');
             }else{
                 exit_json(-1, '保存失败');
@@ -129,6 +154,10 @@ class Admin extends BaseController
             $roleArr = explode(',', $admin['role_id']);
             $dep = model('Department')->select();
             $dep_list = getTree($dep, 0);
+            $province = getArea();
+            $city = getArea($admin["province_id"]);
+            $country = getArea($admin["city_id"]);
+            $this->assign("area", ["province"=>$province, "city"=>$city, "country"=>$country]);
             $this->assign('dep_list', json_encode($dep_list));
             $this->assign('admin', $admin);
             $this->assign('roleArr', $roleArr);

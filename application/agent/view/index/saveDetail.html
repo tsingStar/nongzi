@@ -1,0 +1,160 @@
+{include file='pub/header'/}
+<title>信息补录</title>
+<style>
+    body {
+        background-color: #F7F7F7;
+    }
+
+    .dingbu {
+        line-height: 45px;
+        font-size: 18px;
+        font-weight: bold;
+        background-color: #ffffff;
+    }
+    .ele{
+        border-radius: 10px;
+        border: 1px solid #cccccc;
+    }
+    .money{
+        line-height: 2.5rem;
+        height: 2.5rem;
+        padding: 5px;
+    }
+    .tips{
+        color: #AEAEAE;
+        font-size: .5rem;
+    }
+</style>
+</head>
+<body>
+
+<div class="dingbu col-12 text-c row cl">
+    <div class="l" style="width: 40px;" onclick="history.back()">
+        <i class="Hui-iconfont Hui-iconfont-arrow2-left"></i>
+    </div>
+    <div>
+        信息补录
+    </div>
+</div>
+
+<div class="ml-20 mr-20 mt-10">
+    <form action="" method="post">
+        <input type="hidden" name="user_id" value="{$user_id}">
+        <input type="hidden" name="user_telephone" value="{$user.telephone}">
+        <input type="hidden" name="address" value="">
+        <div class="mt-20">
+            <label class="tx-title">客户电话<span class="tips">（如需更换，请联系抢农资网客服）</span></label>
+            <input type="text" value="{$user.telephone}" disabled class="money col-12 ele mt-5">
+        </div>
+        <div class="mt-20">
+            <label class="tx-title">*客户姓名</label>
+            <input name="user_name" type="text" value="" placeholder="填写客户姓名" class="money col-12 ele mt-5">
+        </div>
+        <div class="mt-20">
+            <label class="tx-title">*客户地址<span class="tips">（需精确到社区/街道）</span></label>
+            <div style="display: flex;">
+                <select type="text" class="money col-4 ele province" disabled style="border-top-right-radius: 0; border-bottom-right-radius: 0;">
+                    <option value="{$area_list[$agent['province_id']]}">{$area_list[$agent['province_id']]}</option>
+                </select>
+                <select type="text" class="money col-4 ele city" disabled style="border-radius: 0;">
+                    <option value="{$area_list[$agent['city_id']]}">{$area_list[$agent['city_id']]}</option>
+                </select>
+                <select type="text" class="money col-4 ele country" style="border-top-left-radius: 0; border-bottom-left-radius: 0;" {if $agent.agent_level eq 2}disabled{/if}>
+                    {foreach $custom_area as $key=>$item}
+                    <option value="{$item}" {if $key eq $agent.country_id}selected{/if}>{$item}</option>
+                    {/foreach}
+                </select>
+            </div>
+            <input id="detail_address" type="text" value="" placeholder="详细地址需精确到街道/社区" class="money col-12 ele mt-5">
+        </div>
+        <div class="mt-20">
+            <label class="tx-title">*上传客户门店照片<span class="tips">（请上传门店正面照，需包括招牌前门等，清晰真实有效）</span></label>
+            <div>
+                <label for="file" id="img" style="display: inline-block; width: 100%; height: auto;">
+            <div class="pd-25" style="border: 1px dashed #AEAEAE; width: 3rem; border-radius: 10px;">
+                <img src="__STATIC__/agent/add.png" style="height: 3rem;" alt="">
+            </div>
+                </label>
+            </div>
+            <input type="file" id="file" onchange="uploadImg(this)" style="display: none;" accept="image/*">
+            <input type="hidden" name="img" id="store_img">
+        </div>
+    </form>
+</div>
+<div class="ml-20 mr-20 mt-10">
+    <div class="mt-10 btn-primary text-c col-12 radius" style="line-height: 3rem; height: 3rem;" onclick="applyDetail()">
+        <label class="ml-15">
+            确认提交审核
+        </label>
+    </div>
+</div>
+<div class="ml-20 mr-20 mt-10">
+    <div class="mt-15 text-l ml-20" style="color: #AEAEAE; font-size: .7rem;">
+        <p style="font-weight: bold;">信息补录规范要求：</p>
+        <p>① 客户信息须真实有效</p>
+        <p>② 客户地址须精确到社区/街道一级，如：“山东省菏泽市XX区XX村XX街道</p>
+        <p>③ 客户门店照片需清晰真实 建议640px以上</p>
+    </div>
+</div>
+
+{include file="pub/footer"/}
+<!--请在下方写此页面业务相关的脚本-->
+<script type="text/javascript">
+    function applyDetail(){
+        var img = $("input[name='img']").val();
+        if(img == ''){
+            layer.msg("门店照片不能为空");
+            return ;
+        }
+        var user_name = $("input[name='user_name']").val();
+        if(user_name == ''){
+            layer.msg("客户姓名不能为空");
+            return ;
+        }
+        var da = $("#detail_address").val();
+        if(da == ""){
+            layer.msg("详细地址不能为空");
+            return ;
+        }else{
+            var address = $(".province").val()+$(".city").val()+$(".country").val()+da;
+            $("input[name='address']").val(address);
+        }
+        $("form").ajaxSubmit(function(res){
+            if(res.code == 1){
+                location.href = "{:url('index/custom')}";
+            }else{
+                layer.alert(res.msg);
+            }
+        });
+
+    }
+
+    /**
+     * 上传文件
+     * @param o 点击元素
+     */
+    function uploadImg(o) {
+        var $form = document.createElement("form");
+        $form.setAttribute("action", "{:url('Index/uploadFile')}");
+        $form.setAttribute("method", "POST");
+        $form.setAttribute("enctype", "multipart/form-data");
+        $("body").append($form);
+        var node = $(o).clone(true);
+        node.attr("name", "file");
+        node.appendTo($form);
+        var index = layer.load();
+        $($form).ajaxSubmit(function (res) {
+            $($form).remove();
+            if(res.code == 1){
+                layer.msg("上传成功");
+                $("#img").html('<img src="'+res.data+'" style="width: 100%; border-radius: 15px;" alt="">');
+                $("#store_img").val(res.data);
+            }else{
+                layer.msg("上传失败");
+            }
+            layer.close(index);
+        });
+    }
+</script>
+</body>
+</html>

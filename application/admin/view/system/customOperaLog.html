@@ -1,0 +1,44 @@
+{include file='pub/header'/}
+<title>会员列表</title>
+</head>
+<body>
+<nav class="breadcrumb">{$breadNav} <a class="btn btn-success radius r" style="line-height:1.6em;margin-top:3px"
+                                       href="javascript:location.replace(location.href);" title="刷新"><i
+        class="Hui-iconfont">&#xe68f;</i></a></nav>
+<div class="page-container">
+    <table class="table table-border table-bordered table-bg">
+        <thead>
+        <tr>
+            <th scope="col" colspan="9">客户审核日志</th>
+        </tr>
+        <tr class="text-c">
+            <th width="50">操作人</th>
+            <th width="50">代理商</th>
+            <th width="50">客户</th>
+            <th width="150">操作</th>
+            <th width="150">数据</th>
+            <th width="50">时间</th>
+        </tr>
+        </thead>
+        <tbody>
+        {foreach $list as $v}
+        <tr class="text-c">
+            <td>{$v.admin_name}</td>
+            <td>{$v.agent_name}</td>
+            <td>{$v.user_name}</td>
+            <td>{$v.name}</td>
+            <td>{$v.data}</td>
+            <td>{$v.create_time}</td>
+        </tr>
+        {/foreach}
+        </tbody>
+    </table>
+    {$list->render()}
+</div>
+{include file="pub/footer"/}
+
+<!--请在下方写此页面业务相关的脚本-->
+<script type="text/javascript">
+</script>
+</body>
+</html>

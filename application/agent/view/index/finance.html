@@ -1,0 +1,108 @@
+{include file='pub/header'/}
+<title>财务信息</title>
+<style>
+    body {
+        background-color: #F7F7F7;
+    }
+
+    .dingbu {
+        line-height: 45px;
+        font-size: 18px;
+        font-weight: bold;
+        background-color: #ffffff;
+    }
+
+    .agent-order {
+        background-color: #FFFFFF;
+    }
+
+    .row1 {
+        line-height: 2.6rem;
+        height: 2.7rem;
+    }
+
+    .agent-order .row1 img {
+        height: 1.2rem;
+    }
+
+    .agent-order .row1 span {
+        color: #AEAEAE;
+    }
+    .acte div{
+        line-height: 2.5rem;
+        height: 2.5rem;
+    }
+</style>
+</head>
+<body>
+
+<div class="dingbu col-12 text-c row cl">
+    <div class="l" style="width: 40px;" onclick="history.back()">
+        <i class="Hui-iconfont Hui-iconfont-arrow2-left"></i>
+    </div>
+    <div>
+        财务信息
+    </div>
+</div>
+<div class="container col-12 text-c">
+    <div class="mt-10 col-12 cl text-l"
+         style="background-image: url('__STATIC__/agent/fnc.png'); background-repeat:no-repeat;background-size:100% 100%;-moz-background-size:100% 100%; line-height: 120px; height: 120px; color: white;">
+        <div style="height: 40px; line-height: 50px; margin-top: 10px; margin-left: 10px; font-size: 1rem;">可提现佣金（元）
+        </div>
+        <div style="height: 80px; line-height: 70px; font-weight: bold; margin-left: 25px; font-size: 1.6rem;">3370.00
+        </div>
+    </div>
+
+</div>
+
+<div class="ml-20 mr-20 mt-10 radius agent-order">
+    <div class="row1 col-12  cl" onclick="location.href='./spreadCustom.html'">
+        <label class="ml-15">
+            推广佣金记录
+        </label>
+        <span class="r">
+            <i class="Hui-iconfont Hui-iconfont-arrow2-right"></i>
+        </span>
+        <div class="ml-15 line"></div>
+    </div>
+    <div class="row1 col-12  cl" onclick="location.href='./spreadOrder.html'">
+        <label class="ml-15">
+            客户订单佣金记录
+        </label>
+        <span class="r">
+            <i class="Hui-iconfont Hui-iconfont-arrow2-right"></i>
+        </span>
+    </div>
+</div>
+<div class="ml-20 mr-20 mt-10 acte">
+    <div class="mt-10 btn-primary col-12 radius" onclick="location.href='./applyWithdraw.html'">
+        <label class="ml-15">
+            申请提现
+        </label>
+        <span class="r">
+            <i class="Hui-iconfont Hui-iconfont-arrow2-right"></i>
+        </span>
+    </div>
+    <div class="mt-10 col-12 radius" style="border: 1px solid #2779F2; color: #2779F2;">
+        <label class="ml-15">
+            提现明细记录
+        </label>
+        <span class="r">
+            <i class="Hui-iconfont Hui-iconfont-arrow2-right"></i>
+        </span>
+    </div>
+</div>
+<div class="ml-20 mr-20 mt-10">
+    <div class="mt-15 text-l ml-20" style="color: #AEAEAE; font-size: .7rem;">
+        <p style="font-weight: bold;">提现须知：</p>
+        <p>① 客户提现每月固定日期提现 系统设置 每月N~M号为提现日期</p>
+        <p>② 备注提示：邮寄地址，企业提供发票，个人需要根据个税扣除税款</p>
+    </div>
+</div>
+
+{include file="pub/footer"/}
+<!--请在下方写此页面业务相关的脚本-->
+<script type="text/javascript">
+</script>
+</body>
+</html>

@@ -1,0 +1,74 @@
+{include file='pub/header'/}
+<title>申请提现</title>
+<style>
+    body {
+        background-color: #F7F7F7;
+    }
+
+    .dingbu {
+        line-height: 45px;
+        font-size: 18px;
+        font-weight: bold;
+        background-color: #ffffff;
+    }
+    .ele{
+        border-radius: 10px;
+        border: 1px solid #cccccc;
+    }
+    .money{
+        line-height: 3rem;
+        height: 3rem;
+        padding: 15px;
+    }
+</style>
+</head>
+<body>
+
+<div class="dingbu col-12 text-c row cl">
+    <div class="l" style="width: 40px;" onclick="history.back()">
+        <i class="Hui-iconfont Hui-iconfont-arrow2-left"></i>
+    </div>
+    <div>
+        申请提现
+    </div>
+</div>
+
+<div class="ml-20 mr-20 mt-10">
+    <form action="">
+        <input type="hidden" name="token" value="">
+        <div class="mt-20">
+            <label class="tx-title">*可提现金额 ￥99999.00</label>
+            <input name="money" type="text" value="" placeholder="填写提现金额" autocomplete="false" class="money col-12 ele mt-5">
+        </div>
+        <div class="mt-15">
+            <label class="tx-title">*备注信息</label>
+            <textarea class="col-12 ele mt-5" style="resize: none;padding: 15px;" name="remarks" id="" cols="30" rows="10" placeholder="请仔细阅读提现须知，根据提示填写"></textarea>
+        </div>
+
+
+    </form>
+</div>
+<div class="ml-20 mr-20 mt-10">
+    <div class="mt-10 btn-primary text-c col-12 radius" style="line-height: 3rem; height: 3rem;" onclick="applyWithdraw()">
+        <label class="ml-15">
+            确认提交，提现申请
+        </label>
+    </div>
+</div>
+<div class="ml-20 mr-20 mt-10">
+    <div class="mt-15 text-l ml-20" style="color: #AEAEAE; font-size: .7rem;">
+        <p style="font-weight: bold;">温馨提示：</p>
+        <p>① 客户提现每月固定日期提现 系统设置 每月N~M号为提现日期</p>
+        <p>② 备注提示：邮寄地址，企业提供发票，个人需要根据个税扣除税款</p>
+    </div>
+</div>
+
+{include file="pub/footer"/}
+<!--请在下方写此页面业务相关的脚本-->
+<script type="text/javascript">
+    function applyWithdraw(){
+
+    }
+</script>
+</body>
+</html>

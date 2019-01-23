@@ -1,0 +1,30 @@
+{include file="pub/header"}
+<title>提现日期设置</title>
+</head>
+<body>
+<nav class="breadcrumb">{$breadNav} <a class="btn btn-success radius r btn-refresh" style="line-height:1.6em;margin-top:3px" href="javascript:location.replace(location.href);" title="刷新" ><i class="Hui-iconfont">&#xe68f;</i></a></nav>
+
+<article class="page-container">
+	<form action="" method="post" class="form form-horizontal" id="form-role-add">
+		<div class="row cl">
+			<label class="form-label col-xs-4 col-sm-3">每月起止日期：</label>
+			<div class="formControls col-xs-8 col-sm-9">
+				<input type="text" name="start_day" class="input input-text" value="{$item.start_day}" style="width: 100px;">~<input type="text" class="input input-text" name="end_day" value="{$item.end_day}" style="width: 100px;">
+			</div>
+		</div>
+		<div class="row cl">
+			<div class="col-xs-8 col-sm-9 col-xs-offset-4 col-sm-offset-3">
+				<input class="btn btn-primary radius" type="submit" value="&nbsp;&nbsp;提交&nbsp;&nbsp;">
+			</div>
+		</div>
+	</form>
+</article>
+
+{include file="pub/footer" /}
+
+<!--请在下方写此页面业务相关的脚本--> 
+<script type="text/javascript">
+</script>
+<!--/请在上方写此页面业务相关的脚本-->
+</body>
+</html>

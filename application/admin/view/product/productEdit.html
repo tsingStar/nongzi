@@ -31,6 +31,19 @@
 			</div>
 		</div>
 
+		<div class="row cl">
+			<label class="form-label col-xs-4 col-sm-2"><span class="c-red">*</span>代理商返利利率：</label>
+			<div class="formControls col-xs-8 col-sm-9">
+				<input type="text" class="input-text" value="{$product.agent_commission}" placeholder="" name="agent_commission">
+			</div>
+		</div>
+		<div class="row cl">
+			<label class="form-label col-xs-4 col-sm-2"><span class="c-red">*</span>业务员返利利率：</label>
+			<div class="formControls col-xs-8 col-sm-9">
+				<input type="text" class="input-text" value="{$product.salesman_commission}" placeholder="" name="salesman_commission">
+			</div>
+		</div>
+
 		{foreach $prop_name as $k=>$v}
 		<div class="row cl prop">
 			<label class="form-label col-xs-4 col-sm-2"><span class="c-red">*</span>{$v}：</label>

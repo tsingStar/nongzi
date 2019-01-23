@@ -1,0 +1,95 @@
+{include file='pub/header'/}
+<title>信息补录</title>
+<style>
+    body {
+        background-color: #F7F7F7;
+    }
+
+    .dingbu {
+        line-height: 45px;
+        font-size: 18px;
+        font-weight: bold;
+        background-color: #ffffff;
+    }
+    .ele{
+        border-radius: 10px;
+        border: 1px solid #cccccc;
+    }
+    .money{
+        line-height: 2.5rem;
+        height: 2.5rem;
+        padding: 5px;
+    }
+    .tips{
+        color: #AEAEAE;
+        font-size: .5rem;
+    }
+</style>
+</head>
+<body>
+
+<div class="dingbu col-12 text-c row cl">
+    <div class="l" style="width: 40px;" onclick="history.back()">
+        <i class="Hui-iconfont Hui-iconfont-arrow2-left"></i>
+    </div>
+    <div>
+        信息审核确认
+    </div>
+</div>
+
+<div class="ml-20 mr-20 mt-10">
+    <form action="">
+        <div class="mt-20">
+            <label class="tx-title">客户电话<span class="tips">（如需更换，请联系抢农资网客服）</span></label>
+            <input name="telephone" type="text" value="{$user_info.user_telephone}" disabled class="money col-12 ele mt-5">
+        </div>
+        <div class="mt-20">
+            <label class="tx-title">*客户姓名</label>
+            <input name="name" type="text" value="{$user_info.user_name}" placeholder="填写客户姓名" class="money col-12 ele mt-5">
+        </div>
+        <div class="mt-20">
+            <label class="tx-title">*客户地址<span class="tips">（需精确到社区/街道）</span></label>
+            <input name="detail_address" type="text" value="{$user_info.address}" placeholder="详细地址需精确到街道/社区" class="money col-12 ele mt-5">
+        </div>
+        <div class="mt-20">
+            <label class="tx-title">*上传客户门店照片<span class="tips">（请上传门店正面照，需包括招牌前门等，清晰真实有效）</span></label>
+            <div class="pd-25" style="border: 1px dashed #AEAEAE; border-radius: 10px;">
+                <img src="{$user_info.img}" style="width: 100%; height: auto;" alt="">
+            </div>
+        </div>
+    </form>
+</div>
+<div class="ml-20 mr-20 mt-10">
+    <div class="mt-10 btn-block text-c col-12 radius" style="line-height: 3rem; height: 3rem;">
+        <label class="ml-15">
+            审核结果：{if $user_info.is_ok eq 0}正在审核{elseif $user_info.is_ok eq 1}审核通过{else}拒绝（{$user_info.reason}）{/if}
+        </label>
+    </div>
+</div>
+{if $user.is_again eq 1 && $user.check_status eq 2}
+<div class="ml-20 mr-20 mt-10">
+    <div class="mt-10 btn-primary text-c col-12 radius" style="line-height: 3rem; height: 3rem;" onclick="saveAgain('{$user.id}')">
+        <label class="ml-15">
+            确认重新提交审核
+        </label>
+    </div>
+</div>
+{/if}
+<div class="ml-20 mr-20 mt-10">
+    <div class="mt-15 text-l ml-20" style="color: #AEAEAE; font-size: .7rem;">
+        <p style="font-weight: bold;">信息补录规范要求：</p>
+        <p>① 客户信息须真实有效</p>
+        <p>② 客户地址须精确到社区/街道一级，如：“山东省菏泽市XX区XX村XX街道</p>
+        <p>③ 客户门店照片需清晰真实 建议640px以上</p>
+    </div>
+</div>
+
+{include file="pub/footer"/}
+<!--请在下方写此页面业务相关的脚本-->
+<script type="text/javascript">
+    function saveAgain(id){
+        location.href = "{:url('saveDetail')}?user_id="+id;
+    }
+</script>
+</body>
+</html>

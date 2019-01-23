@@ -45,11 +45,66 @@
 			<label class="form-label col-xs-4 col-sm-3"><span class="c-red">*</span>角色：</label>
 			<div class="formControls col-xs-8 col-sm-9">
 				{foreach $roleList as $key=>$role}
-				<input type="checkbox" class="input-small" id="role-{$key}" value="{$key}" placeholder="" name="role_id[]" {if in_array($key, $roleArr)}checked{/if}>
+				<input type="checkbox" class="input-small" id="role-{$key}" value="{$key}"  onclick="showAgent('{$key}', this)" placeholder="" name="role_id[]" {if in_array($key, $roleArr)}checked{/if}>
 				<label for="role-{$key}" class="">{$role}</label>
 				{/foreach}
 			</div>
 		</div>
+
+		<div class="row cl agent" {if !in_array(15, $roleArr)} style="display: none;"{/if}>
+			<label class="form-label col-xs-4 col-sm-3">代理商等级：</label>
+			<div class="formControls col-xs-8 col-sm-9">
+                <span class="select-box" style="width: auto;">
+                    <select name="agent_level" class="select">
+                        <option value="1" {if $admin.agent_level eq 1}selected{/if}>市级代理</option>
+                        <option value="2" {if $admin.agent_level eq 2}selected{/if}>区县级代理</option>
+                    </select>
+                </span>
+			</div>
+		</div>
+		<div class="row cl agent" {if !in_array(15, $roleArr)} style="display: none;"{/if}>
+			<label class="form-label col-xs-4 col-sm-3">推广用户佣金金额：</label>
+			<div class="formControls col-xs-8 col-sm-9">
+				<input type="text" name="person_money" class="input input-text" value="{$admin.person_money}">
+			</div>
+		</div>
+		<div class="row cl agent" {if !in_array(15, $roleArr)} style="display: none;"{/if}>
+			<label class="form-label col-xs-4 col-sm-3">动销首单佣金金额：</label>
+			<div class="formControls col-xs-8 col-sm-9">
+				<input type="text" name="first_order" class="input input-text" value="{$admin.first_order}">
+			</div>
+		</div>
+
+		<div class="row cl agent" {if !in_array(15, $roleArr)} style="display: none;"{/if}>
+			<label class="form-label col-xs-4 col-sm-3">代理商区域：</label>
+			<div class="formControls col-xs-8 col-sm-9">
+                <span class="select-box" style="width: auto;">
+                    <select name="province_id" class="select province" onchange="getNextArea(this, 'city')">
+                        <option value="">请选择</option>
+                        {foreach $area["province"] as $item}
+                            <option value="{$item.id}" {if $admin.province_id eq $item.id}selected{/if}>{$item.name}</option>
+                        {/foreach}
+                    </select>
+                </span>
+				<span class="select-box" style="width: auto;">
+                    <select name="city_id"  class="select city" onchange="getNextArea(this, 'country')">
+                        <option value="">请选择</option>
+						{foreach $area["city"] as $item}
+                            <option value="{$item.id}" {if $admin.city_id eq $item.id}selected{/if}>{$item.name}</option>
+                        {/foreach}
+                    </select>
+                </span>
+				<span class="select-box" style="width: auto;">
+                    <select name="country_id" class="select country">
+                        <option value="">请选择</option>
+						{foreach $area["country"] as $item}
+                            <option value="{$item.id}" {if $admin.country_id eq $item.id}selected{/if}>{$item.name}</option>
+                        {/foreach}
+                    </select>
+                </span>
+			</div>
+		</div>
+
 		<div class="row cl">
 			<label class="form-label col-xs-4 col-sm-3">描述：</label>
 			<div class="formControls col-xs-8 col-sm-9">
@@ -69,6 +124,29 @@
 
 <!--请在下方写此页面业务相关的脚本--> 
 <script type="text/javascript">
+
+	function getNextArea(o, sl){
+		var pid = $(o).val();
+		$.getJSON("{:url('getArea')}", {pid:pid}, function(res){
+			var data = res.data;
+			var _l = "<option value=''>请选择</option>";
+			if(sl == "city"){
+				$(".country").html(_l);
+			}
+			$.each(data, function (i,v) {
+				_l += '<option value="'+v.id+'">'+v.name+'</option>';
+			});
+			$("."+sl).html(_l);
+		})
+	}
+
+	function showAgent(role_id, o){
+		var is_show = $(o).prop("checked");
+		if(role_id == 15){
+			is_show?$(".agent").show():$(".agent").hide();
+		}
+	}
+
     $(function(){
         var $dep_list = {$dep_list};
         var opts = '';

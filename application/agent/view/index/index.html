@@ -1,0 +1,149 @@
+{include file='pub/header'/}
+<title xmlns="http://www.w3.org/1999/html">首页</title>
+<style>
+    body {
+        background-color: #F7F7F7;
+    }
+
+    .dingbu {
+        line-height: 100px;
+    }
+
+    table td {
+        font-size: .8rem;
+        color: #ACACAC;
+    }
+
+    .agent-order {
+        background-color: #FFFFFF;
+    }
+
+    .agent-order .row {
+        line-height: 3rem;
+        height: 3rem;
+    }
+
+    .agent-order .row img {
+        height: 1.2rem;
+        width: 1.2rem;
+    }
+
+    .agent-order .row span {
+        color: #AEAEAE;
+    }
+
+    .agent-btn {
+        line-height: 3rem;
+        height: 3rem;
+    }
+    .second{
+        color: #E57D17;
+    }
+    .second .agent-btn{
+        border: 1px solid #E57D17;
+    }
+
+</style>
+</head>
+<body>
+
+<div class="dingbu col-12 cl">
+    <div class="l col-9">
+        <span class="col-offset-0" style="font-size: 2rem;">{$agent.name}</span>
+    </div>
+    <div class="col-3 r">
+        <img src="__STATIC__/agent/touxiang.png" style="width: 80px;" alt="">
+    </div>
+</div>
+<div class="agent_order pr-15 pl-15">
+    <table>
+        <tr>
+            <td>累计</td>
+            <td rowspan="2" style="padding: 5px;color: #2779f2; font-size: .9rem;">
+                <span style=" padding-right: 2px;">{$item.user_num}</span>
+            </td>
+            <td>累计</td>
+            <td rowspan="2" style="padding: 5px;color: #2779f2; font-size: .9rem;">
+                <span style=" padding-right: 2px;">{$item.comp_order}</span>
+            </td>
+            <td>累计</td>
+            <td rowspan="2" style="padding: 5px;color: #2779f2; font-size: .9rem;">￥{$agent.total_commission}</td>
+        </tr>
+        <tr>
+            <td>有效用户</td>
+            <td>结算订单</td>
+            <td>推广佣金</td>
+        </tr>
+    </table>
+</div>
+
+<div class="ml-20 mr-20 mt-10 radius agent-order cl">
+    <div class="row col-12">
+        <label class="ml-15">
+            <img src="__STATIC__/agent/list.png" alt=""> 当月订单数量
+        </label>
+        <span class="r">{$item.month_total_order}</span>
+        <div class="ml-15 line"></div>
+    </div>
+    <div class="row col-12">
+        <label class="ml-15">
+            <img src="__STATIC__/agent/cart.png" alt=""> 已经结算订单数
+        </label>
+        <span class="r">{$item.month_comp_order}</span>
+        <div class="ml-15 line"></div>
+    </div>
+    <div class="row col-12">
+        <label class="ml-15">
+            <img src="__STATIC__/agent/pig.png" alt=""> 订单佣金
+        </label>
+        <span class="r">￥{$item.commission_money}</span>
+    </div>
+</div>
+
+<div class="ml-20 mr-20 mt-10 radius agent-order cl">
+    <div class="row col-12">
+        <label class="ml-15">
+            <img src="__STATIC__/agent/list.png" alt=""> 当月用户数量
+        </label>
+        <span class="r">{$item.month_user}</span>
+        <div class="ml-15 line"></div>
+    </div>
+    <div class="row col-12">
+        <label class="ml-15">
+            <img src="__STATIC__/agent/cart.png" alt=""> 当月有效客户数量
+        </label>
+        <span class="r">{$item.month_user_able}</span>
+        <div class="ml-15 line"></div>
+    </div>
+    <div class="row col-12">
+        <label class="ml-15">
+            <img src="__STATIC__/agent/pig.png" alt=""> 推广佣金
+        </label>
+        <span class="r">￥{$item.commission_user}</span>
+    </div>
+</div>
+
+<div class="ml-20 mr-20 mt-10 cl">
+    <div class="agent-btn btn-primary col-5 text-c radius l cl" onclick="location.href='{:url(\'custom\')}'">
+        <span class="l">客户列表</span> <i class="r Hui-iconfont Hui-iconfont-arrow2-right"></i>
+    </div>
+    <div class="agent-btn col-5 btn-primary text-c radius r cl" onclick="location.href='./customOrder.html'">
+        <span class="l">订单列表</span><i class="r Hui-iconfont Hui-iconfont-arrow2-right"></i>
+    </div>
+</div>
+<div class="ml-20 mr-20 mt-10 cl second">
+    <div class="agent-btn col-5 text-c radius l cl" onclick="location.href='./finance.html'">
+        <span class="l">财务信息</span><i class="Hui-iconfont Hui-iconfont-arrow2-right r"></i>
+    </div>
+    <div class="agent-btn col-5 text-c radius r cl" onclick="location.href='./code.html'">
+        <span class="l">推广二维码</span><i class="r Hui-iconfont Hui-iconfont-arrow2-right"></i>
+    </div>
+</div>
+
+
+{include file="pub/footer"/}
+<!--请在下方写此页面业务相关的脚本-->
+<script type="text/javascript">
+</script>
+</body>
+</html>

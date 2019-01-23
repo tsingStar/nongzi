@@ -1,0 +1,130 @@
+{include file='pub/header'/}
+<title>客户订单列表</title>
+<style>
+    body {
+        background-color: #F7F7F7;
+    }
+
+    .dingbu {
+        line-height: 45px;
+        font-size: 18px;
+        font-weight: bold;
+        background-color: #ffffff;
+    }
+    .custom-nav div {
+        line-height: 2rem;
+        height: 2rem;
+        font-size: .5rem;
+    }
+
+    .custom {
+        background-color: #FFFFFF;
+        border-radius: 10px;
+        padding: .8rem;
+    }
+
+    .custom-name {
+        line-height: 1.2rem;
+        height: 1.2rem;
+        margin: 5px 0 5px 0;
+        font-size: .9rem;
+    }
+    .custom-name1 {
+        line-height: 1.2rem;
+        height: 1.2rem;
+        margin: 5px 0 5px 0;
+        font-size: .9rem;
+        margin-left: 1.3rem;
+    }
+
+    .custom-name img {
+        height: 1rem;
+    }
+
+    .custom-detail {
+        line-height: 1.1rem;
+        height: 1.1rem;
+        color: #AEAEAE;
+        margin-left: 1.3rem;
+        font-size: .6rem;
+        margin-bottom: 5px;
+    }
+
+    .custom-status {
+        line-height: 1.6rem;
+        height: 1.6rem;
+        background-color: #2779f2;
+        color: white;
+        -moz-border-radius-topright: 10px;
+        border-top-right-radius: 10px;
+        border-bottom-left-radius: 50px;
+        margin-top: -0.8rem;
+        margin-right: -0.8rem;
+        font-size: .6rem;
+    }
+    .custom-status1 {
+        line-height: 1.6rem;
+        height: 1.6rem;
+        background-color: #cccccc;
+        color: white;
+        -moz-border-radius-topright: 10px;
+        border-top-right-radius: 10px;
+        border-bottom-left-radius: 50px;
+        margin-top: -0.8rem;
+        margin-right: -0.8rem;
+        font-size: .6rem;
+    }
+</style>
+</head>
+<body>
+
+<div class="dingbu col-12 text-c row cl">
+    <div class="l" style="width: 40px;" onclick="history.back()">
+        <i class="Hui-iconfont Hui-iconfont-arrow2-left"></i>
+    </div>
+    <div>
+        客户订单列表
+    </div>
+</div>
+
+<div>
+    <div class="mt-10 ml-20 mr-20 custom">
+        <div class="r custom-status">
+            &nbsp;&nbsp;&nbsp;已结算&nbsp;&nbsp;
+        </div>
+        <div class="custom-name">
+            <img src="__STATIC__/agent/list.png" alt=""> 订单编号 130****8958
+        </div>
+        <div class="custom-name1">
+            <span>订单金额</span>
+            <span>870.00</span>
+        </div>
+        <div class="custom-detail">
+            <span>注册时间：2018.12.28</span>
+            <span>推广费：870.00</span>
+        </div>
+    </div>
+    <div class="mt-10 ml-20 mr-20 custom">
+        <div class="r custom-status1">
+            &nbsp;&nbsp;&nbsp;未结算&nbsp;&nbsp;
+        </div>
+        <div class="custom-name">
+            <img src="__STATIC__/agent/list.png" alt=""> 订单编号 130****8958
+        </div>
+        <div class="custom-name1">
+            <span>订单金额</span>
+            <span>870.00</span>
+        </div>
+        <div class="custom-detail">
+            <span>注册时间：2018.12.28</span>
+            <span>推广费：870.00</span>
+        </div>
+    </div>
+</div>
+
+{include file="pub/footer"/}
+<!--请在下方写此页面业务相关的脚本-->
+<script type="text/javascript">
+</script>
+</body>
+</html>
