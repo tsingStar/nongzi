@@ -120,7 +120,7 @@ class Pub extends Controller
             if (!$sms) {
                 exit_json(-1, '验证码错误');
             }
-            $res = model('user')->isUpdate(false)->save(['telephone' => $telephone, 'password' => md5($password), 'vip_code' => $vip_code, 'user_name' => uniqid()]);
+            $res = model('user')->isUpdate(false)->save(['telephone' => $telephone, 'password' => md5($password), 'vip_code' => $vip_code, 'user_name' => uniqid(), 'spread_money'=>$admin["person_money"]]);
             if ($res) {
                 $sms->save(['status' => 1]);
                 $user_id = model('user')->getAttr('id');
@@ -329,7 +329,7 @@ class Pub extends Controller
             $user_id = $user->getAttr('id');
             exit_json(1, '注册成功', model('user')->formatOne($user_id));
         } else {
-            $res = model('user')->isUpdate(false)->save(['telephone' => $telephone, 'vip_code' => $vip_code, 'user_name' => $user_name, 'head_img' => $head_img, "open_id" => $open_id]);
+            $res = model('user')->isUpdate(false)->save(['telephone' => $telephone, 'vip_code' => $vip_code, 'user_name' => $user_name, 'head_img' => $head_img, "open_id" => $open_id, 'spread_money'=>$admin['person_money']]);
             if ($res) {
                 $sms->save(['status' => 1]);
                 $user_id = model('user')->getAttr('id');
