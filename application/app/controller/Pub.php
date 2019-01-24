@@ -110,6 +110,8 @@ class Pub extends Controller
             if (!$admin) {
                 exit_json(-1, '请输入合法有效的邀请码');
             }
+        }else{
+            $admin = ["person_money"=>0];
         }
         $user = model('user')->where('telephone', $telephone)->find();
         if ($user) {
