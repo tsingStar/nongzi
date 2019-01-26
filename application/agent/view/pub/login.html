@@ -30,7 +30,7 @@
         }
 
         .dibu {
-            position: absolute;
+            position: relative;
             bottom: 0;
             line-height: 100px;
             color: #ccc;
@@ -40,6 +40,9 @@
             display: inline-block;
             height: 30px;
             line-height: 40px;
+        }
+        .getv{
+            font-size: .8rem;
         }
     </style>
 </head>
@@ -56,14 +59,14 @@
     <div class="col-12 pd-20 text-c">
         <div class="col-12 cl text-c">
             <input type="text" placeholder="请填写验证码" class="vcode col-7 f-l">
-            <button type="button" class="btn btn-primary radius col-2 f-r" data-status="1" onclick="getVcode(this)">获取验证码</button>
+            <button type="button" class="btn getv btn-primary radius col-2 f-r" data-status="1" onclick="getVcode(this)">获取验证码</button>
         </div>
     </div>
 </form>
 <form method="post" id="form_password" style="display: none;" class="form_code">
     <div class="col-12 pd-20 mt-50 text-c">
         <div class="col-12 text-c">
-            <input type="text" placeholder="请填写账号" class="col-12 telephone">
+            <input type="text" placeholder="请填写用户名" class="col-12 telephone">
         </div>
     </div>
     <div class="col-12 pd-20 text-c">
@@ -83,9 +86,12 @@
         </div>
     </div>
 </div>
-<div class="col-12 text-c dibu">
-    进货便宜&nbsp;&nbsp;抢农资网
+<div class="cl mb-20 dibu">
+    <div class="col-12 text-c">
+        进货便宜&nbsp;&nbsp;抢农资网
+    </div>
 </div>
+
 <script type="text/javascript" src="__STATIC__/lib/jquery/1.9.1/jquery.min.js"></script>
 <script type="text/javascript" src="__STATIC__/lib/layer/2.4/layer.js"></script>
 <script>

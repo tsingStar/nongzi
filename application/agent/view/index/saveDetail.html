@@ -76,7 +76,7 @@
             </div>
                 </label>
             </div>
-            <input type="file" id="file" onchange="uploadImg(this)" style="display: none;" accept="image/*">
+            <input type="file" id="file" name="file" onchange="uploadImg(this)" style="display: none;" accept="image/*">
             <input type="hidden" name="img" id="store_img">
         </div>
     </form>
@@ -134,17 +134,22 @@
      * @param o 点击元素
      */
     function uploadImg(o) {
-        var $form = document.createElement("form");
-        $form.setAttribute("action", "{:url('Index/uploadFile')}");
-        $form.setAttribute("method", "POST");
-        $form.setAttribute("enctype", "multipart/form-data");
-        $("body").append($form);
-        var node = $(o).clone(true);
-        node.attr("name", "file");
-        node.appendTo($form);
-        var index = layer.load();
-        $($form).ajaxSubmit(function (res) {
-            $($form).remove();
+        // var $form = document.createElement("form");
+        // $form.setAttribute("action", "{:url('Index/uploadFile')}");
+        // $form.setAttribute("method", "POST");
+        // $form.setAttribute("enctype", "multipart/form-data");
+        // $("body").append($form);
+        // var node = $(o).clone(true);
+        // node.attr("name", "file");
+        // node.appendTo($form);
+        // console.log(node);
+        // alert(node);
+        // // return;
+        // var index = layer.load();
+        $("form").attr("action", "{:url('Index/uploadFile')}");
+        $("form").ajaxSubmit(function (res) {
+            // $($form).remove();
+            $("form").attr("action", "");
             if(res.code == 1){
                 layer.msg("上传成功");
                 $("#img").html('<img src="'+res.data+'" style="width: 100%; border-radius: 15px;" alt="">');

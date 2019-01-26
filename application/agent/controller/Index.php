@@ -9,6 +9,8 @@
 namespace app\agent\controller;
 
 
+use think\Log;
+
 class Index extends BaseAgent
 {
     protected function _initialize()
@@ -57,7 +59,15 @@ class Index extends BaseAgent
      */
     public function code()
     {
-        exit("正在维护");
+        $vip_code = model('Admins')->where('id', $this->agent['id'])->value('vip_code');
+        $spread_url = __URL__."/index/Index/app?vip_code=";
+        require_once VENDOR_PATH.'Qrcode/phpqrcode.php';
+        $file_name = md5($this->agent['id']).'.png';
+        is_dir(__UPLOAD__.'/qrcode') OR mkdir(__UPLOAD__.'/qrcode', 0777, true);
+        $save_path = __UPLOAD__.'/qrcode/'.$file_name;
+        \QRcode::png($spread_url.$vip_code, $save_path, 1, 50);
+        $img_url = __URL__.'/upload/qrcode/'.$file_name;
+        $this->assign("ewm", $img_url);
         return $this->fetch();
     }
 
@@ -67,8 +77,7 @@ class Index extends BaseAgent
      */
     public function finance()
     {
-
-        exit("正在维护");
+        $this->assign("able_commission", $this->agent["able_commission"]);
         return $this->fetch();
     }
 
@@ -117,10 +126,33 @@ class Index extends BaseAgent
      */
     public function customOrder()
     {
-
-        exit("正在维护");
+        if(request()->isAjax()){
+            $page = input("page");
+            $list = model("Order")->alias("a")->join("User b", "a.user_id=b.id")->where("b.vip_code", $this->agent["vip_code"])->where("a.pay_status", 1)->order("a.create_time desc")->limit($page*10, 10)->select();
+            $data = [];
+            foreach ($list as $item){
+                $temp = [];
+                $temp["order_no"] = $item["order_no"];
+                $temp["total_money"] = $item["total_money"];
+                $temp["create_time"] = $item["create_time"];
+                $temp["is_comp"] = $item["is_comp"];
+                $temp["commission"] = $this->getOrderCommission($item["order_no"]);
+                $data[] = $temp;
+            }
+            $is_next = count($data) == 10 ? 1 : 0;
+            exit_json(1, "", ["data"=>$data,"is_next"=>$is_next]);
+        }
         return $this->fetch();
+    }
 
+    public function getOrderCommission($order_no)
+    {
+        $commission = 0;
+        $list = model("OrderDet")->alias("a")->join("Product b", "a.product_id=b.id")->where("a.order_no", $order_no)->field("a.*, b.agent_commission, b.salesman_commission")->select();
+        foreach ($list as $value){
+            $commission += $value["price"]*$value["num"]*$value["agent_commission"]/100;
+        }
+        return round($commission, 2);
     }
 
     /**
@@ -128,7 +160,17 @@ class Index extends BaseAgent
      */
     public function spreadCustom()
     {
-        exit("正在维护");
+        $status = input("status");
+        if(!isset($status)){
+            $list = model("UserAddInfo")->where("agent_id", $this->agent["id"])->select();
+            $this->assign("cu", 1);
+        }else{
+            $list = model("UserAddInfo")->where("agent_id", $this->agent["id"])->where("is_ok", 1)->where("is_comp", 0)->select();
+            $this->assign("cu", 2);
+        }
+        $this->assign("is_ok", ["0"=>"未处理", "1"=>"审核通过", "2"=>"审核拒绝"]);
+        $this->assign("is_comp", ["0"=>"未结算", "1"=>"已结算", "2"=>"撤销结算"]);
+        $this->assign("list", $list);
         return $this->fetch();
     }
 
@@ -137,8 +179,47 @@ class Index extends BaseAgent
      */
     public function spreadOrder()
     {
-        exit("正在维护");
+        
         return $this->fetch();
+    }
+
+    public function spreadOrderData()
+    {
+        $page = input("page");
+        $status = input("status");
+        $model = model("Order")->alias("a")->join("User b", "a.user_id=b.id")->where("b.vip_code", $this->agent["vip_code"]);
+        switch ($status) {
+            case 1:
+                //全部
+                break;
+            case 2:
+                //待结算
+                $model->where("is_comp", 0)->where("pay_status", 1)->where("order_status", "in", [1,2,3]);
+                break;
+            case 3:
+                //已结算
+                $model->where("is_comp", 1);
+                break;
+            default:
+                exit_json(-1, "参数错误");
+        }
+        $list = $model->order("a.create_time")->limit($page * 10, 10)->select();
+        $is_next = count($list) == 10 ? 1 : 0;
+        $data = [];
+        $is_comp = [
+            "0"=>"未结算",
+            "1"=>"已结算",
+            "2"=>"已撤销"
+        ];
+        foreach ($list as $value){
+            $data[] = [
+                "order_no"=>$value["order_no"],
+                "order_status"=>config('order_status')[$value['order_status']],
+                "is_comp"=>$is_comp[$value["is_comp"]]
+            ];
+        }
+        exit_json(1, '请求成功', ["list" => $data, "is_next" => $is_next]);
+        
     }
 
     /**
@@ -146,8 +227,54 @@ class Index extends BaseAgent
      */
     public function applyWithdraw()
     {
-        exit("正在维护");
+        $day = db("withdraw_day")->find();
+        if(request()->isAjax()){
+            $today = date("d");
+            if($today<$day["start_day"] || $today>$day["end_day"]){
+                exit_json(-1, "当前日期不能提现");
+            }
+            $data = input("post.");
+            if(floatval($data["money"])<0.01 || floatval($data["money"])>$this->agent["able_commission"]){
+                exit_json(-1, "提现金额不足");
+            }
+            if(!$data["user_name"]){
+                exit_json(-1, "姓名不能为空");
+            }
+            if(!$data["bank_name"]){
+                exit_json(-1, "开户行不能为空");
+            }
+            if(!$data["bank_card_no"]){
+                exit_json(-1, "银行卡号不能为空");
+            }
+            if(!$data["remarks"]){
+                exit_json(-1, "备注不能为空");
+            }
+            $data["agent_id"] = $this->agent["id"];
+            $data["pre_money"] = $this->agent["able_commission"];
+            $res = model("WithdrawLog")->allowField(true)->save($data);
+            if($res){
+                $this->agent->setDec("able_commission", $data["money"]);
+                exit_json();
+            }else{
+                exit_json(-1, "提现申请失败");
+            }
+
+        }
+        $this->assign("day", $day);
+        $this->assign("agent", $this->agent);
         return $this->fetch();
+    }
+
+    /**
+     * 提现明细
+     */
+    public function withdrawLog()
+    {
+        $list = model("WithdrawLog")->where("agent_id", $this->agent["id"])->order("create_time desc")->paginate(15);
+        $this->assign("status", [0=>"待处理", "1"=>"已处理", "2"=>"已拒绝"]);
+        $this->assign("list", $list);
+        return $this->fetch();
+        
     }
 
     /**
@@ -202,6 +329,7 @@ class Index extends BaseAgent
     public function uploadFile()
     {
         $file = request()->file("file");
+        Log::error($file);
         if ($file) {
             $hash = $file->hash();
             $info = $file->move(__UPLOAD__);

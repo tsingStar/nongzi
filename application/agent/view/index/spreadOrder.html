@@ -51,14 +51,14 @@
 </div>
 
 <div class="mt-10 ml-20 mr-20 text-c custom-nav radius">
-    <div class="col-4 select-current" style="border-right: 1px solid #E3E3E3;">
+    <div class="col-4 select-current" style="border-right: 1px solid #E3E3E3;"  onclick="changeNav(1, this)">
         全部订单
     </div>
-    <div class="col-4" style="border-right: 1px solid #E3E3E3;">
+    <div class="col-4" style="border-right: 1px solid #E3E3E3;"  onclick="changeNav(2, this)">
         待结算
     </div>
-    <div class="col-4">
-        未结算
+    <div class="col-4"  onclick="changeNav(3, this)">
+        已结算
     </div>
 </div>
 <div class="mt-10 ml-20 mr-20">
@@ -70,7 +70,7 @@
             <th>佣金结算</th>
         </tr>
         </thead>
-        <tbody>
+        <tbody class="order-spread">
         <tr class="text-c">
             <td>201815251252142125142</td>
             <td>交易完成</td>
@@ -108,13 +108,56 @@
         </tr>
         </tbody>
     </table>
-
-
+</div>
+<div class="text-c" id="more" onclick="getMore()">
+    加载更多
 </div>
 
 {include file="pub/footer"/}
 <!--请在下方写此页面业务相关的脚本-->
 <script type="text/javascript">
+    var page=0;
+    var status=1;
+
+    function changeNav(type, o) {
+        $(o).siblings().removeClass("select-current");
+        $(o).addClass("select-current");
+        page = 0;
+        status = type;
+        $("#more").html("加载更多");
+        $("#more").attr('onclick', 'getMore()');
+        $(".order-spread").empty();
+        getMore();
+    }
+    $(function () {
+        $(".order-spread").empty();
+        getMore();
+    });
+
+    function getMore(){
+        $.getJSON("{:url('spreadOrderData')}", {status: status, page: page}, function (res) {
+            if(res.code == -1){
+                layer.alert("参数错误");
+                return;
+            }
+            var data = res.data;
+            if(data.is_next==0){
+                $("#more").html("已全部加载");
+                $("#more").removeAttr("onclick");
+            }else{
+                page++;
+            }
+            var _html='';
+            $.each(data.list, function (i,v) {
+                _html += '<tr class="text-c">\n' +
+                    '            <td>'+v.order_no+'</td>\n' +
+                    '            <td>'+v.order_status+'</td>\n' +
+                    '            <td>'+v.is_comp+'</td>\n' +
+                    '        </tr>';
+            });
+            $(".order-spread").append(_html);
+        })
+    }
 </script>
 </body>
 </html>

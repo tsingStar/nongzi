@@ -49,14 +49,14 @@
          style="background-image: url('__STATIC__/agent/fnc.png'); background-repeat:no-repeat;background-size:100% 100%;-moz-background-size:100% 100%; line-height: 120px; height: 120px; color: white;">
         <div style="height: 40px; line-height: 50px; margin-top: 10px; margin-left: 10px; font-size: 1rem;">可提现佣金（元）
         </div>
-        <div style="height: 80px; line-height: 70px; font-weight: bold; margin-left: 25px; font-size: 1.6rem;">3370.00
+        <div style="height: 80px; line-height: 70px; font-weight: bold; margin-left: 25px; font-size: 1.6rem;">{$able_commission}
         </div>
     </div>
 
 </div>
 
 <div class="ml-20 mr-20 mt-10 radius agent-order">
-    <div class="row1 col-12  cl" onclick="location.href='./spreadCustom.html'">
+    <div class="row1 col-12  cl" onclick="location.href='{:url(\"spreadCustom\")}'">
         <label class="ml-15">
             推广佣金记录
         </label>
@@ -65,7 +65,7 @@
         </span>
         <div class="ml-15 line"></div>
     </div>
-    <div class="row1 col-12  cl" onclick="location.href='./spreadOrder.html'">
+    <div class="row1 col-12  cl" onclick="location.href='{:url(\"spreadOrder\")}'">
         <label class="ml-15">
             客户订单佣金记录
         </label>
@@ -75,7 +75,7 @@
     </div>
 </div>
 <div class="ml-20 mr-20 mt-10 acte">
-    <div class="mt-10 btn-primary col-12 radius" onclick="location.href='./applyWithdraw.html'">
+    <div class="mt-10 btn-primary col-12 radius" onclick="location.href='{:url(\"applyWithdraw\")}'">
         <label class="ml-15">
             申请提现
         </label>
@@ -83,7 +83,7 @@
             <i class="Hui-iconfont Hui-iconfont-arrow2-right"></i>
         </span>
     </div>
-    <div class="mt-10 col-12 radius" style="border: 1px solid #2779F2; color: #2779F2;">
+    <div class="mt-10 col-12 radius" style="border: 1px solid #2779F2; color: #2779F2;" onclick="location.href='{:url(\"withdrawLog\")}'">
         <label class="ml-15">
             提现明细记录
         </label>

@@ -34,18 +34,27 @@
 </div>
 
 <div class="ml-20 mr-20 mt-10">
-    <form action="">
-        <input type="hidden" name="token" value="">
+    <form action="" method="post">
         <div class="mt-20">
-            <label class="tx-title">*可提现金额 ￥99999.00</label>
-            <input name="money" type="text" value="" placeholder="填写提现金额" autocomplete="false" class="money col-12 ele mt-5">
+            <label class="tx-title">*可提现金额 ￥{$agent.able_commission}</label>
+            <input name="money" type="text" value="" placeholder="填写提现金额" autocomplete="false" class="money col-12 ele mt-5" required>
+        </div>
+        <div class="mt-20">
+            <label class="tx-title">*收款人姓名</label>
+            <input name="user_name" type="text" value="" placeholder="填写姓名" autocomplete="false" class="money col-12 ele mt-5" required>
+        </div>
+        <div class="mt-20">
+            <label class="tx-title">*开户行</label>
+            <input name="bank_name" type="text" value="" placeholder="开户行" autocomplete="false" class="money col-12 ele mt-5" required>
+        </div>
+        <div class="mt-20">
+            <label class="tx-title">*银行卡号</label>
+            <input name="bank_card_no" type="text" value="" placeholder="银行卡号" autocomplete="false" class="money col-12 ele mt-5" required>
         </div>
         <div class="mt-15">
             <label class="tx-title">*备注信息</label>
-            <textarea class="col-12 ele mt-5" style="resize: none;padding: 15px;" name="remarks" id="" cols="30" rows="10" placeholder="请仔细阅读提现须知，根据提示填写"></textarea>
+            <textarea class="col-12 ele mt-5" style="resize: none;padding: 15px;" name="remarks" id="" cols="30" rows="10" placeholder="请仔细阅读提现须知，根据提示填写" required></textarea>
         </div>
-
-
     </form>
 </div>
 <div class="ml-20 mr-20 mt-10">
@@ -58,7 +67,7 @@
 <div class="ml-20 mr-20 mt-10">
     <div class="mt-15 text-l ml-20" style="color: #AEAEAE; font-size: .7rem;">
         <p style="font-weight: bold;">温馨提示：</p>
-        <p>① 客户提现每月固定日期提现 系统设置 每月N~M号为提现日期</p>
+        <p>① 每月{$day.start_day}~{$day.end_day}号为提现日期</p>
         <p>② 备注提示：邮寄地址，企业提供发票，个人需要根据个税扣除税款</p>
     </div>
 </div>
@@ -67,7 +76,13 @@
 <!--请在下方写此页面业务相关的脚本-->
 <script type="text/javascript">
     function applyWithdraw(){
-
+        $("form").ajaxSubmit(function (res) {
+            if(res.code == 1){
+                location.reload();
+            }else{
+                layer.msg(res.msg);
+            }
+        })
     }
 </script>
 </body>

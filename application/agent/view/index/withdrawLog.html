@@ -46,39 +46,32 @@
         <i class="Hui-iconfont Hui-iconfont-arrow2-left"></i>
     </div>
     <div>
-        推广佣金记录
+        提现明细记录
     </div>
 </div>
 
-<div class="mt-10 ml-20 mr-20 text-c custom-nav radius">
-    <div class="col-6 {if $cu eq 1} select-current {/if}" style="border-right: 1px solid #E3E3E3;" onclick="location.href='{:url(\"spreadCustom\")}'">
-        全部客户
-    </div>
-    <div class="col-6 {if $cu eq 2} select-current {/if}" onclick="location.href='{:url(\"spreadCustom\")}?status=1'">
-        未结算
-    </div>
-</div>
 <div class="mt-10 ml-20 mr-20">
     <table class="table table-hover table-border">
         <thead>
         <tr class="text-c">
-            <th>客户信息</th>
-            <th>审核情况</th>
-            <th>佣金结算</th>
+            <th>申请时间</th>
+            <th>金额</th>
+            <th>状态</th>
         </tr>
         </thead>
         <tbody>
         {foreach $list as $item}
         <tr class="text-c">
-            <td>{$item.user_name}{$item.user_telephone}</td>
+            <td>{$item.create_time}</td>
             <td>
-                {$is_ok[$item.is_ok]}
+                {$item.money}
             </td>
-            <td>{$is_comp[$item.is_comp]}</td>
+            <td>{$status[$item.status]}</td>
         </tr>
         {/foreach}
         </tbody>
     </table>
+    {$list->render()}
 </div>
 
 {include file="pub/footer"/}

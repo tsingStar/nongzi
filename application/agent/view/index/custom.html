@@ -202,7 +202,7 @@
         page = 0;
         status = type;
         $("#more").html("加载更多");
-        $("#more").bind('click', 'getMore()');
+        $("#more").attr('onclick', 'getMore()');
         $(".custom-list").empty();
         getMore();
     }
@@ -220,7 +220,7 @@
             var data = res.data;
             if(data.is_next==0){
                 $("#more").html("已全部加载");
-                $("#more").unbind('click');
+                $("#more").removeAttr('onclick');
             }else{
                 page++;
             }

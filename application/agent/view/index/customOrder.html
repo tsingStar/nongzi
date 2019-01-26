@@ -87,44 +87,66 @@
     </div>
 </div>
 
-<div>
-    <div class="mt-10 ml-20 mr-20 custom">
-        <div class="r custom-status">
-            &nbsp;&nbsp;&nbsp;已结算&nbsp;&nbsp;
-        </div>
-        <div class="custom-name">
-            <img src="__STATIC__/agent/list.png" alt=""> 订单编号 130****8958
-        </div>
-        <div class="custom-name1">
-            <span>订单金额</span>
-            <span>870.00</span>
-        </div>
-        <div class="custom-detail">
-            <span>注册时间：2018.12.28</span>
-            <span>推广费：870.00</span>
-        </div>
-    </div>
-    <div class="mt-10 ml-20 mr-20 custom">
-        <div class="r custom-status1">
-            &nbsp;&nbsp;&nbsp;未结算&nbsp;&nbsp;
-        </div>
-        <div class="custom-name">
-            <img src="__STATIC__/agent/list.png" alt=""> 订单编号 130****8958
-        </div>
-        <div class="custom-name1">
-            <span>订单金额</span>
-            <span>870.00</span>
-        </div>
-        <div class="custom-detail">
-            <span>注册时间：2018.12.28</span>
-            <span>推广费：870.00</span>
-        </div>
-    </div>
+<div class="custom_order">
+
+</div>
+<div class="text-c" id="more" onclick="getMore()">
+    加载更多
 </div>
 
 {include file="pub/footer"/}
 <!--请在下方写此页面业务相关的脚本-->
 <script type="text/javascript">
+    var page=0;
+    $(function () {
+        $(".custom_order").empty();
+        getMore();
+    });
+
+    function getMore(){
+        $.post("{:url('customOrder')}", {status: status, page: page}, function (res) {
+            if(res.code == -1){
+                layer.alert("参数错误");
+                return;
+            }
+            var data = res.data;
+            if(data.is_next==0){
+                $("#more").html("已全部加载");
+                $("#more").unbind('click');
+            }else{
+                page++;
+            }
+            var _html='';
+            $.each(data.data, function (i,v) {
+                _html += '<div class="mt-10 ml-20 mr-20 custom">\n';
+                        if(v.is_comp ==1){
+                            _html +='        <div class="r custom-status">\n' +
+                            '            &nbsp;&nbsp;&nbsp;已结算&nbsp;&nbsp;\n' +
+                            '        </div>\n';
+                        }else if(v.is_comp == 0){
+                            _html += '        <div class="r custom-status1">\n' +
+                            '            &nbsp;&nbsp;&nbsp;未结算&nbsp;&nbsp;\n' +
+                            '        </div>\n';
+                        }else if(v.is_comp == 2){
+                            _html += '        <div class="r custom-status1">\n' +
+                                '            &nbsp;&nbsp;&nbsp;已撤销&nbsp;&nbsp;\n' +
+                                '        </div>\n';
+                        }
+                    _html += '        <div class="custom-name">\n' +
+                    '            <img src="__STATIC__/agent/list.png" alt=""> 订单编号 '+v.order_no+'        </div>\n' +
+                    '        <div class="custom-name1">\n' +
+                    '            <span>订单金额</span>\n' +
+                    '            <span>'+v.total_money+'</span>\n' +
+                    '        </div>\n' +
+                    '        <div class="custom-detail">\n' +
+                    '            <span>订单日期：'+v.create_time+'</span>\n' +
+                    '            <span>返现金额：'+v.commission+'</span>\n' +
+                    '        </div>\n' +
+                    '    </div>';
+            });
+            $(".custom_order").append(_html);
+        })
+    }
 </script>
 </body>
 </html>
