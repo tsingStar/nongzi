@@ -262,8 +262,12 @@ class Product extends BaseController
             $res = model('Product')->allowField(true)->save($data);
             if ($res) {
                 $product_id = model('Product')->getLastInsID();
-
-
+                //添加佣金记录
+                model("ProductCommissionChangeLog")->save([
+                    "admin_id"=>session("admin_id"),
+                    "product_id"=>$product_id,
+                    "name"=>"商品佣金设置:代理商佣金".$data['agent_commission']."、业务员佣金".$data["salesman_commission"],
+                ]);
                 //规格属性处理
                 $prop_name = [];
                 $prop_value = [];
@@ -362,6 +366,70 @@ class Product extends BaseController
     }
 
     /**
+     * 保存商品返利比率
+     */
+    public function saveShipping()
+    {
+        $pid = input("pid");
+        $com = input("com");
+        $product = model("Product")->where("id", $pid)->find();
+        if(!$product){
+            exit_json(-1, "商品不存在");
+        }
+        $pre_send_fee = $product["send_fee"];
+        if($pre_send_fee == $com){
+            exit_json();
+        }
+        if($product->save(["send_fee"=>$com])){
+            exit_json();
+        }else{
+            exit_json(-1, "保存失败");
+        }
+    }
+    /**
+     * 保存商品返利比率
+     */
+    public function saveCommission()
+    {
+        $type = input("type");
+        $pid = input("pid");
+        $com = input("com");
+        $product = model("Product")->where("id", $pid)->find();
+        if(!$product){
+            exit_json(-1, "商品不存在");
+        }
+        $pre_agent_commission = $product["agent_commission"];
+        $pre_salesman_commission = $product["salesman_commission"];
+        if($type == 1){
+            if($pre_agent_commission == $com){
+                exit_json();
+            }else{
+                $res = $product->save(["agent_commission"=>$com]);
+                $name = "商品佣金变动:代理商佣金".$pre_agent_commission."变动".$com;
+            }
+        }elseif ($type == 2){
+            if($pre_salesman_commission == $com){
+                exit_json();
+            }else{
+                $res = $product->save(["salesman_commission"=>$com]);
+                $name = "商品佣金变动:业务员佣金".$pre_salesman_commission."变动".$com;
+            }
+        }else{
+            exit_json(-1, "参数错误");
+        }
+        if($res){
+            model("ProductCommissionChangeLog")->save([
+                "admin_id"=>session("admin_id"),
+                "product_id"=>$pid,
+                "name"=>$name,
+            ]);
+            exit_json();
+        }else{
+            exit_json(-1, "更新失败");
+        }
+    }
+
+    /**
      * 编辑商品
      */
     public function productEdit()
@@ -382,9 +450,18 @@ class Product extends BaseController
             model('ProductPropName')->startTrans();
             model('ProductPropValue')->startTrans();
             model('ProductAttr')->startTrans();
+            $pre_agent_commission = $product["agent_commission"];
+            $pre_salesman_commission = $product["salesman_commission"];
             $res = $product->allowField(true)->save($data);
             if ($res) {
                 $product_id = input('product_id');
+                if($pre_agent_commission != $data["agent_commission"] || $pre_salesman_commission != $data['salesman_commission']){
+                    model("ProductCommissionChangeLog")->save([
+                        "admin_id"=>session("admin_id"),
+                        "product_id"=>$product_id,
+                        "name"=>"商品佣金变动:代理商佣金".$pre_agent_commission."变动".$data["agent_commission"]."、业务员佣金".$pre_salesman_commission."变动".$data["salesman_commission"],
+                    ]);
+                }
                 //规格属性处理
                 $prop_name = [];
                 $prop_value = [];

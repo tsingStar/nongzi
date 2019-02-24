@@ -24,6 +24,7 @@ class System extends BaseController
         if(request()->isPost()){
             db("withdraw_day")->delete(true);
             db("withdraw_day")->insert(input("post."));
+            echo '<script>alert("保存成功")</script>';
         }
         $this->assign("item", db("withdraw_day")->find());
         return $this->fetch();
@@ -45,6 +46,26 @@ class System extends BaseController
     public function customOperaLog()
     {
         $list = model("CustomOperaLog")->alias("a")->join("Admins b", "a.admin_id=b.id")->join("Admins c", "a.agent_id=c.id")->join("User d", "a.user_id=d.id")->field("a.*, b.name admin_name, c.name agent_name, d.user_name")->paginate(15);
+        $this->assign("list", $list);
+        return $this->fetch();
+    }
+
+    /**
+     * 商品佣金变动记录
+     */
+    public function productCommission()
+    {
+        $list = model("ProductCommissionChangeLog")->alias("a")->join("Admins b", "a.admin_id=b.id")->join("Product c", "a.product_id=c.id")->field("a.*, b.name admin_name, c.name product_name")->paginate(15);
+        $this->assign("list", $list);
+        return $this->fetch();
+    }
+
+    /**
+     * 订单审核日志
+     */
+    public function checkOrderLog()
+    {
+        $list = model("OrderCommissionOperaLog")->alias("a")->join("Admins b","a.admin_id=b.id")->field("a.*, b.name admin_name")->paginate(15);
         $this->assign("list", $list);
         return $this->fetch();
     }

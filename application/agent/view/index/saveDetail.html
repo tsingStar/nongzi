@@ -41,14 +41,14 @@
     <form action="" method="post">
         <input type="hidden" name="user_id" value="{$user_id}">
         <input type="hidden" name="user_telephone" value="{$user.telephone}">
-        <input type="hidden" name="address" value="">
+        <input type="hidden" name="address" value="{$ua.address|default=''}">
         <div class="mt-20">
             <label class="tx-title">客户电话<span class="tips">（如需更换，请联系抢农资网客服）</span></label>
             <input type="text" value="{$user.telephone}" disabled class="money col-12 ele mt-5">
         </div>
         <div class="mt-20">
             <label class="tx-title">*客户姓名</label>
-            <input name="user_name" type="text" value="" placeholder="填写客户姓名" class="money col-12 ele mt-5">
+            <input name="user_name" type="text" value="{$ua.user_name|default=''}" placeholder="填写客户姓名" class="money col-12 ele mt-5">
         </div>
         <div class="mt-20">
             <label class="tx-title">*客户地址<span class="tips">（需精确到社区/街道）</span></label>
@@ -61,26 +61,54 @@
                 </select>
                 <select type="text" class="money col-4 ele country" style="border-top-left-radius: 0; border-bottom-left-radius: 0;" {if $agent.agent_level eq 2}disabled{/if}>
                     {foreach $custom_area as $key=>$item}
+                    {if isset($ua['a2'])}
+                    <option value="{$item}" {if $item eq $ua.a2}selected{/if}>{$item}</option>
+                    {else}
                     <option value="{$item}" {if $key eq $agent.country_id}selected{/if}>{$item}</option>
+                    {/if}
                     {/foreach}
                 </select>
             </div>
-            <input id="detail_address" type="text" value="" placeholder="详细地址需精确到街道/社区" class="money col-12 ele mt-5">
+            <input id="detail_address" type="text" value="{$ua.a3}" placeholder="详细地址需精确到街道/社区" class="money col-12 ele mt-5">
         </div>
         <div class="mt-20">
             <label class="tx-title">*上传客户门店照片<span class="tips">（请上传门店正面照，需包括招牌前门等，清晰真实有效）</span></label>
             <div>
                 <label for="file" id="img" style="display: inline-block; width: 100%; height: auto;">
-            <div class="pd-25" style="border: 1px dashed #AEAEAE; width: 3rem; border-radius: 10px;">
+            <div class="pd-25" style="border: 1px dashed #AEAEAE; border-radius: 10px;">
+                {if isset($ua.img)}
+                <img src="{$ua.img}" style="width: 100%; height: auto;" alt="">
+                {else}
                 <img src="__STATIC__/agent/add.png" style="height: 3rem;" alt="">
+                {/if}
             </div>
                 </label>
             </div>
             <input type="file" id="file" name="file" onchange="uploadImg(this)" style="display: none;" accept="image/*">
-            <input type="hidden" name="img" id="store_img">
+            <input type="hidden" name="img" id="store_img" value="{$ua.img|default=''}">
         </div>
     </form>
 </div>
+
+
+{if isset($ua.is_ok)}
+<div class="ml-20 mr-20 mt-10">
+    <div class="mt-10 btn-block text-c col-12 radius" style="line-height: 3rem; height: 3rem;">
+        <label class="ml-15">
+            审核结果：{if $ua.is_ok eq 0}正在审核{elseif $ua.is_ok eq 1}审核通过{else}拒绝（{$ua.reason}）{/if}
+        </label>
+    </div>
+</div>
+{/if}
+{if $user.is_again eq 1 && $user.check_status eq 2}
+<div class="ml-20 mr-20 mt-10">
+    <div class="mt-10 btn-primary text-c col-12 radius" style="line-height: 3rem; height: 3rem;" onclick="applyDetail()">
+        <label class="ml-15">
+            确认重新提交审核
+        </label>
+    </div>
+</div>
+{else}
 <div class="ml-20 mr-20 mt-10">
     <div class="mt-10 btn-primary text-c col-12 radius" style="line-height: 3rem; height: 3rem;" onclick="applyDetail()">
         <label class="ml-15">
@@ -88,6 +116,7 @@
         </label>
     </div>
 </div>
+{/if}
 <div class="ml-20 mr-20 mt-10">
     <div class="mt-15 text-l ml-20" style="color: #AEAEAE; font-size: .7rem;">
         <p style="font-weight: bold;">信息补录规范要求：</p>
@@ -116,7 +145,7 @@
             layer.msg("详细地址不能为空");
             return ;
         }else{
-            var address = $(".province").val()+$(".city").val()+$(".country").val()+da;
+            var address = $(".province").val()+" "+$(".city").val()+" "+$(".country").val()+" "+da;
             $("input[name='address']").val(address);
         }
         $("form").ajaxSubmit(function(res){

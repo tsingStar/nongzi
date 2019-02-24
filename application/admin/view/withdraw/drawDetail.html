@@ -1,0 +1,145 @@
+{include file='pub/header'/}
+<title>提现详情</title>
+</head>
+<body>
+<div class="page-container">
+    <form class="form form-horizontal" id="report" method="post" enctype="multipart/form-data">
+        <input type="hidden" name="image" id="image" value="{$item.image||default=''}">
+        <div class="row cl">
+            <label class="form-label col-xs-4 col-sm-2">代理商：</label>
+            <div class="formControls col-xs-8 col-sm-9">
+                <input type="text" class="input-text" value="{$item.agent_name}" disabled/>
+            </div>
+        </div>
+        <div class="row cl">
+            <label class="form-label col-xs-4 col-sm-2">提现金额：</label>
+            <div class="formControls col-xs-8 col-sm-9">
+                <input type="text" class="input-text" value="{$item.money}" disabled/>
+            </div>
+        </div>
+        <div class="row cl">
+            <label class="form-label col-xs-4 col-sm-2">开户人：</label>
+            <div class="formControls col-xs-8 col-sm-9">
+                <input type="text" class="input-text" value="{$item.user_name}" disabled/>
+            </div>
+        </div>
+        <div class="row cl">
+            <label class="form-label col-xs-4 col-sm-2">开户行：</label>
+            <div class="formControls col-xs-8 col-sm-9">
+                <input type="text" class="input-text" value="{$item.bank_name}" disabled/>
+            </div>
+        </div>
+        <div class="row cl">
+            <label class="form-label col-xs-4 col-sm-2">银行卡号：</label>
+            <div class="formControls col-xs-8 col-sm-9">
+                <input type="text" class="input-text" value="{$item.bank_card_no}" disabled/>
+            </div>
+        </div>
+        <div class="row cl">
+            <label class="form-label col-xs-4 col-sm-2">备注：</label>
+            <div class="formControls col-xs-8 col-sm-9">
+                <textarea class="textarea" cols="30" rows="10" disabled>{$item.remarks}</textarea>
+            </div>
+        </div>
+        <div class="row cl">
+            <label class="form-label col-xs-4 col-sm-2">支付金额：</label>
+            <div class="formControls col-xs-8 col-sm-9">
+                <input type="text" class="input-text" name="pay_money" value="{$item.pay_money|default=''}"/>
+            </div>
+        </div>
+        <div class="row cl">
+            <label class="form-label col-xs-4 col-sm-2">支付凭证：</label>
+            <div class="formControls col-xs-8 col-sm-9">
+                <div id="img">
+                    {if $item.image != ''}
+                    <img src="{$item.image||default=''}" style="width: 100px;" alt="">
+                    {/if}
+                </div>
+                {if $item.status eq 0}
+                <span class="btn-upload">
+                    <a href="javascript:void();" class="btn btn-primary radius">
+                        <i class="Hui-iconfont Hui-iconfont-upload"></i>上传图片
+                    </a>
+                    <input type="file" onchange="uploadImg(this)" multiple class="input-file" accept="image/*">
+                </span>
+                {/if}
+            </div>
+        </div>
+        <div class="row cl">
+            <label class="form-label col-xs-4 col-sm-2">打款备注：</label>
+            <div class="formControls col-xs-8 col-sm-9">
+                <input type="text" class="input-text" name="beizhu" value="{$item.beizhu}"/>
+            </div>
+        </div>
+
+        <div class="row cl">
+            <div class="col-xs-8 col-sm-9 col-xs-offset-4 col-sm-offset-2">
+                {if $item.status eq 0}
+                <button class="btn btn-secondary radius" type="button" onclick="pay_commission()"><i class="Hui-iconfont">&#xe632;</i> 确定打款
+                </button>
+                <button class="btn btn-secondary radius" type="button" onclick="refuse_commission('{$item.id}')"><i class="Hui-iconfont">&#xe632;</i> 拒绝打款
+                </button>
+                {/if}
+                <button class="btn btn-secondary radius" type="button" onclick="layer_close()"><i class="Hui-iconfont Hui-iconfont-del"></i> 取消
+                </button>
+            </div>
+        </div>
+    </form>
+</div>
+{include file="pub/footer"/}
+<script type="text/javascript">
+    function pay_commission() {
+        $("form").ajaxSubmit(function (res) {
+            if(res.code == 1){
+                parent.location.reload();
+            }else{
+                layer.msg(res.msg);
+            }
+        })
+    }
+    function refuse_commission(id){
+        layer.prompt("请输入拒绝原因", function(reason){
+            if(reason == ""){
+                layer.msg('原因不能为空');
+                return;
+            }else{
+                $.post("{:url('refuse_commission')}", {id:id, reason:reason}, function (res) {
+                    if(res.code == 1){
+                        parent.location.reload();
+                    }else{
+                        layer.alert(res.msg);
+                    }
+                });
+            }
+        })
+    }
+
+    /**
+     * 上传文件
+     * @param o 点击元素
+     */
+    function uploadImg(o) {
+        var $form = document.createElement("form");
+        $form.setAttribute("action", "{:url('Withdraw/uploadFile')}");
+        $form.setAttribute("method", "POST");
+        $form.setAttribute("enctype", "multipart/form-data");
+        $("body").append($form);
+        var node = $(o).clone(true);
+        node.attr("name", "file");
+        node.appendTo($form);
+        var index = layer.load();
+        $($form).ajaxSubmit(function (res) {
+            $($form).remove();
+            if(res.code == 1){
+                layer.msg("上传成功");
+                $("#img").html('<img src="'+res.data+'" style="width: 100px; border-radius: 15px;" alt="">');
+                $("#image").val(res.data);
+            }else{
+                layer.msg("上传失败");
+            }
+            layer.close(index);
+        });
+    }
+</script>
+</body>
+</html>

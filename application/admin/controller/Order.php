@@ -26,34 +26,53 @@ class Order extends BaseController
     public function orderList()
     {
         $this->assign('is_admin', 1);
-        if (request()->isPost()) {
-            $order = model('order');
-            $where = [];
-            if (input('searchKey') && input('searchValue')) {
-                $where[input('searchKey')] = input('searchValue');
-            }
-
-            if (input('order_status') !== "") {
-                $where['a.order_status'] = input('order_status');
-            }
-            if (input('start_time')) {
-                $where['a.create_time'] = ['egt', strtotime(input('start_time'))];
-            }
-            if (input('end_time')) {
-                $where['a.create_time'] = ['elt', strtotime(input('end_time') . '+1 day')];
-            }
-            if (input('start_time') && input('end_time')) {
-                $where['a.create_time'] = [
-                    ['egt', strtotime(input('start_time'))],
-                    ['elt', strtotime(input('end_time') . '+1 day')]
-                ];
-            }
-            $order_list = $order->alias('a')->join('user b', 'a.user_id=b.id')->field('a.*, b.user_name, b.telephone')->where($where)->select();
-            $this->assign('list', $order_list);
-            return $this->fetch('orderList');
+        $param = input("get.");
+        $order = model('order')->alias("a")->join('user b', 'a.user_id=b.id')->join("Admins c", "b.vip_code=c.vip_code");
+        if((isset($param["searchKey"]) && $param["searchKey"] !="") && (isset($param["searchValue"]) && $param["searchValue"] != "")){
+            $order->where($param["searchKey"], $param["searchValue"]);
         }
-        $this->assign('list', []);
-        return $this->fetch();
+        if(isset($param["order_status"]) && $param["order_status"] !== ""){
+            $order->where("a.order_status", $param["order_status"]);
+        }
+        if(isset($param["start_time"]) && $param["start_time"] !=""){
+            $order->where("a.create_time", "egt", $param["start_time"]);
+        }
+        if(isset($param["end_time"]) && $param["end_time"] != ""){
+            $order->where("a.create_time", "elt", $param["end_time"]);
+        }
+
+
+
+//        if (request()->isPost()) {
+//            $order = model('order');
+//            $where = [];
+//            if (input('searchKey') && input('searchValue')) {
+//                $where[input('searchKey')] = input('searchValue');
+//            }
+//
+//            if (input('order_status') !== "") {
+//                $where['a.order_status'] = input('order_status');
+//            }
+//            if (input('start_time')) {
+//                $where['a.create_time'] = ['egt', strtotime(input('start_time'))];
+//            }
+//            if (input('end_time')) {
+//                $where['a.create_time'] = ['elt', strtotime(input('end_time') . '+1 day')];
+//            }
+//            if (input('start_time') && input('end_time')) {
+//                $where['a.create_time'] = [
+//                    ['egt', strtotime(input('start_time'))],
+//                    ['elt', strtotime(input('end_time') . '+1 day')]
+//                ];
+//            }
+        $order->where("is_trash", 0);
+        $order_list = $order->field('a.*, b.user_name, b.telephone, c.name agent_name')->select();
+        $this->assign('list', $order_list);
+        $this->assign("param", $param);
+        return $this->fetch('orderList');
+//        }
+//        $this->assign('list', []);
+//        return $this->fetch();
     }
 
     /**
@@ -63,28 +82,89 @@ class Order extends BaseController
     {
         $vip_code = model('Admins')->where('id', session(config('adminKey')))->value('vip_code');
         $user_ids = model('User')->where('vip_code', $vip_code)->column('id');
-        $where = ['a.user_id' => ['in', $user_ids]];
-        if (input('searchKey') && input('searchValue')) {
-            $where[input('searchKey')] = input('searchValue');
+//        $where = ['a.user_id' => ['in', $user_ids]];
+//        if (input('searchKey') && input('searchValue')) {
+//            $where[input('searchKey')] = input('searchValue');
+//        }
+//        if (input('order_status') !== "") {
+//            $where['a.order_status'] = input('order_status');
+//        }
+//        if (input('start_time')) {
+//            $where['a.create_time'] = ['egt', strtotime(input('start_time'))];
+//        }
+//        if (input('end_time')) {
+//            $where['a.create_time'] = ['elt', strtotime(input('end_time') . '+1 day')];
+//        }
+//        if (input('start_time') && input('end_time')) {
+//            $where['a.create_time'] = [
+//                ['egt', strtotime(input('start_time'))],
+//                ['elt', strtotime(input('end_time') . '+1 day')]
+//            ];
+//        }
+
+        $param = input("get.");
+        $order = model('order')->alias("a")->join('user b', 'a.user_id=b.id')->where("a.user_id", "in", $user_ids)->join("Admins c", "c.vip_code=b.vip_code");
+        if((isset($param["searchKey"]) && $param["searchKey"] !="") && (isset($param["searchValue"]) && $param["searchValue"] != "")){
+            $order->where($param["searchKey"], $param["searchValue"]);
         }
-        if (input('order_status') !== "") {
-            $where['a.order_status'] = input('order_status');
+        if(isset($param["order_status"]) && $param["order_status"] !== ""){
+            $order->where("a.order_status", $param["order_status"]);
         }
-        if (input('start_time')) {
-            $where['a.create_time'] = ['egt', strtotime(input('start_time'))];
+        if(isset($param["start_time"]) && $param["start_time"] !=""){
+            $order->where("a.create_time", "egt", $param["start_time"]);
         }
-        if (input('end_time')) {
-            $where['a.create_time'] = ['elt', strtotime(input('end_time') . '+1 day')];
+        if(isset($param["end_time"]) && $param["end_time"] != ""){
+            $order->where("a.create_time", "elt", $param["end_time"]);
         }
-        if (input('start_time') && input('end_time')) {
-            $where['a.create_time'] = [
-                ['egt', strtotime(input('start_time'))],
-                ['elt', strtotime(input('end_time') . '+1 day')]
-            ];
-        }
-        $orderList = model('Order')->alias('a')->join('user b', 'a.user_id=b.id')->field('a.*, b.user_name, b.telephone')->where($where)->select();
+        $order->where("is_trash", 0);
+
+        $orderList = $order->field('a.*, b.user_name, b.telephone, c.name agent_name')->select();
         $this->assign('list', $orderList);
         $this->assign('is_show', 1);
+        $this->assign("param", $param);
+        return $this->fetch('orderList');
+    }
+
+    /**
+     * 回收订单
+     */
+    public function order_trash()
+    {
+        $order_no = input("order_no");
+        $status = input("status");
+        $order = model("Order")->where("order_no", $order_no)->find();
+        if($order){
+            if($order->save(["is_trash"=>$status])){
+                exit_json();
+            }else{
+                exit_json(-1, "操作失败");
+            }
+        }else{
+            exit_json(-1, "订单不存在");
+        }
+    }
+
+    public function trashOrderList()
+    {
+        $this->assign('is_admin', 1);
+        $param = input("get.");
+        $order = model('order')->alias("a")->join('user b', 'a.user_id=b.id')->join("Admins c", "b.vip_code=c.vip_code");
+        if((isset($param["searchKey"]) && $param["searchKey"] !="") && (isset($param["searchValue"]) && $param["searchValue"] != "")){
+            $order->where($param["searchKey"], $param["searchValue"]);
+        }
+        if(isset($param["order_status"]) && $param["order_status"] !== ""){
+            $order->where("a.order_status", $param["order_status"]);
+        }
+        if(isset($param["start_time"]) && $param["start_time"] !=""){
+            $order->where("a.create_time", "egt", $param["start_time"]);
+        }
+        if(isset($param["end_time"]) && $param["end_time"] != ""){
+            $order->where("a.create_time", "elt", $param["end_time"]);
+        }
+        $order->where("is_trash", 1);
+        $order_list = $order->field('a.*, b.user_name, b.telephone, c.name agent_name')->select();
+        $this->assign('list', $order_list);
+        $this->assign("param", $param);
         return $this->fetch('orderList');
     }
 
@@ -151,9 +231,11 @@ class Order extends BaseController
                     exit_json(-1, '订单状态错误');
                 }
                 $send_fee = input('send_fee');
+                $discount_fee = input("discount_fee");
                 $res = $order->save([
                     'send_fee' => $send_fee,
-                    'order_money' => $order['total_money'] + $send_fee
+                    'discount_fee'=>$discount_fee,
+                    'order_money' => $order['total_money'] + $send_fee-$discount_fee
                 ]);
                 if ($res) {
                     exit_json();
@@ -257,7 +339,7 @@ class Order extends BaseController
                     $order->save(['refund_money' => $refund_money]);
                     $refund->save(['status' => 2, 'image' => $image, 'pay_time' => $pay_time]);
                     exit_json(1, $res['msg']);
-                }else{
+                } else {
 //                    exit_json(-1, $res['msg']);
                     exit_json(-1, "退款失败");
                 }
@@ -266,6 +348,7 @@ class Order extends BaseController
             }
         }
     }
+
     public function backDetail()
     {
         $refund_id = input('refund_id');
@@ -274,6 +357,7 @@ class Order extends BaseController
         $this->assign('item', $refund);
         return $this->fetch();
     }
+
     /**
      * 增加退款附加信息
      */
@@ -298,9 +382,9 @@ class Order extends BaseController
                 //}
                 //整单退
                 //退款参数
-                if($refund['refund_content'] == 1){
+                if ($refund['refund_content'] == 1) {
                     $refund_money = $order['order_money'];
-                }else{
+                } else {
                     $refund_money = $order['total_money'];
                 }
                 $orderInfo = [
@@ -314,10 +398,10 @@ class Order extends BaseController
                 $weixin = new WeiXinPay();
                 $res = $weixin->refund($orderInfo);
                 if ($res['code']) {
-                    $order->save(['refund_money' => $refund_money, "is_apply_refund"=>2]);
+                    $order->save(['refund_money' => $refund_money, "is_apply_refund" => 2]);
                     $refund->save(['status' => 2, 'image' => $image, 'pay_time' => $pay_time]);
                     exit_json(1, $res['msg']);
-                }else{
+                } else {
                     exit_json(-1, $res['msg']);
 //                    exit_json(-1, "退款失败");
                 }
@@ -327,7 +411,7 @@ class Order extends BaseController
                 //    exit_json(-1, ' 退款金额不能大于申请退货商品总金额');
                 //}
                 $refund->save(['image' => $image, 'pay_time' => $pay_time, 'status' => 2]);
-                $order->save(['refund_money' => $refund_money, "is_apply_refund"=>2]);
+                $order->save(['refund_money' => $refund_money, "is_apply_refund" => 2]);
                 exit_json();
             }
         } else {
@@ -343,14 +427,14 @@ class Order extends BaseController
         $money = input("money");
         $order = model('Order')->where('order_no', $order_no)->find();
         $refund = model('OrderRefund')->where('order_no', $order_no)->find();
-        $res1 = $order->save(["refund_money"=>$money, "is_apply_refund"=>2]);
+        $res1 = $order->save(["refund_money" => $money, "is_apply_refund" => 2]);
         $res2 = $refund->save([
-            "pay_time"=>date("Y-m-d"),
-            "status"=>2
+            "pay_time" => date("Y-m-d"),
+            "status" => 2
         ]);
-        if($res1 && $res2){
+        if ($res1 && $res2) {
             exit_json();
-        }else{
+        } else {
             exit_json(-1, '处理失败');
         }
 
@@ -363,19 +447,143 @@ class Order extends BaseController
     {
         $order_no = input('order_no');
         $order = model('Order')->where('order_no', $order_no)->find();
-        if($order['is_send'] == 1 && $order['sure_time'] == ""){
-            $res1 = $order->save(['order_status'=>2, 'is_apply_refund'=>0]);
-        }else if($order['is_send'] == 1 && $order['sure_time'] != ""){
-            $res1 = $order->save(['order_status'=>3, 'is_apply_refund'=>0]);
-        }else{
-            $res1 = $order->save(['order_status'=>1, 'is_apply_refund'=>0]);
+        if ($order['is_send'] == 1 && $order['sure_time'] == "") {
+            $res1 = $order->save(['order_status' => 2, 'is_apply_refund' => 0]);
+        } else if ($order['is_send'] == 1 && $order['sure_time'] != "") {
+            $res1 = $order->save(['order_status' => 3, 'is_apply_refund' => 0]);
+        } else {
+            $res1 = $order->save(['order_status' => 1, 'is_apply_refund' => 0]);
         }
         $res2 = model('OrderRefund')->where('order_no', $order_no)->delete();
-        if($res1 && $res2){
+        if ($res1 && $res2) {
             exit_json();
-        }else{
+        } else {
             exit_json(-1, '处理失败');
         }
+    }
+
+    /**
+     * 订单核算
+     */
+    public function order_check()
+    {
+        $status = input("status");
+        $order_no = input("order_no");
+        $order = model("Order")->where("order_no", $order_no)->find();
+        $commission = $this->getOrderCommission($order_no);
+        if ($status == 1) {
+            if ($order["is_comp"] != 0) {
+                exit_json(-1, "订单已处理过");
+            }
+            $this->addCheckLog(session("admin_id"), $order_no, 1, "订单审核通过", $commission);
+            $this->addOrderCommissionLog(session("admin_id"), 1, $order_no, $order["user_id"], $commission);
+            $order->save(["is_comp" => 1]);
+            exit_json();
+        } elseif ($status == 2) {
+            if ($order["is_comp"] != 0) {
+                exit_json(-1, "订单已处理过");
+            }
+            $this->addCheckLog(session("admin_id"), $order_no, 2, "订单审核拒绝", $commission);
+            $order->save(["is_comp" => 2]);
+            exit_json();
+        } elseif ($status == 3) {
+            if ($order["is_comp"] != 1) {
+                exit_json(-1, "订单状态错误");
+            }
+            $this->addCheckLog(session("admin_id"), $order_no, 3, "订单审核撤销", $commission);
+            $this->addOrderCommissionLog(session("admin_id"), 2, $order_no, $order["user_id"], -$commission);
+            $order->save(["is_comp" => 2]);
+            exit_json();
+        } else {
+            exit_json(-1, "参数错误");
+        }
+
+    }
+
+    /**
+     * 首单核算
+     */
+    public function order_first()
+    {
+        $status = input("status");
+        $order_no = input("order_no");
+        $order = model("Order")->where("order_no", $order_no)->find();
+        if ($order["is_first"] != 1) {
+            exit_json(-1, "订单不是首单");
+        }
+        $vip_code = model("User")->where("id", $order['user_id'])->value("vip_code");
+        $agent = model("Admins")->where("vip_code", $vip_code)->find();
+        $commission = $agent["first_order"];
+        if ($status == 1) {
+            if ($order["is_first_comp"] != 0) {
+                exit_json(-1, "订单已处理过");
+            }
+            $this->addCheckLog(session("admin_id"), $order_no, 4, "订单首单审核通过", $commission);
+            $this->addOrderCommissionLog(session("admin_id"), 3, $order_no, $order["user_id"], $commission);
+            $order->save(["is_first_comp" => 1]);
+            exit_json();
+        } elseif ($status == 2) {
+            if ($order["is_first_comp"] != 0) {
+                exit_json(-1, "订单已处理过");
+            }
+            $this->addCheckLog(session("admin_id"), $order_no, 5, "订单首单审核拒绝", $commission);
+            $order->save(["is_first_comp" => 2]);
+            exit_json();
+        } elseif ($status == 3) {
+            if ($order["is_first_comp"] != 1) {
+                exit_json(-1, "订单状态错误");
+            }
+            $this->addCheckLog(session("admin_id"), $order_no, 6, "订单首单审核撤销", $commission);
+            $this->addOrderCommissionLog(session("admin_id"), 4, $order_no, $order["user_id"], -$commission);
+            $order->save(["is_first_comp" => 2]);
+            exit_json();
+        } else {
+            exit_json(-1, "参数错误");
+        }
+    }
+
+    public function getOrderCommission($order_no)
+    {
+        $commission = 0;
+        $list = model("OrderDet")->alias("a")->join("Product b", "a.product_id=b.id")->where("a.order_no", $order_no)->field("a.*, b.agent_commission, b.salesman_commission")->select();
+        foreach ($list as $value) {
+            $commission += $value["price"] * $value["num"] * $value["agent_commission"] / 100;
+        }
+        return round($commission, 2);
+    }
+
+    /**
+     * 增加订单核算记录
+     */
+    public function addCheckLog($admin_id, $order_no, $type, $name, $commission)
+    {
+        model("OrderCommissionOperaLog")->save([
+            "order_no" => $order_no,
+            "commission_money" => $commission,
+            "admin_id" => $admin_id,
+            "type" => $type,
+            "name" => $name
+        ]);
+    }
+
+    /**
+     * 订单返现日志
+     */
+    public function addOrderCommissionLog($admin_id, $type, $order_no, $user_id, $commission)
+    {
+        $vip_code = model("User")->where("id", $user_id)->value("vip_code");
+        $agent = model("Admins")->where("vip_code", $vip_code)->find();
+        $agent->setInc("total_commission", $commission);
+        $agent->setInc("able_commission", $commission);
+        model("OrderCommissionLog")->save([
+            "order_no" => $order_no,
+            "commission_money" => $commission,
+            "agent_id" => $agent["id"],
+            "user_id" => $user_id,
+            "admin_id" => $admin_id,
+            "type" => $type
+        ]);
+
     }
 
     //TODO 待处理

@@ -37,7 +37,7 @@ class Pub extends Controller
                     exit_json(-1, "验证码错误");
                 }
             } elseif ($type == 2) {
-                $admin = Admins::get(["uname" => $telephone, "password" => md5($vcode)]);
+                $admin = Admins::get(["uname" => $telephone]);
             } else {
                 exit_json(-1, "参数错误");
             }
@@ -46,6 +46,9 @@ class Pub extends Controller
             } else {
                 if (!in_array(15, explode(",", $admin["role_id"]))) {
                     exit_json(-1, "抱歉，您还不是代理商");
+                }
+                if($admin["password"] != md5($vcode)){
+                    exit_json("密码错误");
                 }
                 session("agent_id", $admin["id"]);
                 exit_json();

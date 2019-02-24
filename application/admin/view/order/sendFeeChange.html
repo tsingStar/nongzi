@@ -14,12 +14,18 @@
         <div class="row cl">
             <label class="form-label col-xs-4 col-sm-2"><span class="c-red">*</span>新运费：</label>
             <div class="formControls col-xs-8 col-sm-9">
-                <input type="number" value="0" name="send_fee" class="input-text" required>
+                <input type="number" value="{$order.send_fee}" name="send_fee" class="input-text" required>
+            </div>
+        </div>
+        <div class="row cl">
+            <label class="form-label col-xs-4 col-sm-2"><span class="c-red">*</span>优惠金额：</label>
+            <div class="formControls col-xs-8 col-sm-9">
+                <input type="number" value="{$order.discount_fee}" name="discount_fee" class="input-text" required>
             </div>
         </div>
         <div class="row cl">
             <div class="col-xs-8 col-sm-9 col-xs-offset-4 col-sm-offset-2">
-                <a href="javascript:;" class="btn btn-secondary radius" onclick="$('form').submit()"><i class="Hui-iconfont">&#xe632;</i>确定配送
+                <a href="javascript:;" class="btn btn-secondary radius" onclick="$('form').submit()"><i class="Hui-iconfont">&#xe632;</i>确定
                 </a>
             </div>
         </div>

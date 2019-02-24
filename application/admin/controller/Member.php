@@ -55,7 +55,8 @@ class Member extends BaseController
         if (request()->isAjax()) {
             $id = input('id');
             $vip_code = input('vip_code');
-            $res = model('User')->save(['vip_code' => $vip_code], ['id' => $id]);
+            $admin = model("Admins")->where("vip_code", $vip_code)->find();
+            $res = model('User')->save(['vip_code' => $vip_code, "spread_money"=>$admin["person_money"]], ['id' => $id]);
             if ($res) {
                 exit_json();
             } else {

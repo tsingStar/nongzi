@@ -1,5 +1,10 @@
 {include file='pub/header'/}
 <title>订单列表</title>
+<style>
+    .td-manage a{
+        display: inline-block;
+    }
+</style>
 </head>
 
 <body class="pos-r">
@@ -8,26 +13,26 @@
         class="Hui-iconfont">&#xe68f;</i></a></nav>
     <div class="page-container">
         <div class="text-c">
-            <form action="" method="post">
+            <form action="" method="get">
                 查询类型：
                 <select name="searchKey" style="width:auto" class="select-box">
                     <option value="">未选择</option>
-                    <option value="a.order_no" {if input('searchKey') eq 'a.order_no'}selected{/if}>订单编号</option>
-                    <option value="b.user_name" {if input('searchKey') eq 'b.user_name'}selected{/if}>客户姓名</option>
+                    <option value="a.order_no" {if isset($param['searchKey']) && $param['searchKey'] eq 'a.order_no'}selected{/if}>订单编号</option>
+                    <option value="b.user_name" {if  isset($param['searchKey']) && $param['searchKey'] eq 'b.user_name'}selected{/if}>客户姓名</option>
                 </select>
                 查询条件：
-                <input type="text" name="searchValue" {if input('searchKey') neq ''}value="{:input('searchValue')}"{/if} style="width:250px" class="input-text"/>
+                <input type="text" name="searchValue" value="{$param.searchValue||default=''}" style="width:250px" class="input-text"/>
                 订单状态：
                 <select name="order_status" style="width: auto;" class="select-box">
                     <option value="">全部</option>
                     {foreach :config("order_status") as $key=>$val}
-                    <option value="{$key}">{$val}</option>
+                    <option value="{$key}" {if isset($param['order_status']) && $param['order_status'] eq $key}selected{/if}>{$val}</option>
                     {/foreach}
                 </select>
                 订单生成时间：
-                <input type="text" onfocus="WdatePicker({maxDate:'#F{ $dp.$D(datemax)}'})" id="datemin"
+                <input type="text" value="{$param.start_time||default=''}" onfocus="WdatePicker({maxDate:'#F{ $dp.$D(datemax)}'})" id="datemin"
                        name="start_time" class="input-text Wdate" style="width:120px;">-
-                <input type="text" onfocus="WdatePicker({minDate:'#F{ $dp.$D(datemin)}'})" id="datemax"
+                <input type="text" value="{$param.end_time||default=''}" onfocus="WdatePicker({minDate:'#F{ $dp.$D(datemin)}'})" id="datemax"
                        name="end_time" class="input-text Wdate" style="width:120px;">
                 <button class="btn btn-success" type="submit">
                     <i class="Hui-iconfont">&#xe665;</i>查询
@@ -51,10 +56,12 @@
                     <th width="50">支付订单号<br><span style="font-size: 12px;">(作为财务审核订单用)</span></th>
                     <th width="60">下单时间</th>
                     <th width="60">下单客户</th>
+                    <th width="60">归属客服</th>
                     <th width="30">订单状态</th>
                     <th width="30">支付方式</th>
                     <th width="30">商品总金额</th>
                     <th width="30">运费</th>
+                    <th width="30">优惠金额</th>
                     <th width="60">支付总金额</th>
                     <th width="60">发货时间</th>
                     <th width="60">收货时间</th>
@@ -68,6 +75,7 @@
                     <td><b style="color: #F83B3C;">{$item.order_no_pre}</b></td>
                     <td>{$item.create_time}</td>
                     <td>{$item.user_name}</td>
+                    <td>{$item.agent_name}</td>
                     <td>
                         {if $item.refund_money eq $item.order_money || $item.refund_money eq $item.total_money}
                         已退款
@@ -81,6 +89,7 @@
                     <td>{:config('pay_type')[$item.pay_type]}</td>
                     <td>{$item.total_money}</td>
                     <td>{$item.send_fee}</td>
+                    <td>{$item.discount_fee}</td>
                     <td>
                         {$item.order_money}
                         {if $item.refund_money gt 0}
@@ -90,6 +99,18 @@
                     <td>{$item.send_time}</td>
                     <td>{$item.sure_time}</td>
                     <td class="td-manage">
+                        {if $item.order_status eq 0 && $item.is_trash eq 0}
+                        <a style="text-decoration:none" class="ml-5" onClick="order_trash('{$item.order_no}', this, 1)"
+                           href="javascript:;" title="订单回收">
+                            <i class="Hui-iconfont Hui-iconfont-del2"></i>订单回收
+                        </a>
+                        {/if}
+                        {if $item.order_status eq 0 && $item.is_trash eq 1}
+                        <a style="text-decoration:none" class="ml-5" onClick="order_trash('{$item.order_no}', this, 0)"
+                           href="javascript:;" title="撤销回收">
+                            <i class="Hui-iconfont Hui-iconfont-del2"></i>撤销回收
+                        </a>
+                        {/if}
                         {if $item.order_status eq 1 and $item.is_send eq 0}
                         <a style="text-decoration:none" class="ml-5" onClick="order_send('{$item.order_no}')"
                            href="javascript:;" title="发货">
@@ -120,6 +141,56 @@
                             <i class="Hui-iconfont">&#xe623;</i>取消退货
                         </a>
                         {/if}
+                        {if $item.pay_status eq 1}
+                        {if $item.is_comp eq 0}
+                        <a style="text-decoration:none" class="ml-5" data-status="1" onClick="order_check('{$item.order_no}', this)"
+                           href="javascript:;" title="结算">
+                            审核结算
+                        </a>
+                        <a style="text-decoration:none" class="ml-5" data-status="2" onClick="order_check('{$item.order_no}', this)"
+                           href="javascript:;" title="结算">
+                            拒绝结算
+                        </a>
+                        {/if}
+
+                        {if $item.is_comp eq 1}
+                        <a style="text-decoration:none" class="ml-5" data-status="3" onClick="order_check('{$item.order_no}', this)"
+                           href="javascript:;" title="结算">
+                            撤销结算
+                        </a>
+                        {/if}
+                        {if $item.is_comp eq 2}
+                        <a style="text-decoration:none" class="ml-5"
+                           href="javascript:;">
+                            已取消结算
+                        </a>
+                        {/if}
+
+                        {if $item.is_first eq 1}
+                            {if $item.is_first_comp eq 0}
+                        <a style="text-decoration:none" class="ml-5" data-status="1" onClick="order_first('{$item.order_no}', this)"
+                           href="javascript:;" title="结算">
+                            首单结算
+                        </a>
+                        <a style="text-decoration:none" class="ml-5" data-status="2" onClick="order_first('{$item.order_no}', this)"
+                           href="javascript:;" title="结算">
+                            拒绝首单结算
+                        </a>
+                            {/if}
+                            {if $item.is_first_comp eq 1}
+                            <a style="text-decoration:none" class="ml-5" data-status="3" onClick="order_first('{$item.order_no}', this)"
+                               href="javascript:;" title="结算">
+                                首单撤销结算
+                            </a>
+                            {/if}
+                            {if $item.is_first_comp eq 2}
+                            <a style="text-decoration:none" class="ml-5"
+                               href="javascript:;">
+                                首单已取消结算
+                            </a>
+                            {/if}
+                        {/if}
+                        {/if}
                     </td>
                 </tr>
                 {/foreach}
@@ -130,11 +201,60 @@
 
 {include file='pub/footer'/}
 <script type="text/javascript">
+    function order_trash(order_no, o, status) {
+        var msg = status==1?"确定回收此订单？":"确定撤销回收此订单？";
+        layer.confirm(msg, function () {
+            $.post('{:url("order_trash")}', {order_no:order_no, status:status}, function (res) {
+                if(res.code == 1){
+                    $(o).parent().parent().remove();
+                }
+                layer.msg(res.msg);
+            });
+        })
+    }
+
+
+
+
+    function order_check(order_no, o){
+        var status = $(o).data("status");
+        $.post('{:url("order_check")}', {order_no:order_no, status:status}, function (res) {
+            if(res.code == 1){
+                if(status == 1){
+                    $(o).data("status", 3);
+                    $(o).next().remove();
+                    $(o).html("撤销订单结算");
+                }else{
+                    $(o).unbind();
+                    $(o).html("已取消结算");
+                }
+            }
+        });
+    }
+
+    function order_first(order_no, o){
+        var status = $(o).data("status");
+        $.post('{:url("order_first")}', {order_no:order_no, status:status}, function (res) {
+            if(res.code == 1){
+                if(status == 1){
+                    $(o).data("status", 3);
+                    $(o).next().remove();
+                    $(o).html("首单撤销结算");
+                }else{
+                    $(o).unbind();
+                    $(o).html("已取消首单结算");
+                }
+            }
+        });
+    }
+
+
+
     $('.table-sort').dataTable({
         "aaSorting": [[1, "desc"]],//默认第几个排序
         "bStateSave": true,//状态保存
         "aoColumnDefs": [
-            {"orderable": false, "aTargets": [8]}// 制定列不参与排序
+            {"orderable": false, "aTargets": [13]}// 制定列不参与排序
         ],
     });
 

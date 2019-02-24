@@ -96,7 +96,9 @@ class PayResult extends Controller
                         } else {
                             $pay_type = 3;
                         }
-                        $order->save(['out_transaction_id' => $transaction_id, 'pay_type' => $pay_type, 'pay_status' => 1, 'pay_time' => $result['time_end'], 'order_status'=>1, 'order_no_pre'=>$order_pre]);
+                        $num = model("Order")->where("user_id", $order["user_id"])->count();
+                        $is_first = $num==1?1:0;
+                        $order->save(['out_transaction_id' => $transaction_id, 'pay_type' => $pay_type, 'pay_status' => 1, 'pay_time' => $result['time_end'], 'order_status'=>1, 'order_no_pre'=>$order_pre, "is_first"=>$is_first]);
                         try{
                             $this->orderSolve($order_no);
                         } catch (\Exception $e){

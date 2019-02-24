@@ -1,0 +1,51 @@
+{include file='pub/header'/}
+<title>订单列表</title>
+<style>
+    .td-manage a{
+        display: inline-block;
+    }
+</style>
+</head>
+
+<body class="pos-r">
+<nav class="breadcrumb">{$breadNav} <a class="btn btn-success radius r" style="line-height:1.6em;margin-top:3px"
+                                       href="javascript:location.replace(location.href);" title="刷新"><i
+        class="Hui-iconfont">&#xe68f;</i></a></nav>
+    <div class="page-container">
+        <div class="text-c">
+
+        </div>
+        <div class="cl pd-5 bg-1 bk-gray mt-20">
+        </div>
+        <div class="mt-20">
+            <table class="table table-border table-bordered table-bg table-hover table-sort">
+                <thead>
+                <tr class="text-c">
+                    <th width="50">代理商姓名</th>
+                    <th width="50">类型</th>
+                    <th width="60">金额</th>
+                    <th width="60">时间</th>
+                </tr>
+                </thead>
+                <tbody>
+                {foreach $list as $item}
+                <tr class="text-c va-m">
+                    <td>{$item.agent_name}</td>
+                    <td>{$type[$item.type]}</td>
+                    <td>
+                        {$item.commission_money}
+                    </td>
+                    <td>{$item.create_time}</td>
+                </tr>
+                {/foreach}
+                </tbody>
+            </table>
+            {$list->render()}
+        </div>
+    </div>
+
+{include file='pub/footer'/}
+<script type="text/javascript">
+</script>
+</body>
+</html>

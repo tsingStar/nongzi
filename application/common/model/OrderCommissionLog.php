@@ -17,5 +17,6 @@ class OrderCommissionLog extends Model
     {
         parent::initialize();
     }
+    protected $autoWriteTimestamp=true;
 
 }

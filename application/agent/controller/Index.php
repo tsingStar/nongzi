@@ -9,7 +9,6 @@
 namespace app\agent\controller;
 
 
-use think\Log;
 
 class Index extends BaseAgent
 {
@@ -290,7 +289,7 @@ class Index extends BaseAgent
             if($r){
                 exit_json(-1, "你已完善此客户信息");
             }else{
-                model("UserAddInfo")->isUpdate(false)->data($data)->save();
+                model("UserAddInfo")->isUpdate(false)->allowField(true)->data($data)->save();
                 $user->save(['is_add_info'=>1, 'check_status'=>0]);
                 exit_json();
             }
@@ -300,6 +299,15 @@ class Index extends BaseAgent
         $user = model("User")->where("id", $user_id)->find();
         $area_list = model("Area")->column("name", "id");
         $custom_area = model("Area")->where('parent_id', $this->agent["city_id"])->column("name", "id");
+        $p = model("UserAddInfo")->where("user_id", $user_id)->order("create_time desc")->find();
+        if($p){
+            $user_area = explode(" ", $p["address"]);
+            $p["a0"] = $user_area[0];
+            $p["a1"] = $user_area[1];
+            $p["a2"] = $user_area[2];
+            $p["a3"] = $user_area[3];
+        }
+        $this->assign("ua", $p);
         $this->assign("agent", $this->agent);
         $this->assign("custom_area", $custom_area);
         $this->assign("user", $user);
@@ -329,7 +337,6 @@ class Index extends BaseAgent
     public function uploadFile()
     {
         $file = request()->file("file");
-        Log::error($file);
         if ($file) {
             $hash = $file->hash();
             $info = $file->move(__UPLOAD__);

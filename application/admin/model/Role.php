@@ -34,8 +34,13 @@ class Role extends Model
      */
     function getNodeList($roleId)
     {
-        $nodeList = $this->where(array('id' => $roleId))->find();
-        return $nodeList['node_id'];
+        $nodeList = $this->where(array('id' => ['in', $roleId]))->column("node_id");
+        $node_arr = explode(",", implode(",", $nodeList));
+        if(in_array("all", $node_arr)){
+            return "all";
+        }
+//        return $nodeList['node_id'];
+        return implode(",", $node_arr);
     }
 
     /**
@@ -48,9 +53,9 @@ class Role extends Model
      */
     function getRoleName($roleId)
     {
-        if ($roleId > 0) {
-            $role = $this->where(['id' => $roleId])->find();
-            return $role['role_name'];
+        if ($roleId != 0) {
+            $role = $this->where(['id' => ['in', $roleId]])->column("role_name");
+            return implode(",", $role);
         } else {
             return '超级管理员';
         }

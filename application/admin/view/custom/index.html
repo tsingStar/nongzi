@@ -41,7 +41,7 @@
             <td>
                 <img onclick="showImg('{$v.img}')" src="{$v.img}" style="width: 200px;" alt="">
             </td>
-            <td>{$v.regist_time}</td>
+            <td>{:date('Y-m-d H:i:s',$v.regist_time)}</td>
             <td>{$v.create_time}</td>
             <td>
                 {if $v.is_ok eq 0}
@@ -56,7 +56,7 @@
                 <a class="btn btn-primary radius size-MINI" href="javascript:;" onclick="comp('{$v.id}', 1)">结算</a>
                 {/if}
                 {if $v.is_comp eq 1}
-                <a class="btn btn-primary radius size-MINI" href="javascript:;" onclick="comp('{$v.id}', 1)">撤销结算</a>
+                <a class="btn btn-primary radius size-MINI" href="javascript:;" onclick="comp('{$v.id}', 2)">撤销结算</a>
                 {/if}
                 {if $v.is_comp eq 2}
                 已撤销
@@ -85,7 +85,7 @@
     }
     //结算
     function comp(id, status) {
-        var msg = status==1?"确定结算？":"确定取消结算？"
+        var msg = status==1?"确定结算？":"确定取消结算？此撤销不可逆，请谨慎操作"
         layer.confirm(msg, function () {
             $.post('{:url("comp")}', {id:id, status:status}, function (res) {
                 if(res.code==1){

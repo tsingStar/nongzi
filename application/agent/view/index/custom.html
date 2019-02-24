@@ -247,7 +247,11 @@
                     '        <div class="line"></div>\n' +
                     '        <div class="cl custom-shenhe">\n';
                 if(v.is_add_info == 1){
-                    _html += '<span class="l"><b style="font-weight: bold; color: #2779f2;">●</b>&nbsp;信息完整</span>';
+                    if(v.is_again == 1 && v.check_status==2){
+                        _html += '<span class="l" onclick="saveDetail('+v.id+')" style="color: #2779f2;"><b style="font-weight: bold; color: #CCCCCC;">●</b>&nbsp;重新补录</span>';
+                    }else{
+                        _html += '<span class="l"><b style="font-weight: bold; color: #2779f2;">●</b>&nbsp;信息完整</span>';
+                    }
                 }else{
                     _html += '            <span onclick="saveDetail('+v.id+')" class="l" style="color: #2779f2;"><b style="font-weight: bold; color: #CCCCCC;">●</b>&nbsp;信息补录</span>\n';
                 }
