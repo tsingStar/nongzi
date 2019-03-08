@@ -35,13 +35,14 @@ class Order extends BaseController
             $order->where("a.order_status", $param["order_status"]);
         }
         if(isset($param["start_time"]) && $param["start_time"] !=""){
-            $order->where("a.create_time", "egt", $param["start_time"]);
+            $order->where("a.create_time", "egt", strtotime($param["start_time"]));
         }
         if(isset($param["end_time"]) && $param["end_time"] != ""){
-            $order->where("a.create_time", "elt", $param["end_time"]);
+            $order->where("a.create_time", "elt", strtotime($param["end_time"])+86400);
         }
-
-
+        if(isset($param["agent_name"]) && $param["agent_name"] != ""){
+            $order->where("c.name", "like", "%".$param["agent_name"]."%");
+        }
 
 //        if (request()->isPost()) {
 //            $order = model('order');
@@ -111,10 +112,10 @@ class Order extends BaseController
             $order->where("a.order_status", $param["order_status"]);
         }
         if(isset($param["start_time"]) && $param["start_time"] !=""){
-            $order->where("a.create_time", "egt", $param["start_time"]);
+            $order->where("a.create_time", "egt", strtotime($param["start_time"]));
         }
         if(isset($param["end_time"]) && $param["end_time"] != ""){
-            $order->where("a.create_time", "elt", $param["end_time"]);
+            $order->where("a.create_time", "elt", strtotime($param["end_time"])+86400);
         }
         $order->where("is_trash", 0);
 

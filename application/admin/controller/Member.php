@@ -38,6 +38,12 @@ class Member extends BaseController
                 ['elt', $end_time]
             ];
         }
+        if(isset($param["agent_name"]) && $param["agent_name"]){
+            $where["b.name"] = [
+                "like",
+                "%".$param["agent_name"]."%"
+            ];
+        }
         if ($uname) {
             $where['a.telephone|a.user_name'] = $uname;
         }

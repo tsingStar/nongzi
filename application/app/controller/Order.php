@@ -315,7 +315,7 @@ class Order extends BaseUser
         $pageNum = input('pageNum') ? input('pageNum') : 10;
         $offset = $page * $pageNum;
 //        $orderList = model('Order')->where('user_id', USER_ID)->where('order_status', $order_status)->field('order_no, receiver_name, receiver_telephone, address, remarks, send_fee, order_status, order_money, create_time')->limit($offset, $pageNum)->order('create_time desc')->select();
-        $orderList = model('Order')->alias('a')->join('OrderRefund b', 'a.order_no=b.order_no', 'left')->where('a.user_id', USER_ID)->where('a.order_status', $order_status)->field('a.order_no, a.receiver_name, a.receiver_telephone, a.address, a.remarks, a.send_fee, a.order_status, a.order_money, a.create_time, b.status refund_status')->limit($offset, $pageNum)->order('a.create_time desc')->select();
+        $orderList = model('Order')->alias('a')->join('OrderRefund b', 'a.order_no=b.order_no', 'left')->where('a.user_id', USER_ID)->where('a.order_status', $order_status)->where('a.is_trash', 0)->field('a.order_no, a.receiver_name, a.receiver_telephone, a.address, a.remarks, a.send_fee, a.order_status, a.order_money, a.create_time, b.status refund_status')->limit($offset, $pageNum)->order('a.create_time desc')->select();
         foreach ($orderList as $order) {
             $order_no = $order['order_no'];
             $order_det = model('OrderDet')->where('order_no', $order_no)->field('id det_id, name, thumb_img, prop_value_attr, prop_name, price price_comb, num, price*num total_price, product_id')->select();

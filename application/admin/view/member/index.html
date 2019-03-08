@@ -7,13 +7,16 @@
         class="Hui-iconfont">&#xe68f;</i></a></nav>
 <div class="page-container">
     <form action="" method="get">
-        <div class="text-c"> 注册日期：
+        <div class="text-c">
+            注册日期：
             <input type="text" value="{$param.mintime||default=''}" onfocus="WdatePicker({maxDate:'#F{ $dp.$D(\'datemax\')}'})" id="datemin" name="mintime"
                    class="input-text Wdate" style="width:120px;">
             -
             <input type="text" value="{$param.maxtime||default=''}" onfocus="WdatePicker({minDate:'#F{ $dp.$D(\'datemin\')}'})" id="datemax" name="maxtime"
                    class="input-text Wdate" style="width:120px;">
             <input type="text" value="{$param.uname||default=''}" class="input-text" style="width:250px" placeholder="输入会员/手机号名称" name="uname">
+            归属客服：
+            <input type="text" value="{$param.agent_name||default=''}" class="input-text" style="width:250px" placeholder="输入客服名称" name="agent_name">
             <button type="submit" class="btn btn-success" id="" name=""><i class="Hui-iconfont">&#xe665;</i> 搜会员
             </button>
         </div>

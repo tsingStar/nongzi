@@ -22,6 +22,10 @@
                 </select>
                 查询条件：
                 <input type="text" name="searchValue" value="{$param.searchValue||default=''}" style="width:250px" class="input-text"/>
+                {if isset($is_admin) && $is_admin eq 1}
+                归属客服：
+                <input type="text" name="agent_name" value="{$param.agent_name||default=''}" style="width:100px" class="input-text"/>
+                {/if}
                 订单状态：
                 <select name="order_status" style="width: auto;" class="select-box">
                     <option value="">全部</option>
@@ -29,11 +33,13 @@
                     <option value="{$key}" {if isset($param['order_status']) && $param['order_status'] eq $key}selected{/if}>{$val}</option>
                     {/foreach}
                 </select>
+                <label style="display: inline-block;">
                 订单生成时间：
                 <input type="text" value="{$param.start_time||default=''}" onfocus="WdatePicker({maxDate:'#F{ $dp.$D(datemax)}'})" id="datemin"
                        name="start_time" class="input-text Wdate" style="width:120px;">-
                 <input type="text" value="{$param.end_time||default=''}" onfocus="WdatePicker({minDate:'#F{ $dp.$D(datemin)}'})" id="datemax"
                        name="end_time" class="input-text Wdate" style="width:120px;">
+                </label>
                 <button class="btn btn-success" type="submit">
                     <i class="Hui-iconfont">&#xe665;</i>查询
                 </button>
@@ -105,7 +111,7 @@
                             <i class="Hui-iconfont Hui-iconfont-del2"></i>订单回收
                         </a>
                         {/if}
-                        {if $item.order_status eq 0 && $item.is_trash eq 1}
+                        {if $item.is_trash eq 1}
                         <a style="text-decoration:none" class="ml-5" onClick="order_trash('{$item.order_no}', this, 0)"
                            href="javascript:;" title="撤销回收">
                             <i class="Hui-iconfont Hui-iconfont-del2"></i>撤销回收
