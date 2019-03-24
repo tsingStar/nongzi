@@ -15,11 +15,25 @@
 		<div class="row cl">
 			<label class="form-label col-xs-4 col-sm-2"><span class="c-red">*</span>分类：</label>
 			<div class="formControls col-xs-8 col-sm-9">
+				<!--<span class="select-box" style="width: 300px;">-->
+					<!--<select id="cateId1" name="" class="select" size="1" required></select>-->
+				<!--</span>-->
+				<!--<span class="select-box" style="width: 300px;">-->
+					<!--<select id="cateId2" name="cate_id" class="select" size="1" required></select>-->
+				<!--</span>-->
 				<span class="select-box" style="width: 300px;">
-					<select id="cateId1" name="" class="select" size="1" required></select>
-				</span>
-				<span class="select-box" style="width: 300px;">
-					<select id="cateId2" name="cate_id" class="select" size="1" required></select>
+					<select id="cate" name="" class="select" size="1" required>
+						<option value="0">请选择分类</option>
+						{foreach $cateTree as $c1}
+							<option value="{$c1.id}">{$c1.name}</option>
+							{if count($c1.children)>0}
+							{foreach $c1.children as $c2}
+							<option value="{$c1.id},{$c2.id}">{$c1.name}-{$c2.name}</option>
+							{/foreach}
+							{/if}
+						{/foreach}
+
+					</select>
 				</span>
 			</div>
 		</div>
@@ -354,33 +368,41 @@ $(function(){
     var ue = UE.getEditor('editor');
     var ue1 = UE.getEditor('editor1');
 	//动态添加分类 开始
-    var $cateTree = {:json_encode($cateTree)};
-    var opts = '';
-    $.each($cateTree, function(i, v){
-       opts += '<option value="'+i+'">'+v.name+'</option>';
-	});
-    $("#cateId1").html(opts);
-    var cateId = $("#cateId1").val();
-    $("#cate_name").val($cateTree[cateId].name);
-    $("#cate_parent_id").val($cateTree[cateId].id);
-    var opts1= '';
-    $.each($cateTree[cateId].children, function (i1,v1) {
-        opts1 += '<option value="'+v1.id+'">'+v1.name+'</option>';
-    });
-    $("#cateId2").html(opts1);
-
-    $("#cateId1").on('change', function () {
-		var id = $(this).val();
-        $("#cate_name").val($cateTree[id].name);
-        $("#cate_parent_id").val($cateTree[id].id);
-		var opts2 = "";
-		$.each($cateTree[id].children, function (i1,v1) {
-			opts2 += '<option value="'+v1.id+'">'+v1.name+'</option>';
-        });
-		$("#cateId2").html(opts2);
-    });
+    // var $cateTree = {:json_encode($cateTree)};
+    // var opts = '';
+    // $.each($cateTree, function(i, v){
+    //    opts += '<option value="'+i+'">'+v.name+'</option>';
+	// });
+    // $("#cateId1").html(opts);
+    // var cateId = $("#cateId1").val();
+    // $("#cate_name").val($cateTree[cateId].name);
+    // $("#cate_parent_id").val($cateTree[cateId].id);
+    // var opts1= '';
+    // $.each($cateTree[cateId].children, function (i1,v1) {
+    //     opts1 += '<option value="'+v1.id+'">'+v1.name+'</option>';
+    // });
+    // $("#cateId2").html(opts1);
+	//
+    // $("#cateId1").on('change', function () {
+	// 	var id = $(this).val();
+    //     $("#cate_name").val($cateTree[id].name);
+    //     $("#cate_parent_id").val($cateTree[id].id);
+	// 	var opts2 = "";
+	// 	$.each($cateTree[id].children, function (i1,v1) {
+	// 		opts2 += '<option value="'+v1.id+'">'+v1.name+'</option>';
+    //     });
+	// 	$("#cateId2").html(opts2);
+    // });
 	//动态添加分类  结束
-
+	$("#cate").change(function () {
+		var cate_id = $(this).val();
+		if(cate_id==0){
+			return false;
+		}
+		var cate_name = $(this).find("option:selected").html().replace(/&nbsp\;/g, "");
+		var cate_html = '<span style="background-color: #ccc; padding: 2px;margin: 2px;">'+cate_name+'<i class="Hui-iconfont Hui-iconfont-del" onclick="$(this).parent().remove()" style="cursor: pointer;"></i><input type="hidden" name="cate_ids[]" value="'+cate_id+'"></span>';
+		$(this).parent().before(cate_html);
+	});
     $('.skin-minimal input').iCheck({
         checkboxClass: 'icheckbox-blue',
         radioClass: 'iradio-blue',

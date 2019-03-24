@@ -9,12 +9,12 @@
     <form action="" method="get">
         <div class="text-c">
             注册日期：
-            <input type="text" value="{$param.mintime||default=''}" onfocus="WdatePicker({maxDate:'#F{ $dp.$D(\'datemax\')}'})" id="datemin" name="mintime"
+            <input type="text" value="{$param.mintime||default=''}" autocomplete="off" onfocus="WdatePicker({maxDate:'#F{ $dp.$D(\'datemax\')}'})" id="datemin" name="mintime"
                    class="input-text Wdate" style="width:120px;">
             -
-            <input type="text" value="{$param.maxtime||default=''}" onfocus="WdatePicker({minDate:'#F{ $dp.$D(\'datemin\')}'})" id="datemax" name="maxtime"
+            <input type="text" value="{$param.maxtime||default=''}" autocomplete="off" onfocus="WdatePicker({minDate:'#F{ $dp.$D(\'datemin\')}'})" id="datemax" name="maxtime"
                    class="input-text Wdate" style="width:120px;">
-            <input type="text" value="{$param.uname||default=''}" class="input-text" style="width:250px" placeholder="输入会员/手机号名称" name="uname">
+            <input type="text" value="{$param.uname||default=''}" class="input-text" autocomplete="off" style="width:250px" placeholder="输入会员/手机号名称" name="uname">
             归属客服：
             <input type="text" value="{$param.agent_name||default=''}" class="input-text" style="width:250px" placeholder="输入客服名称" name="agent_name">
             <button type="submit" class="btn btn-success" id="" name=""><i class="Hui-iconfont">&#xe665;</i> 搜会员
@@ -58,6 +58,7 @@
         {/foreach}
         </tbody>
     </table>
+    {$list->render()}
 </div>
 {include file="pub/footer"/}
 
@@ -85,11 +86,11 @@
         layer_show('用户名单', '{:url("deliver")}?id='+id);
     }
 
-    $(function () {
-        $("table").dataTable({
-		"ordering":false
-	});
-    })
+    // $(function () {
+    //     $("table").dataTable({
+	// 	"ordering":false
+	// });
+    // })
     //下载会员信息
     function downloadMember() {
         layer_show('下载订单', "{:url('Member/downloadMember')}", '350', '300');

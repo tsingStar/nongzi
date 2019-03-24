@@ -5,6 +5,8 @@
 <div class="page-container">
 	<form class="form form-horizontal" id="form-product-add" enctype="multipart/form-data">
 		<input type="hidden" name="product_id" value="{$product.id}">
+		<!--<input type="hidden" name="cate_name" value="{$parent_cate.name}" id="cate_name"/>-->
+		<!--<input type="hidden" name="cate_parent_id" value="{$parent_cate.id}" id="cate_parent_id"/>-->
 		<div class="row cl">
 			<label class="form-label col-xs-4 col-sm-2"><span class="c-red">*</span>分类：</label>
 			<div class="formControls col-xs-8 col-sm-9">
@@ -366,6 +368,44 @@
     $(function(){
         var ue = UE.getEditor('editor');
         var ue1 = UE.getEditor('editor1');
+        //动态添加分类 开始
+        /*// var $cateTree = {:json_encode($cateTree)};
+        // var $cate_parent = "{$parent_cate.id}";
+        // var opts = '';
+        // $.each($cateTree, function(i, v){
+        //     if(v.id == $cate_parent){
+        //         opts += '<option value="'+i+'" selected>'+v.name+'</option>';
+		// 	}else{
+        //         opts += '<option value="'+i+'">'+v.name+'</option>';
+        //     }
+        // });
+        // $("#cateId1").html(opts);
+        // var cateId = $("#cateId1").val();
+        // $("#cate_name").val($cateTree[cateId].name);
+        // $("#cate_parent_id").val($cateTree[cateId].id);
+        // var opts1= '';
+        // var pid = "{$pid}";
+        // $.each($cateTree[cateId].children, function (i1,v1) {
+        //     if(v1.id == pid){
+        //         opts1 += '<option value="'+v1.id+'" selected>'+v1.name+'</option>';
+		// 	}else{
+        //         opts1 += '<option value="'+v1.id+'">'+v1.name+'</option>';
+        //     }
+        // });
+        // $("#cateId2").html(opts1);
+		//
+        // $("#cateId1").on('change', function () {
+        //     var id = $(this).val();
+        //     $("#cate_name").val($cateTree[id].name);
+        //     $("#cate_parent_id").val($cateTree[id].id);
+        //     var opts2 = "";
+        //     $.each($cateTree[id].children, function (i1,v1) {
+        //         opts2 += '<option value="'+v1.id+'">'+v1.name+'</option>';
+        //     });
+        //     $("#cateId2").html(opts2);
+        // });*/
+        //动态添加分类  结束
+
 
         $('.skin-minimal input').iCheck({
             checkboxClass: 'icheckbox-blue',

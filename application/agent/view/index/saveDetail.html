@@ -72,7 +72,7 @@
             <input id="detail_address" type="text" value="{$ua.a3}" placeholder="详细地址需精确到街道/社区" class="money col-12 ele mt-5">
         </div>
         <div class="mt-20">
-            <label class="tx-title">*上传客户门店照片<span class="tips">（请上传门店正面照，需包括招牌前门等，清晰真实有效）</span></label>
+            <label class="tx-title">*上传客户门店照片/营业执照<span class="tips">（请上传门店正面照，需包括招牌前门等，清晰真实有效）</span></label>
             <div>
                 <label for="file" id="img" style="display: inline-block; width: 100%; height: auto;">
             <div class="pd-25" style="border: 1px dashed #AEAEAE; border-radius: 10px;">
@@ -122,7 +122,7 @@
         <p style="font-weight: bold;">信息补录规范要求：</p>
         <p>① 客户信息须真实有效</p>
         <p>② 客户地址须精确到社区/街道一级，如：“山东省菏泽市XX区XX村XX街道</p>
-        <p>③ 客户门店照片需清晰真实 建议640px以上</p>
+        <p>③ 客户门店照片需清晰真实 建议640px以上，大小控制在6M内</p>
     </div>
 </div>
 
@@ -186,7 +186,7 @@
             }else{
                 layer.msg("上传失败");
             }
-            layer.close(index);
+            //layer.close(index);
         });
     }
 </script>

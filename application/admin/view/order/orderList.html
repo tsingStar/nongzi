@@ -18,10 +18,12 @@
                 <select name="searchKey" style="width:auto" class="select-box">
                     <option value="">未选择</option>
                     <option value="a.order_no" {if isset($param['searchKey']) && $param['searchKey'] eq 'a.order_no'}selected{/if}>订单编号</option>
+                    <option value="a.order_no_pre" {if  isset($param['searchKey']) && $param['searchKey'] eq 'a.order_no_pre'}selected{/if}>支付订单号</option>
                     <option value="b.user_name" {if  isset($param['searchKey']) && $param['searchKey'] eq 'b.user_name'}selected{/if}>客户姓名</option>
+                    <option value="b.telephone" {if  isset($param['searchKey']) && $param['searchKey'] eq 'b.telephone'}selected{/if}>客户手机号</option>
                 </select>
                 查询条件：
-                <input type="text" name="searchValue" value="{$param.searchValue||default=''}" style="width:250px" class="input-text"/>
+                <input type="text" autocomplete="off" name="searchValue" value="{$param.searchValue||default=''}" style="width:250px" class="input-text"/>
                 {if isset($is_admin) && $is_admin eq 1}
                 归属客服：
                 <input type="text" name="agent_name" value="{$param.agent_name||default=''}" style="width:100px" class="input-text"/>
@@ -30,14 +32,14 @@
                 <select name="order_status" style="width: auto;" class="select-box">
                     <option value="">全部</option>
                     {foreach :config("order_status") as $key=>$val}
-                    <option value="{$key}" {if isset($param['order_status']) && $param['order_status'] eq $key}selected{/if}>{$val}</option>
+                    <option value="{$key}" {if isset($param['order_status']) && $param['order_status'] === "$key"}selected{/if}>{$val}</option>
                     {/foreach}
                 </select>
                 <label style="display: inline-block;">
                 订单生成时间：
-                <input type="text" value="{$param.start_time||default=''}" onfocus="WdatePicker({maxDate:'#F{ $dp.$D(datemax)}'})" id="datemin"
+                <input type="text" autocomplete="off" value="{$param.start_time||default=''}" onfocus="WdatePicker({maxDate:'#F{ $dp.$D(datemax)}'})" id="datemin"
                        name="start_time" class="input-text Wdate" style="width:120px;">-
-                <input type="text" value="{$param.end_time||default=''}" onfocus="WdatePicker({minDate:'#F{ $dp.$D(datemin)}'})" id="datemax"
+                <input type="text" autocomplete="off" value="{$param.end_time||default=''}" onfocus="WdatePicker({minDate:'#F{ $dp.$D(datemin)}'})" id="datemax"
                        name="end_time" class="input-text Wdate" style="width:120px;">
                 </label>
                 <button class="btn btn-success" type="submit">
@@ -45,7 +47,7 @@
                 </button>
             </form>
         </div>
-        <div class="cl pd-5 bg-1 bk-gray mt-20">
+        <!--<div class="cl pd-5 bg-1 bk-gray mt-20">-->
             {if !isset($is_show)}
             <!--<span class="l">-->
                 <!--<a class="btn btn-primary radius" onclick="downloadOrder()" href="javascript:;">-->
@@ -53,7 +55,7 @@
                 <!--</a>-->
             <!--</span>-->
             {/if}
-        </div>
+        <!--</div>-->
         <div class="mt-20">
             <table class="table table-border table-bordered table-bg table-hover table-sort">
                 <thead>
@@ -202,11 +204,13 @@
                 {/foreach}
                 </tbody>
             </table>
+            {$list->render()}
         </div>
     </div>
 
 {include file='pub/footer'/}
 <script type="text/javascript">
+
     function order_trash(order_no, o, status) {
         var msg = status==1?"确定回收此订单？":"确定撤销回收此订单？";
         layer.confirm(msg, function () {
@@ -256,13 +260,13 @@
 
 
 
-    $('.table-sort').dataTable({
-        "aaSorting": [[1, "desc"]],//默认第几个排序
-        "bStateSave": true,//状态保存
-        "aoColumnDefs": [
-            {"orderable": false, "aTargets": [13]}// 制定列不参与排序
-        ],
-    });
+    // $('.table-sort').dataTable({
+    //     "aaSorting": [[1, "desc"]],//默认第几个排序
+    //     "bStateSave": true,//状态保存
+    //     "aoColumnDefs": [
+    //         {"orderable": false, "aTargets": [13]}// 制定列不参与排序
+    //     ],
+    // });
 
     function ok_refund(order_no, o){
         layer.prompt({

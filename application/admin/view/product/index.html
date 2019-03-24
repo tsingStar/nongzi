@@ -37,6 +37,7 @@
                 var zTree = $.fn.zTree.getZTreeObj(treeId);
                 if (treeNode.isParent) {
                     zTree.expandNode(treeNode);
+                    demoIframe.attr("src", "{:url('Product/plist')}?cateId="+treeNode.id);
                     return false;
                 } else {
                     demoIframe.attr("src", "{:url('Product/plist')}?cateId="+treeNode.id);

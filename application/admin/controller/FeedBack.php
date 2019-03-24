@@ -22,7 +22,7 @@ class FeedBack extends BaseController
      */
     public function mySupply()
     {
-        $list = model('BuySupply')->alias('a')->join('User b', 'a.user_id=b.id', 'left')->join('Admins c', 'b.vip_code=c.vip_code', 'left')->where('c.id', session(config('adminKey')))->where('a.type', 2)->field('a.*, b.user_name, c.name sale_name')->order('a.create_time desc')->select();
+        $list = model('BuySupply')->alias('a')->join('User b', 'a.user_id=b.id', 'left')->join('Admins c', 'b.vip_code=c.vip_code', 'left')->where('c.id', session(config('adminKey')))->where('a.type', 2)->field('a.*, b.user_name, c.name sale_name')->order('a.create_time desc')->paginate(20);
         $this->assign('list', $list);
         return $this->fetch('mySupply');
     }
@@ -32,7 +32,7 @@ class FeedBack extends BaseController
      */
     public function myBuy()
     {
-        $list = model('BuySupply')->alias('a')->join('User b', 'a.user_id=b.id', 'left')->join('Admins c', 'b.vip_code=c.vip_code', 'left')->where('c.id', session(config('adminKey')))->where('a.type', 1)->field('a.*, b.user_name, c.name sale_name')->order('a.create_time desc')->select();
+        $list = model('BuySupply')->alias('a')->join('User b', 'a.user_id=b.id', 'left')->join('Admins c', 'b.vip_code=c.vip_code', 'left')->where('c.id', session(config('adminKey')))->where('a.type', 1)->field('a.*, b.user_name, c.name sale_name')->order('a.create_time desc')->paginate(15);
         $this->assign('list', $list);
         return $this->fetch('mySupply');
 
@@ -43,7 +43,7 @@ class FeedBack extends BaseController
      */
     public function saleFeed()
     {
-        $list = model('BuySupply')->alias('a')->join('User b', 'a.user_id=b.id', 'left')->join('Admins c', 'b.vip_code=c.vip_code', 'left')->field('a.*, b.user_name, c.name sale_name')->order('a.create_time desc')->select();
+        $list = model('BuySupply')->alias('a')->join('User b', 'a.user_id=b.id', 'left')->join('Admins c', 'b.vip_code=c.vip_code', 'left')->field('a.*, b.user_name, c.name sale_name')->order('a.create_time desc')->paginate(15);
         $this->assign('list', $list);
         return $this->fetch();
     }

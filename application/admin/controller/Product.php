@@ -170,8 +170,9 @@ class Product extends BaseController
             $where["is_up"] = 0;
         }
         if ($cateId) {
-            $where['cate_id'] = $cateId;
-            $goodsList = model('Product')->where($where)->paginate(15, false, ["query"=>request()->param()]);
+//            $where['cate_id'] = $cateId;
+//            $where['cate_id'] = ['find_in_set', $cateId];
+            $goodsList = model('Product')->where("FIND_IN_SET($cateId,cate_id)")->paginate(15, false, ["query"=>request()->param()]);
         } else {
             $goodsList = model('Product')->where($where)->order('ord desc, id desc')->paginate(15, false, ["query"=>request()->param()]);
         }
@@ -246,6 +247,11 @@ class Product extends BaseController
         if (request()->isAjax()) {
 
             $data = input('post.');
+            if(count($data["cate_ids"])==0){
+                exit_json(-1, '商品分类不能为空');
+            }
+            $data['cate_id'] = implode(",", array_unique(explode(",", implode(",", $data["cate_ids"]))));
+            $data['cate_parent_id'] = 0;
             if (!isset($data['prop_attr'])) {
                 exit_json(-1, '商品规格未设置');
             }
@@ -438,6 +444,11 @@ class Product extends BaseController
         if (request()->isAjax()) {
 
             $data = input('post.');
+            if(count($data["cate_ids"])==0){
+                exit_json(-1, '商品分类不能为空');
+            }
+            $data['cate_id'] = implode(",", array_unique(explode(",", implode(",", $data["cate_ids"]))));
+            $data['cate_parent_id'] = 0;
             $prop = $data['prop'];
             $prop_attr = $data['prop_attr'];
             if (isset($data['swiper_img'])) {
@@ -521,13 +532,15 @@ class Product extends BaseController
             }
         }
         $cate_parent = model('ProductCate')->where('id', $product['cate_parent_id'])->find();
-        $cate = model('ProductCate')->where('id', $product['cate_id'])->find();
+//        $cate = model('ProductCate')->where('id', $product['cate_id'])->find();
         $list = model('ProductCate')->field('id, name, parent_id')->select();
         $cateTree = getTree($list, 0);
         $prop_value = model('ProductPropValue')->where('product_id', $product['id'])->column('prop_value_id');
         $this->assign('prop_val', $prop_value);
-        $this->assign('pid', $cate['id']);
+//        $this->assign('pid', $cate['id']);
         $this->assign('parent_cate', $cate_parent);
+        $product_cate = model("ProductCate")->alias("a")->join("ProductCate b", "a.parent_id=b.id", "left")->where("a.id", "in", $product["cate_id"])->field("a.id, a.name, a.parent_id, b.name parent_name")->select();
+        $this->assign("product_cate", $product_cate);
         $this->assign('product', $product);
         $this->assign('cateTree', $cateTree);
         $prop_arr = model('PropName')->column('prop_name', 'id');
