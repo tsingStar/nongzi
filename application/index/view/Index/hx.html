@@ -1,0 +1,70 @@
+{include file="admin@pub/header"}
+</head>
+<body>
+<div class="page-container">
+	<div class="text-c">
+		<form action="" method="get">
+			<input type="text" name="group_title" value="{$param.telephone || default=''}" id="" placeholder="输入会员/手机号名称" style="width:250px" class="input-text">
+			<button class="btn btn-success" type="submit"><i class="Hui-iconfont">&#xe665;</i> 搜索
+			</button>
+		</form>
+	</div>
+	<div class="cl pd-5 bg-1 bk-gray mt-20">
+		<a class="btn btn-success radius r" style="line-height:1.6em;margin-top:3px"
+		   href="javascript:location.replace(location.href);" title="刷新">
+			<i class="Hui-iconfont">&#xe68f;</i>
+		</a>
+	</div>
+	<div class="mt-20">
+	<table class="table table-border table-bordered table-hover table-bg table-sort">
+		<thead>
+			<tr class="text-c">
+				<th width="80">ID</th>
+				<th width="70">用户</th>
+				<th width="70">手机号</th>
+				<th width="70">注册时间</th>
+				<th width="100">核销</th>
+			</tr>
+		</thead>
+		<tbody>
+			{foreach name="list" item="item"}
+				<tr class="text-c">
+					<td>{$item.id}</td>
+					<td>{$item.user_name}</td>
+					<td>{$item.telephone}</td>
+					<td>{$item.create_time}</td>
+					<td class="td-manage">
+						{if $item.is_check eq 0}
+						<button type="button" onclick="check('{$item.id}')" class="btn btn-primary radius c-blue bold">未核销</button>
+						{else}
+						<b>已核销</b>
+						{/if}
+					</td>
+				</tr>
+			{/foreach}
+		</tbody>
+	</table>
+		{$list->render()}
+	</div>
+</div>
+{include file="admin@pub/footer" /}
+
+<!--请在下方写此页面业务相关的脚本-->
+</body>
+<script>
+	function check(user_id){
+		layer.confirm("确定核销该用户？", function () {
+			$.post("{:url('checkUser')}", {id:user_id}, function(res){
+			    if(res.code == 1){
+			        setTimeout(function () {
+						location.reload();
+                    }, 666);
+				}
+				layer.msg(res.msg);
+			});
+        });
+	}
+
+
+</script>
+</html>

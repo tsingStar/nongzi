@@ -16,48 +16,94 @@
         <table class="table table-border table-bordered table-bg table-hover table-sort">
             <thead>
             <tr class="text-c">
-                <th width="40"><input name="" type="checkbox" value=""></th>
-                <th width="80">ID</th>
+                <th width="40">ID</th>
                 <th width="100">分类名称</th>
                 <th width="100">图片</th>
-                <th width="150">排序</th>
-                <th width="150">创建时间</th>
-                <th width="150">维护时间</th>
+                <th width="100">文字图片</th>
+                <th width="50">排序</th>
                 <th width="100">导航是否显示</th>
-                <th width="100">操作</th>
+                <th width="100">是否首页推荐</th>
+                <th width="100">推荐商品数量</th>
+                <th width="150">操作</th>
             </tr>
             </thead>
             <tbody>
             {foreach $cateList as $list}
             <tr class="text-c">
-                <td><input name="ids[]" type="checkbox" value="{$list.id}"></td>
                 <td>{$list.id}</td>
-                <td>{$list.name}</td>
+                <td class="text-l">{$list.name}</td>
                 <td>
                     <img height="45px;" class="picture-thumb" src="{$list.image}"
                          onclick="picture_show('{$list.name}', '{$list.image}')">
                 </td>
+                <td>
+                    <img height="45px;" class="picture-thumb" src="{$list.word_image}"
+                         onclick="picture_show('{$list.name}', '{$list.word_image}')">
+                </td>
                 <td>{$list.ord}</td>
-                <td>{$list.create_time}</td>
-                <td>{$list.update_time}</td>
                 <td>
                     {if $list.is_index eq 1}
-                    <a href="javascript:;" onclick="changeStatus('{$list.id}', 0)" style="text-decoration: none;">是</a>
+                    <button onclick="changeStatus('{$list.id}', 0)" class="btn btn-primary size-MINI radius">是</button>
                     {else/}
-                    <a href="javascript:;" onclick="changeStatus('{$list.id}', 1)" style="text-decoration: none;">否</a>
+                    <button onclick="changeStatus('{$list.id}', 1)" class="btn btn-default size-MINI radius">否</button>
                     {/if}
                 </td>
+                <td>
+                    {if $list.is_recommond eq 1}
+                    <button onclick="indexCommond('{$list.id}', 0)" class="btn btn-primary size-MINI radius">是</button>
+                    {else/}
+                    <button onclick="indexCommond('{$list.id}', 1)" class="btn btn-default size-MINI radius">否</button>
+                    {/if}
+                </td>
+                <td>{$list.show_num}</td>
                 <td class="td-manage">
                     <a style="text-decoration:none" class="ml-5"
                        onClick="category_edit('分类编辑','{:url(\'Category/categoryEdit\', [\'categoryId\'=>$list.id])}')"
                        href="javascript:;" title="编辑"><i class="Hui-iconfont">&#xe6df;</i>编辑</a>
                     <a style="text-decoration:none" class="ml-5"
-                       onClick="category_child('{$list.name}','{:url(\'Category/index\', [\'categoryId\'=>$list.id])}')"
-                       href="javascript:;" title="编辑"><i class="Hui-iconfont">&#xe681;</i>查看子分类</a>
+                       onClick="category_add('{$list.name}','{:url(\'Category/categoryAdd\', [\'parentId\'=>$list.id])}')"
+                       href="javascript:;" title="编辑"><i class="Hui-iconfont">&#xe681;</i>添加子分类</a>
                     <a style="text-decoration:none" class="ml-5" onClick="category_del(this,'{$list.id}')"
                        href="javascript:;" title="删除"><i class="Hui-iconfont">&#xe6e2;</i>删除</a>
                 </td>
             </tr>
+            {foreach $list.children as $sec}
+            <tr class="text-c">
+                <td>{$sec.id}</td>
+                <td class="text-l">------{$sec.name}</td>
+                <td>
+                    <img height="45px;" class="picture-thumb" src="{$sec.image}"
+                         onclick="picture_show('{$sec.name}', '{$sec.image}')">
+                </td>
+                <td>
+                    <img height="45px;" class="picture-thumb" src="{$sec.word_image}"
+                         onclick="picture_show('{$sec.name}', '{$sec.word_image}')">
+                </td>
+                <td>{$sec.ord}</td>
+                <td>
+                    {if $sec.is_index eq 1}
+                    <button onclick="changeStatus('{$list.id}', 0)" class="btn btn-primary size-MINI radius">是</button>
+                    {else/}
+                    <button onclick="changeStatus('{$list.id}', 1)" class="btn btn-default size-MINI radius">否</button>
+                    {/if}
+                </td>
+                <td>
+                    {if $sec.is_recommond eq 1}
+                    <button onclick="indexCommond('{$sec.id}', 0)" class="btn btn-primary size-MINI radius">是</button>
+                    {else/}
+                    <button onclick="indexCommond('{$sec.id}', 1)" class="btn btn-default size-MINI radius">否</button>
+                    {/if}
+                </td>
+                <td>{$sec.show_num}</td>
+                <td class="td-manage">
+                    <a style="text-decoration:none" class="ml-5"
+                       onClick="category_edit('分类编辑','{:url(\'Category/categoryEdit\', [\'categoryId\'=>$sec.id])}')"
+                       href="javascript:;" title="编辑"><i class="Hui-iconfont">&#xe6df;</i>编辑</a>
+                    <a style="text-decoration:none" class="ml-5" onClick="category_del(this,'{$sec.id}')"
+                       href="javascript:;" title="删除"><i class="Hui-iconfont">&#xe6e2;</i>删除</a>
+                </td>
+            </tr>
+            {/foreach}
             {/foreach}
             </tbody>
         </table>
@@ -66,17 +112,26 @@
 
 {include file="pub/footer"/}
 <script type="text/javascript">
-    $('.table-sort').dataTable({
-        "aaSorting": [[1, "asc"]],//默认第几个排序
-        "bStateSave": true,//状态保存
-        "aoColumnDefs": [
-            //{"bVisible": false, "aTargets": [ 3 ]} //控制列的隐藏显示
-            {"orderable": false, "aTargets": [0, 3, 6]}// 制定列不参与排序
-        ]
-    });
+    // $('.table-sort').dataTable({
+    //     "aaSorting": [[1, "asc"]],//默认第几个排序
+    //     "bStateSave": true,//状态保存
+    //     "aoColumnDefs": [
+    //         //{"bVisible": false, "aTargets": [ 3 ]} //控制列的隐藏显示
+    //         {"orderable": false, "aTargets": [0, 3, 6]}// 制定列不参与排序
+    //     ]
+    // });
 
     function changeStatus(id, status) {
         $.post('{:url("changeCateStatus")}', {id:id, is_index:status}, function (res) {
+            if(res.code == 1){
+                location.reload();
+            }else{
+                layer.msg(res.msg);
+            }
+        });
+    }
+    function indexCommond(id, status) {
+        $.post('{:url("indexCommond")}', {id:id, is_recommond:status}, function (res) {
             if(res.code == 1){
                 location.reload();
             }else{

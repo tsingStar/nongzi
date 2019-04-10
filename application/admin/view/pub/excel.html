@@ -20,25 +20,11 @@
         </tr>
     </thead>
     <tbody>
-    <tr>
-        <td></td>
-        <td></td>
-        <td></td>
-        <td>
-            <table>
-                <tr>
-                    <td>规格名称</td>
-                    <td>单价</td>
-                    <td>件价</td>
-                </tr>
-            </table>
-        </td>
-    </tr>
         {foreach $list as $item}
         <tr>
-            <td rowspan="{:count($item[3])}" style="mso-number-format:'\@';">{$item[0]}</td>
-            <td rowspan="{:count($item[3])}" style="mso-number-format:'\@';">{$item[1]}</td>
-            <td rowspan="{:count($item[3])}">{$item[2]}</td>
+            <td style="mso-number-format:'\@';">{$item[0]}</td>
+            <td style="mso-number-format:'\@';">{$item[1]}</td>
+            <td>{$item[2]}</td>
             <td>
                 <table>
                     {foreach $item[3] as $v}

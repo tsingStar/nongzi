@@ -32,7 +32,7 @@ class Index extends BaseAgent
 
         //当月用户数量
         $month_user = model("User")->where("vip_code", $this->agent["vip_code"])->where("create_time", "gt", strtotime(date("Y-m")))->count();
-        $month_user_able = model("User")->where("vip_code", $this->agent["vip_code"])->where("check_status", 1)->where("create_time", "gt", date("Y-m"))->count();
+        $month_user_able = model("User")->where("vip_code", $this->agent["vip_code"])->where("check_status", 1)->where("create_time", "gt", strtotime(date("Y-m")))->count();
 
         $commission_user = model("UserCommissionLog")->where("agent_id", $this->agent["id"])->where("create_time", "gt", strtotime(date("Y-m")))->sum("commission_money");
 
@@ -76,7 +76,9 @@ class Index extends BaseAgent
      */
     public function finance()
     {
+        $day = db("withdraw_day")->find();
         $this->assign("able_commission", $this->agent["able_commission"]);
+        $this->assign("day", $day);
         return $this->fetch();
     }
 

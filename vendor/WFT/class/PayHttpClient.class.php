@@ -39,7 +39,7 @@ class PayHttpClient {
 	
 	
 	function PayHttpClient() {
-		$this->reqContent = "";
+		$this->reqContent = array();
 		$this->resContent = "";
 		
 		$this->errInfo = "";
@@ -52,7 +52,7 @@ class PayHttpClient {
 	
 	//设置请求内容
 	function setReqContent($url,$data) {
-		$this->reqContent['url']=$url;
+        $this->reqContent['url']=$url;
         $this->reqContent['data']=$data;
 	}
 	

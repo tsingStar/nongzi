@@ -78,11 +78,11 @@ Class Request
     public function submitOrderInfo($order, $notify_url)
     {
         $this->reqHandler->setReqParams($order, array('method'));
-        $this->reqHandler->setParameter('service', 'unified.trade.pay');//非原生统一下单
-//        $this->reqHandler->setParameter('service', 'pay.weixin.raw.app');//原生统一下单
+//        $this->reqHandler->setParameter('service', 'unified.trade.pay');//非原生统一下单
+        $this->reqHandler->setParameter('service', 'pay.weixin.raw.app');//原生统一下单
         $this->reqHandler->setParameter('mch_id', $this->cfg->C('mchId'));//必填项，商户号，由平台分配
-//        $this->reqHandler->setParameter('appid', $this->cfg->C('appid'));//如果调用原生统一下单，则此参数必填
-//        $this->reqHandler->setParameter('sub_appid', $this->cfg->C('appid'));//如果调用原生统一下单，则此参数必填
+        $this->reqHandler->setParameter('appid', $this->cfg->C('appid'));//如果调用原生统一下单，则此参数必填
+        $this->reqHandler->setParameter('sub_appid', $this->cfg->C('appid'));//如果调用原生统一下单，则此参数必填
         $this->reqHandler->setParameter('version', '2.0');
         $this->reqHandler->setParameter('sign_type', $this->cfg->C('sign_type'));
         //$this->reqHandler->setParameter('op_shop_id','1314');
@@ -94,7 +94,7 @@ Class Request
         //$notify_url = 'http://'.$_SERVER['HTTP_HOST'];
         //$this->reqHandler->setParameter('notify_url',$notify_url.'/payInterface/request.php?method=callback');
         $this->reqHandler->setParameter('notify_url', $notify_url);//商户需传自己的
-        $this->reqHandler->setParameter('nonce_str', mt_rand(time(), time() + rand()));//随机字符串，必填项，不长于 32 位
+        $this->reqHandler->setParameter('nonce_str', mt_rand());//随机字符串，必填项，不长于 32 位
         $this->reqHandler->createSign();//创建签名
 
         $data = Utils::toXml($this->reqHandler->getAllParameters());

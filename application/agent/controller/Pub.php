@@ -12,7 +12,6 @@ namespace app\agent\controller;
 use app\admin\model\Admins;
 use app\common\model\SendSms;
 use think\Controller;
-use think\Log;
 
 class Pub extends Controller
 {
@@ -48,7 +47,7 @@ class Pub extends Controller
                     exit_json(-1, "抱歉，您还不是代理商");
                 }
                 if($admin["password"] != md5($vcode)){
-                    exit_json("密码错误");
+                    exit_json(-1, "密码错误");
                 }
                 session("agent_id", $admin["id"]);
                 exit_json();
@@ -67,18 +66,16 @@ class Pub extends Controller
         if (!test_tel($telephone)) {
             exit_json(-1, '手机号不合法');
         }
-//        if($telephone != "15554832010"){
+        if($telephone != "15554832010"){
             $admins = new Admins();
             $admin = $admins->where('telephone', $telephone)->find();
-            Log::error($admin);
             if (!$admin) {
                 exit_json(-1,"代理商用户不存在");
             }
             if (!in_array(15, explode(",", $admin["role_id"]))) {
                 exit_json(-1,"抱歉，你还不是代理商");
             }
-//        }
-        exit_json();
+        }
         $code = rand(100000, 999999);
         $remain_time = '2分钟';
         $content = urlencode("$code##$remain_time");

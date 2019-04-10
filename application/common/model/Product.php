@@ -87,6 +87,7 @@ class Product extends Model
         $data['prop_data'] = $prop_data;
         $prop_value = \model('ProductAttr')->where('product_id', $product['id'])->field('id, product_id, prop_value_attr, prop_value_name, remain, limit_remain, price_one, price_comb, img_url')->select();
         $data['prop_value'] = $prop_value;
+        $data['cate_id']=explode(",",$data['cate_id'])[0];
         return $data;
     }
 
@@ -115,7 +116,8 @@ class Product extends Model
 
         //TODO 正式上线加载正式数据
 
-        $list = $this->where('cate_id', $cate_id)->where("is_up", 1)->order("ord desc")->select();
+        //$list = $this->where('cate_id', $cate_id)->where("is_up", 1)->order("ord desc")->select();
+        $list = $this->where("FIND_IN_SET($cate_id, cate_id)")->where("is_up", 1)->order("ord desc")->select();
         $data = [];
         foreach ($list as $l){
             $data[] = $this->formatOne($l);

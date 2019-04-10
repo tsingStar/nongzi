@@ -64,6 +64,7 @@
                     <th width="50">支付订单号<br><span style="font-size: 12px;">(作为财务审核订单用)</span></th>
                     <th width="60">下单时间</th>
                     <th width="60">下单客户</th>
+                    <th width="60">客户ID</th>
                     <th width="60">归属客服</th>
                     <th width="30">订单状态</th>
                     <th width="30">支付方式</th>
@@ -83,6 +84,7 @@
                     <td><b style="color: #F83B3C;">{$item.order_no_pre}</b></td>
                     <td>{$item.create_time}</td>
                     <td>{$item.user_name}</td>
+                    <td>{$item.user_id}</td>
                     <td>{$item.agent_name}</td>
                     <td>
                         {if $item.refund_money eq $item.order_money || $item.refund_money eq $item.total_money}

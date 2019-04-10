@@ -9,8 +9,6 @@
 namespace app\admin\controller;
 
 
-use think\Log;
-
 class Withdraw extends BaseController
 {
     protected function _initialize()
@@ -114,7 +112,6 @@ class Withdraw extends BaseController
     public function uploadFile()
     {
         $file = request()->file("file");
-        Log::error($file);
         if ($file) {
             $hash = $file->hash();
             $info = $file->move(__UPLOAD__);

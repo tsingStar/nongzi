@@ -45,6 +45,28 @@
 			</div>
 		</div>
 		<div class="row cl">
+			<label class="form-label col-xs-4 col-sm-2">导航是否显示：</label>
+			<div class="formControls col-xs-8 col-sm-9">
+				<div class="uploader-thum-container">
+					<label for=""><input type="radio" value="1" class="check-box" {if $cate.is_index eq 1}checked{/if} placeholder="" name="is_index">是</label>
+					<label for=""><input type="radio" value="0" class="check-box" {if $cate.is_index eq 0}checked{/if} placeholder="" name="is_index">否</label>
+				</div>
+			</div>
+		</div>
+		<div class="row cl">
+			<label class="form-label col-xs-4 col-sm-2">首页推荐：</label>
+			<div class="formControls col-xs-8 col-sm-9">
+				<label for=""><input type="radio" value="1" class="check-box" placeholder="" {if $cate.is_recommond eq 1}checked{/if} name="is_recommond">是</label>
+				<label for=""><input type="radio" value="0" class="check-box" placeholder="" {if $cate.is_recommond eq 1}checked{/if} name="is_recommond">否</label>
+			</div>
+		</div>
+		<div class="row cl">
+			<label class="form-label col-xs-4 col-sm-2">推荐商品数量：</label>
+			<div class="formControls col-xs-8 col-sm-9">
+				<input type="number" class="input-text" value="8" placeholder="" name="show_num">
+			</div>
+		</div>
+		<div class="row cl">
 			<div class="col-xs-8 col-sm-9 col-xs-offset-4 col-sm-offset-2">
 				<button class="btn btn-secondary radius" type="submit"><i class="Hui-iconfont">&#xe632;</i> 保存</button>
 				<button onClick="layer_close();" class="btn btn-default radius" type="button">&nbsp;&nbsp;取消&nbsp;&nbsp;</button>

@@ -140,11 +140,20 @@ class Statistic extends BaseController
         if (isset($param['start_time']) && $param["start_time"] != "") {
             $model->where("a.create_time", "gt", strtotime($param["start_time"]));
         }
+        if (!isset($param['start_time'])) {
+        	$param['start_time'] = date("Y-m-d");
+            $model->where("a.create_time", "gt", strtotime($param["start_time"]));
+        }
         if (isset($param['end_time']) && $param["end_time"] != "") {
-            $model->where("a.create_time", "lt", strtotime($param["start_time"]) + 86400);
+            $model->where("a.create_time", "lt", strtotime($param["end_time"]) + 86400);
+        }
+        if (!isset($param['end_time'])) {
+        	$param['end_time'] = date("Y-m-d");
+            $model->where("a.create_time", "lt", strtotime($param["end_time"]) + 86400);
         }
         $list = $model->join("User b", "a.user_id=b.id", "left")->join("Admins c", "b.vip_code=c.vip_code", "left")->field("a.*, b.user_name, b.telephone, c.name")->select();
         $this->assign("list", $list);
+        $this->assign("param", $param);
         return $this->fetch();
     }
 

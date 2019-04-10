@@ -65,6 +65,9 @@ class Shop extends Controller
         exit_json(1, '请求成功', $list);
     }
 
+
+
+    //TODO 太他妈恶心了
     /**
      * 获取分类信息及商品信息
      */
@@ -75,16 +78,33 @@ class Shop extends Controller
         $data = [];
         foreach ($list as $l) {
             $temp = [];
-            foreach ($l['children'] as $key=>$item) {
-                $cate_id = $item['id'];
-                $item['children'] = model('Product')->getListByCateId($cate_id);
-                if(count($item['children'])>0){
-                    $temp[] = $item;
+            if(count($l["children"])>0) {
+                foreach ($l['children'] as $key => $item) {
+                    $cate_id = $item['id'];
+                    $item['children'] = model('Product')->getListByCateId($cate_id);
+                    if (count($item['children']) > 0) {
+                        $temp[] = $item;
+                    }
                 }
-            }
-            if(count($temp)>0){
-                $l['children'] = $temp;
-                $data[] = $l;
+                if (count($temp) > 0) {
+                    $l['children'] = $temp;
+                    $data[] = $l;
+                }
+//            }
+            }else{
+//                //查询一级分类下商品
+                $pl = model('Product')->getListByCateId($l["id"]);
+                //没有二级分类，自造默认分类
+                if(count($pl)>0){
+                    $l["children"] = [[
+                        "id"=>0,
+                        "name"=>"默认",
+                        "ord"=>0,
+                        "parent_id"=>$l["id"],
+                        "children"=>$pl
+                    ]];
+                    $data[] = $l;
+                }
             }
         }
         exit_json(1, '请求成功', $data);
@@ -107,13 +127,13 @@ class Shop extends Controller
             ]);
         }
         $where = [];
-        $where['cate_parent_id'] = $cate_parent_id;
+//        $where['cate_parent_id'] = $cate_parent_id;
         $where["is_up"] = 1;
-        $data = $this->productList($where);
+        $data = $this->productList($where, $cate_parent_id);
         exit_json(1, '请求成功', $data);
     }
 
-    public function productList($where)
+    public function productList($where, $cate_id=0)
     {
         //排序字段
         $sort = input('sort');
@@ -125,7 +145,11 @@ class Shop extends Controller
         switch ($sort) {
             case 'price':
                 //根据价格排序
-                $product_ids = model('Product')->where($where)->column('id');
+                if($cate_id>0){
+                    $product_ids = model('Product')->where($where)->where("FIND_IN_SET($cate_id,cate_id)")->column('id');
+                }else{
+                    $product_ids = model('Product')->where($where)->column('id');
+                }
                 $ids = model('ProductAttr')->whereIn('product_id', $product_ids)->group('product_id')->order("price_comb $is_desc")->limit($offset, $pageNum)->column('product_id');
                 $products = [];
                 foreach ($ids as $pid) {
@@ -137,21 +161,33 @@ class Shop extends Controller
                 }
                 break;
             case 'sell':
-                $products = model('Product')->where($where)->order("sell_num $is_desc")->limit($offset, $pageNum)->select();
+                if($cate_id>0){
+                    $products = model('Product')->where($where)->where("FIND_IN_SET($cate_id,cate_id)")->order("sell_num $is_desc")->limit($offset, $pageNum)->select();
+                }else{
+                    $products = model('Product')->where($where)->order("sell_num $is_desc")->limit($offset, $pageNum)->select();
+                }
                 $data = [];
                 foreach ($products as $p) {
                     $data[] = model('Product')->formatOne($p);
                 }
                 break;
             case 'time':
-                $products = model('Product')->where($where)->order("create_time $is_desc")->limit($offset, $pageNum)->select();
+                if($cate_id>0){
+                    $products = model('Product')->where($where)->where("FIND_IN_SET($cate_id,cate_id)")->order("create_time $is_desc")->limit($offset, $pageNum)->select();
+                }else{
+                    $products = model('Product')->where($where)->order("create_time $is_desc")->limit($offset, $pageNum)->select();
+                }
                 $data = [];
                 foreach ($products as $p) {
                     $data[] = model('Product')->formatOne($p);
                 }
                 break;
             default:
-                $products = model('Product')->where($where)->order("ord desc")->limit($offset, $pageNum)->select();
+                if($cate_id>0){
+                    $products = model('Product')->where($where)->where("FIND_IN_SET($cate_id,cate_id)")->order("ord desc")->limit($offset, $pageNum)->select();
+                }else{
+                    $products = model('Product')->where($where)->order("ord desc")->limit($offset, $pageNum)->select();
+                }
                 $data = [];
                 foreach ($products as $p) {
                     $data[] = model('Product')->formatOne($p);
@@ -181,20 +217,40 @@ class Shop extends Controller
      */
     public function getProductIndex()
     {
-        $data = model('Product')->alias('a')->join('ProductCate b', 'a.cate_parent_id=b.id')->where('a.is_index', 1)->where("a.is_up", 1)->field('a.*, b.word_image')->order('a.ord desc')->select();
+        //获取首页推荐分类
+        $cate_list = model("ProductCate")->where("is_recommond", 1)->order("ord")->select();
         $temp = [];
-        foreach ($data as $item){
-            $temp[$item['cate_parent_id']]['image'] = $item['word_image']?__URL__.$item['word_image']:"";
-            $temp[$item['cate_parent_id']]['cate_id'] = $item['cate_parent_id'];
-            $temp[$item['cate_parent_id']]['cate_name'] = $item['cate_name'];
-            $temp[$item['cate_parent_id']]['data'][] = model('Product')->formatOne($item);;
+        foreach ($cate_list as $cate){
+            $plist = model("Product")->where("FIND_IN_SET(".$cate['id'].", cate_id)")->where("is_index", 1)->where("is_up", 1)->limit($cate['show_num'])->order("ord desc")->select();
+            $product = [];
+            foreach ($plist as $item){
+                $product[] = model('Product')->formatOne($item);
+            }
+            if(count($product)>0){
+                $temp[] = [
+                    "image"=>$cate['word_image']?__URL__.$cate['word_image']:"",
+                    "cate_id"=>$cate["id"],
+                    "cate_name"=>$cate["name"],
+                    "data"=>$product
+                ];
+            }
         }
+        exit_json(1, '请求成功', $temp);
 
-        $list = array_values($temp);
-//        foreach ($data as $p) {
-//            $list[] = model('Product')->formatOne($p);
+//        $data = model('Product')->alias('a')->join('ProductCate b', 'a.cate_parent_id=b.id')->where('a.is_index', 1)->where("a.is_up", 1)->field('a.*, b.word_image, b.ord')->order('b.ord desc, a.ord desc')->select();
+//        $temp = [];
+//        foreach ($data as $item){
+//            $temp[$item['cate_parent_id']]['image'] = $item['word_image']?__URL__.$item['word_image']:"";
+//            $temp[$item['cate_parent_id']]['cate_id'] = $item['cate_parent_id'];
+//            $temp[$item['cate_parent_id']]['cate_name'] = $item['cate_name'];
+//            $temp[$item['cate_parent_id']]['data'][] = model('Product')->formatOne($item);
 //        }
-        exit_json(1, '请求成功', $list);
+//
+//        $list = array_values($temp);
+////        foreach ($data as $p) {
+////            $list[] = model('Product')->formatOne($p);
+////        }
+//        exit_json(1, '请求成功', $list);
     }
 
     /**

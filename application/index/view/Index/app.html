@@ -1,5 +1,4 @@
 ﻿<!DOCTYPE html>
-<!-- saved from url=(0041)https://atc789.com/settlement/login/login -->
 <html>
 <head>
 <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
@@ -33,7 +32,7 @@
         .plea p{ color:#333; clear:both; padding-top:10px;}
         .main-content{position: absolute;left: 0;right: 0;top:62%;}
         .and, .ios{ display:block; width:55%; height:50px; line-height:50PX; border-radius:10px;
-            color:#fff; margin:0 auto 30px; border:2px solid #fff; text-align:center}
+            color:#fff; margin:0 auto 30px; border:2px solid #fff; text-align:center; background:#346906}
         .and img, .ios img{ vertical-align:middle;}
         .banben{position: absolute;left: 0;right: 0;top:90%; color:#fff; text-align:center;}
         .weixin-tip {
@@ -67,12 +66,10 @@
           </div>
           <div class="main-content">
               <a href="###" name="anzhuo" id="downloadButton"  data-url="https://shop.qiangnongzi.com/nongzi.apk" onclick="_hmt.push(['_trackEvent', 'software', 'download', 'manzhuo']);" class="and downloadButton">
-                <img src="__STATIC__/images/and.png">
-                andriod下载
-              </a>
-              <a href="###" name="ios" id="downloadButton" class="ios downloadButton" data-url="https://itunes.apple.com/cn/app/id1435678263?mt=8" onclick="_hmt.push(['_trackEvent', 'software', 'download', 'miso']);">
-                <img src="__STATIC__/images/ios.png">
-                iphone版下载
+                <img class="android" src="__STATIC__/images/and.png">
+                  <img class="ios1" src="__STATIC__/images/ios.png">
+                <span class="android">android下载</span>
+                  <span class="ios1">iphone版下载</span>
               </a>
           </div>
           <div class="banben">版本号 {$version}</div>
@@ -85,7 +82,25 @@
     </div>
 
 </body>
-<script type="text/javascript" charset="UTF-8" src="//res.cdn.openinstall.io/openinstall.js"></script>
+
+<script src="__STATIC__/lib/jquery/1.9.1/jquery.js"></script>
+<script language="javascript">
+    window.onload = function() {
+        var u = navigator.userAgent;
+        if (u.indexOf('Android') > -1 || u.indexOf('Linux') > -1) { //安卓手机
+            //                    alert("安卓手机");
+            $(".ios1").hide();
+        } else if (u.indexOf('iPhone') > -1) { //苹果手机
+            //                    alert("苹果手机");
+            $(".android").hide();
+        } else if (u.indexOf('Windows Phone') > -1) { //winphone手机
+            alert("WindowsPhone暂未推出。");
+        } else if (u.indexOf('Windows NT') > -1) { //Windows电脑
+            alert("请用手机浏览器访问。");
+        }
+    }
+</script>
+<script type="text/javascript" charset="UTF-8" src="https://res.cdn.openinstall.io/openinstall.js"></script>
 <script type="text/javascript">
     //openinstall初始化时将与openinstall服务器交互，应尽可能早的调用
     /*web页面向app传递的json数据(json string/js Object)，应用被拉起或是首次安装时，通过相应的android/ios api可以获取此数据*/
@@ -119,81 +134,7 @@
 </script>
 
 <!--<script src="__STATIC__/lib/clipboard/clipboard.js"></script>-->
-<script src="__STATIC__/lib/jquery/1.9.1/jquery.js"></script>
-<!--<script>-->
-    <!--// var clipboard = new ClipboardJS('#copy', {-->
-    <!--//     target: function() {-->
-    <!--//         return document.querySelector('#con');-->
-    <!--//     }-->
-    <!--// });-->
-    <!--// clipboard.on('success', function(e) {-->
-    <!--//     console.log(e);-->
-    <!--//     alert('复制成功');-->
-    <!--// });-->
-    <!--// clipboard.on('error', function(e) {-->
-    <!--//     alert('222');-->
-    <!--//     console.log(e);-->
-    <!--// });-->
-
-    <!--function copy(message) {-->
-        <!--let input = document.createElement("input");-->
-        <!--input.value = message;-->
-        <!--document.body.appendChild(input);-->
-        <!--input.select();-->
-        <!--input.setSelectionRange(0, input.value.length), document.execCommand('Copy');-->
-        <!--document.body.removeChild(input);-->
-        <!--alert("复制成功");-->
-    <!--}-->
-<!--</script>-->
-<script language="javascript">
-    window.onload = function() {
-        var u = navigator.userAgent;
-        $(".downloadButton").hide();
-        if (u.indexOf('Android') > -1 || u.indexOf('Linux') > -1) { //安卓手机
-            //                    alert("安卓手机");
-            $(".and").show();
-        } else if (u.indexOf('iPhone') > -1) { //苹果手机
-            //                    alert("苹果手机");
-            $(".ios").show();
-        } else if (u.indexOf('Windows Phone') > -1) { //winphone手机
-            alert("WindowsPhone暂未推出。");
-            // window.location.href = "mobile/index.html";
-        } else if (u.indexOf('Windows NT') > -1) { //Windows电脑
-            alert("请用手机浏览器访问。");
-            //                    window.location.href = "https://itunes.apple.com/us/app/ya-da-yun/id1072053485?l=zh&ls=1&mt=8";
-        }
-        //                var vU=JSON.stringify(u);
-        //                alert(vU);
-    }
-        <!--var winHeight = $(window).height();-->
-
-        <!--function is_weixin() {-->
-            <!--var ua = navigator.userAgent.toLowerCase();-->
-            <!--if (ua.match(/MicroMessenger/i) == "micromessenger") {-->
-                <!--return true;-->
-            <!--} else {-->
-                <!--return false;-->
-            <!--}-->
-        <!--}-->
-        <!--function down(o){-->
-            <!--var isWeixin = is_weixin();-->
-            <!--if (isWeixin) {-->
-                <!--$(".weixin-tip").css("height", winHeight);-->
-                <!--$(".weixin-tip").show();-->
-            <!--}else{-->
-                <!--var url = $(o).data('url');-->
-                <!--if(url == ""){-->
-                    <!--alert('正在玩命开发中。。。');-->
-                    <!--return;-->
-                <!--}-->
-                <!--window.location.href=url;-->
-            <!--}-->
-        <!--}-->
-</script>
 <script>
-    function down(o){
-
-    }
     var _hmt = _hmt || [];
     (function() {
         var hm = document.createElement("script");

@@ -367,6 +367,16 @@
         var ue = UE.getEditor('editor');
         var ue1 = UE.getEditor('editor1');
 
+        $("#cate").change(function () {
+            var cate_id = $(this).val();
+            if(cate_id==0){
+                return false;
+            }
+            var cate_name = $(this).find("option:selected").html().replace(/&nbsp\;/g, "");
+            var cate_html = '<span style="background-color: #ccc; padding: 2px;margin: 2px;">'+cate_name+'<i class="Hui-iconfont Hui-iconfont-del" onclick="$(this).parent().remove()" style="cursor: pointer;"></i><input type="hidden" name="cate_ids[]" value="'+cate_id+'"></span>';
+            $(this).parent().before(cate_html);
+        });
+
         $('.skin-minimal input').iCheck({
             checkboxClass: 'icheckbox-blue',
             radioClass: 'iradio-blue',

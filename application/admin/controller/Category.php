@@ -25,11 +25,13 @@ class Category extends BaseController
     function index()
     {
         $categoryId = input('categoryId') ?: 0;
-        $cateList = model('ProductCate')->where('parent_id', $categoryId)->select();
+//        $cateList = model('ProductCate')->where('parent_id', $categoryId)->select();
+        $cateList = model('ProductCate')->order("ord")->select();
+        $cateList = getTree($cateList, 0);
         $this->assign('cateList', $cateList);
         if ($categoryId) {
             $this->assign('parentId', $categoryId);
-            return $this->fetch('categoryChild');
+//            return $this->fetch('categoryChild');
         }
         return $this->fetch();
     }
@@ -112,6 +114,22 @@ class Category extends BaseController
             exit_json(-1, '操作失败');
         }
 
-        
+
+    }
+    /**
+     * 是否首页推荐
+     */
+    public function indexCommond()
+    {
+        $cate_id = input('id');
+        $is_index = input('is_recommond');
+        $res = model('ProductCate')->where('id', $cate_id)->setField('is_recommond', $is_index);
+        if($res){
+            exit_json();
+        }else{
+            exit_json(-1, '操作失败');
+        }
+
+
     }
 }

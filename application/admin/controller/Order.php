@@ -164,7 +164,7 @@ class Order extends BaseController
             $order->where("a.create_time", "elt", strtotime($param["end_time"])+86400);
         }
         $order->where("is_trash", 1);
-        $order_list = $order->field('a.*, b.user_name, b.telephone, c.name agent_name')->order('a.create_time desc')->paginate(20);
+        $order_list = $order->field('a.*, b.user_name, b.telephone, c.name agent_name')->order('a.create_time desc')->paginate(20, false, ["query"=>$param]);
         $this->assign('list', $order_list);
         $this->assign("param", $param);
         return $this->fetch('orderList');

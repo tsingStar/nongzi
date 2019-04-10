@@ -55,13 +55,13 @@ class Index extends BaseController
         $role = model('Role')->column('role_name', 'id');
         $department = model('Department')->column('name', 'id');
         $this->assign('role', $role);
-        $this->assign('depart', $department);
         $admin_role = explode(",", $admin["role_id"]);
         $a_role = [];
         foreach ($admin_role as $r){
             $a_role[] = $role[$r];
         }
         $this->assign("admin_role", implode(";", $a_role));
+        $this->assign('depart', $department);
         $this->assign('admin', $admin);
         return $this->fetch();
     }

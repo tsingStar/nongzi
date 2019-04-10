@@ -47,7 +47,7 @@ class Member extends BaseController
         if ($uname) {
             $where['a.telephone|a.user_name'] = $uname;
         }
-        $userList = model('User')->alias('a')->join('Admins b', 'a.vip_code=b.vip_code', 'left')->where($where)->field('a.*, b.name sale_name')->order('a.create_time desc')->paginate(20);
+        $userList = model('User')->alias('a')->join('Admins b', 'a.vip_code=b.vip_code', 'left')->where($where)->field('a.*, b.name sale_name')->order('a.create_time desc')->paginate(20,false,['query'=>$param]);
         $this->assign('list', $userList);
         $this->assign("param", $param);
         return $this->fetch();
@@ -97,7 +97,7 @@ class Member extends BaseController
         if ($uname) {
             $where['a.telephone|a.user_name'] = $uname;
         }
-        $userList = model('User')->alias('a')->join('Admins b', 'a.vip_code=b.vip_code', 'left')->where($where)->field('a.*, b.name sale_name')->order('a.create_time desc')->paginate(20);
+        $userList = model('User')->alias('a')->join('Admins b', 'a.vip_code=b.vip_code', 'left')->where($where)->field('a.*, b.name sale_name')->order('a.create_time desc')->paginate(20,false,['query'=>$_GET]);
         $this->assign('list', $userList);
         return $this->fetch();
 

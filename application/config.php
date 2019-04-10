@@ -17,7 +17,7 @@ return [
     // 应用调试模式
     'app_debug' => false,
     // 应用Trace
-    'app_trace' => true,
+    'app_trace' => false,
     // 应用模式状态
     'app_status' => '',
     // 是否支持多模块
@@ -154,7 +154,7 @@ return [
     // 错误显示信息,非调试模式有效
     'error_message' => '页面错误！请稍后再试～',
     // 显示错误信息
-    'show_error_msg' => true,
+    'show_error_msg' => false,
     // 异常处理handle类 留空使用 \think\exception\Handle
     'exception_handle' => '',
 
@@ -297,7 +297,7 @@ return [
         '1' => '微信',
         '2' => '支付宝',
         '3' => '小程序',
-        '4' => '小程序'
+        '4'=>'线下支付'
     ],
     'dispatch_type'=>[
         '0'=>'店铺配送',
@@ -311,6 +311,6 @@ return [
         'cert_path' => __PUBLIC__ . '/apiclient_cert_wapp.pem',
         'key_path' => __PUBLIC__ . '/apiclient_key_wapp.pem'
     ],
-    'version'=>'V1.6',
+    'version'=>'V2.2',
     'download_url'=>__URL__.'/nongzi.apk',
 ];

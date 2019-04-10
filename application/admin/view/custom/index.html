@@ -41,7 +41,7 @@
             <td>
                 <img onclick="showImg('{$v.img}')" src="{$v.img}" style="width: 200px;" alt="">
             </td>
-            <td>{:date('Y-m-d H:i:s',$v.regist_time)}</td>
+            <td>{$v.regist_time}</td>
             <td>{$v.create_time}</td>
             <td>
                 {if $v.is_ok eq 0}

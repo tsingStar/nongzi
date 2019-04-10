@@ -8,10 +8,15 @@
 <div class="page-container">
 
     <form action="" method="get">
-        <div class="text-l">
-            <button type="button" class="btn btn-success" id="" name="" onclick="method1('product', '产品详情统计', '产品详情统计')"><i class="Hui-iconfont">&#xe665;</i> 下载
+    		<input type="text" value="{$param.start_time||default=''}" onfocus="WdatePicker({maxDate:'#F{ $dp.$D(datemax)}'})" id="datemin"
+                       name="start_time" class="input-text Wdate" style="width:120px;">-
+                <input type="text" value="{$param.end_time||default=''}" onfocus="WdatePicker({minDate:'#F{ $dp.$D(datemin)}'})" id="datemax"
+                       name="end_time" class="input-text Wdate" style="width:120px;">
+                       <button class="btn btn-success" type="submit">
+                    <i class="Hui-iconfont">&#xe665;</i>查询
+                </button>
+            <button type="button" class="btn btn-success" id="" name="" onclick="method1('product', '产品详情统计', '产品详情统计')"><i class="Hui-iconfont"></i> 下载
             </button>
-        </div>
     </form>
     <table class="table table-border table-bordered table-bg table-sort">
         <thead>
@@ -21,6 +26,7 @@
         <tr class="text-c">
             <th width="50">日期</th>
             <th width="50">用户名</th>
+            <th width="50">用户ID</th>
             <th width="50">手机号</th>
             <th width="50">所属客服</th>
             <th width="50">商品id</th>
@@ -32,6 +38,7 @@
         <tr class="text-c">
             <td>{$v.create_time}</td>
             <td>{$v.user_name}</td>
+            <td>{$v.user_id}</td>
             <td>{$v.telephone}</td>
             <td>{$v.name}</td>
             <td>{$v.product_id}</td>
@@ -171,6 +178,8 @@
             if (!table.nodeType) table = document.getElementById(table)
             var ctx = {worksheet: name || 'Worksheet', table: table.innerHTML}
             // window.location.href = uri + base64(format(template, ctx))
+            //let blob = new Blob([format(template, ctx]);
+			//document.getElementById("dlink").href = URL.createObjectURL(blob);
             document.getElementById("dlink").href = uri + base64(format(template, ctx));
             document.getElementById("dlink").download = filename;
             document.getElementById("dlink").click();
