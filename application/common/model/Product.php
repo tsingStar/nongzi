@@ -98,25 +98,6 @@ class Product extends Model
      */
     public function getListByCateId($cate_id)
     {
-
-//        $product = [
-//            'id'=>3468,
-//            'thumb_img'=>__URL__."/upload/20180730/0f67922f113bff0df803cac8e95a5d7d.png",
-//            'name'=>'测试商品',
-//            'prop_name'=>'200克*50瓶/箱',
-//            'price_comb'=>'260元/箱',
-//            'price_one'=>'10元/瓶',
-//        ];
-//
-//        $list = [];
-//        for($i=0;$i<10;$i++){
-//            $list[] = $product;
-//        }
-//        return $list;
-
-        //TODO 正式上线加载正式数据
-
-        //$list = $this->where('cate_id', $cate_id)->where("is_up", 1)->order("ord desc")->select();
         $list = $this->where("FIND_IN_SET($cate_id, cate_id)")->where("is_up", 1)->order("ord desc")->select();
         $data = [];
         foreach ($list as $l){
@@ -139,6 +120,33 @@ class Product extends Model
             exit_json(-1, '商品不存在');
         }
         return $this->formatOneDetail($product);
+    }
+
+    /**
+     * 获取所有商品
+     */
+    public function getAllProducts()
+    {
+        $product_list = $this->field("id product_id, cate_id, name product_name, agent_commission, salesman_commission, parttime_commission, send_fee, is_index, is_hot, ord, is_up")->select();
+        $data = [];
+        foreach ($product_list as $item){
+            $temp = [];
+            $temp[] = $item["product_id"];
+            $temp[] = $item["product_name"];
+            $temp[] = $item["agent_commission"];
+            $temp[] = $item["salesman_commission"];
+            $temp[] = $item["parttime_commission"];
+            $temp[] = $item["send_fee"];
+            $temp[] = $item["is_index"]==1?"是":"否";
+            $temp[] = $item["is_hot"]==1?"是":"否";
+            $temp[] = $item["ord"];
+            //获取分类信息
+            $cate_arr = \model("ProductCate")->whereIn("id", $item["cate_id"])->column("name");
+            $temp[] = implode(",", $cate_arr);
+            $temp[] = $item["is_up"]==1?"是":"否";
+            $data[] = $temp;
+        }
+        return $data;
     }
 
 

@@ -1,0 +1,84 @@
+{include file='pub/header'/}
+<title></title>
+</head>
+<body>
+<div class="page-container">
+    <form class="form form-horizontal">
+        <div class="row cl">
+            <label class="form-label col-xs-4 col-sm-2"><span class="c-red">*</span>产品文件：</label>
+            <div class="formControls col-xs-8 col-sm-9">
+                <input type="file" class="upload-btn" name="product_file">
+            </div>
+        </div>
+        <div class="row cl">
+            <label class="form-label col-xs-4 col-sm-2"><span class="c-red">*</span>文件介绍：</label>
+            <div class="formControls col-xs-8 col-sm-9">
+                1.文件格式为Excel标准格式<br>
+                2.文件分两个工作区：产品列表和产品规格列表,顺序切勿搞错<br>
+                3.表格第一行字段顺序需严格按照图1-1，图1-2所示<br>
+                4.是否首页显示，显示标记为是，不显示标记为否，热销、上架设置同理<br>
+                5.分类设置：设置多个分类以英文模式下逗号分隔，具体可参考图2<br>
+            </div>
+        </div>
+        <div class="row cl">
+            <label class="form-label col-xs-4 col-sm-2"><span class="c-red">*</span>参考图：</label>
+            <div class="formControls col-xs-8 col-sm-9">
+                <div>
+                    <div class="col-xs-6 text-c inline pd-10">
+                        <img src="__STATIC__/images/tips1.png" alt="" style="display: block; width: 100%; cursor: pointer;">
+                        <span>图1-1</span>
+                    </div>
+                    <div class="col-xs-6 text-c inline pd-10">
+                        <img src="__STATIC__/images/tips2.png" alt="" style="display: block; width: 100%; cursor: pointer;">
+                        <span>图1-2</span>
+                    </div>
+                </div>
+                <div>
+                    <div class="text-c inline pd-10">
+                        <img src="__STATIC__/images/tips3.png" alt="" style="display: block; width: 100%; cursor: pointer;">
+                        <span>图2</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="row cl">
+            <div class="col-xs-8 col-sm-9 col-xs-offset-4 col-sm-offset-2">
+                <button class="btn btn-secondary radius save_excel" type="button"><i class="Hui-iconfont">&#xe632;</i> 保存属性
+                </button>
+                <button onClick="layer_close();" class="btn btn-default radius" type="button">
+                    &nbsp;&nbsp;取消&nbsp;&nbsp;
+                </button>
+            </div>
+        </div>
+    </form>
+</div>
+{include file="pub/footer"/}
+
+<script type="text/javascript">
+    $(function () {
+        $("img").click(function () {
+            var src = $(this).attr("src");
+            parent.layer.open({
+                title:"查看图片",
+                content: "<img src='"+src+"'/>",
+                area:["100%", "100%"]
+            });
+        });
+
+        $(".save_excel").click(function () {
+            var ind = layer.load();
+            $("form").ajaxSubmit({
+                type: 'post',
+                url: '{:url("Product/loadExcel")}',
+                success: function (res) {
+                    layer.close(ind);
+
+
+                }
+            });
+        });
+
+    });
+</script>
+</body>
+</html>

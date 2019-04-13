@@ -9,6 +9,7 @@
 
 namespace app\admin\controller;
 
+use app\common\model\ProductAttr;
 use think\Log;
 
 class Product extends BaseController
@@ -615,8 +616,67 @@ class Product extends BaseController
         
     }
 
+    /**
+     * 导出商品
+     */
+    public function download()
+    {
 
-    //TODO 待处理
+//        商品库的批量修改（产品名称，返利【代理商返利，销售人员返利，兼职人员返利】，运费，首页显示，热销产品，排序，规格[单价，件价，库存量]，分类【可以多分类】，商品上下架）
+        $product = new \app\common\model\Product();
+        $product_list = $product->getAllProducts();
+        $product_header = [
+            "产品ID",
+            "产品名称",
+            "代理商返利(%)",
+            "销售人员返利(%)",
+            "兼职人员返利(%)",
+            "运费",
+            "首页显示",
+            "热销产品",
+            "排序",
+            "分类",
+            "是否上架"
+        ];
+        //获取所有商品规格
+        $prop = new ProductAttr();
+        $prop_list = $prop->getAllProp();
+        $prop_header = [
+            "规格ID",
+            "产品ID",
+            "产品名称",
+            "规格名称",
+            "库存",
+            "单价",
+            "件价",
+        ];
+        $header = [
+            $product_header,
+            $prop_header
+        ];
+        $data = [
+            $product_list,
+            $prop_list
+        ];
+        echo \Excel::export($header, $data, "产品列表", 2, ["产品列表", "规格列表"]);
+        exit;
+    }
+
+    /**
+     * 导入商品列表
+     */
+    public function loadExcel()
+    {
+        if(request()->isAjax()){
+            $file = request()->file("product_file");
+            print_r($file);
+            exit;
+
+        }
+        return $this->fetch();
+    }
+
+
 
 
 }

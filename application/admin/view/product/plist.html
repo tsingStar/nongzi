@@ -24,6 +24,12 @@
                 <a class="btn btn-primary radius" onclick="product_add('添加商品','productAdd.html')" href="javascript:;">
                     <i class="Hui-iconfont">&#xe600;</i> 添加商品
                 </a>
+                <a class="btn btn-primary radius" title="导出商品" onclick="product_download()" href="javascript:;">
+                    <i class="Hui-iconfont Hui-iconfont-down"></i> 商品导出
+                </a>
+                <a class="btn btn-primary radius" title="上传商品" onclick="loadProductExcel()" href="javascript:;">
+                    <i class="Hui-iconfont Hui-iconfont-upload"></i> 上传商品
+                </a>
                 <a href="javascript:;" class="btn btn-primary radius" onclick="listCon(1)">
                     <i class="Hui-iconfont Hui-iconfont-search"></i>首页推荐
                 </a>
@@ -174,6 +180,14 @@
     //     "ordering":false,
     //     "bStateSave": true,//状态保存
     // });
+    //导出商品
+    function product_download() {
+        location.href = "{:url('download')}";
+    }
+    //导入商品信息
+    function loadProductExcel(){
+        window.parent.layer_show("导入商品", "{:url('loadExcel')}");
+    }
 
     function saveShipping(o){
         var pid = $(o).data("pid");
