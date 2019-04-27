@@ -10,6 +10,7 @@
 namespace app\admin\controller;
 
 use app\common\model\ProductAttr;
+use think\Exception;
 use think\Log;
 
 class Product extends BaseController
@@ -407,6 +408,7 @@ class Product extends BaseController
         }
         $pre_agent_commission = $product["agent_commission"];
         $pre_salesman_commission = $product["salesman_commission"];
+        $pre_parttime_commission = $product["parttime_commission"];
         if($type == 1){
             if($pre_agent_commission == $com){
                 exit_json();
@@ -420,6 +422,13 @@ class Product extends BaseController
             }else{
                 $res = $product->save(["salesman_commission"=>$com]);
                 $name = "商品佣金变动:业务员佣金".$pre_salesman_commission."变动".$com;
+            }
+        }elseif ($type == 3){
+            if($pre_parttime_commission == $com){
+                exit_json();
+            }else{
+                $res = $product->save(["parttime_commission"=>$com]);
+                $name = "商品佣金变动:兼职代理佣金".$pre_salesman_commission."变动".$com;
             }
         }else{
             exit_json(-1, "参数错误");
@@ -669,9 +678,66 @@ class Product extends BaseController
     {
         if(request()->isAjax()){
             $file = request()->file("product_file");
-            print_r($file);
-            exit;
+            is_dir(__STATIC__."/product") or mkdir(__STATIC__."/product", "0777");
+            if(!$file->checkExt(["xls", "xlsx"])){
+                exit_json(-1, "文件类型错误, 请上传标准的excel文档");
+            }
+            $file_name = md5(time().rand(1000, 9999)).".".pathinfo($file->getInfo("name"), PATHINFO_EXTENSION);
+            if($file->move(__STATIC__."/product", $file_name)){
+                $file_path = __STATIC__."/product/".$file_name;
+                $ext = pathinfo($file_name, PATHINFO_EXTENSION);
+                if($ext == "xls"){
+                    $type = "Excel5";
+                }elseif($ext == "xlsx"){
+                    $type = "Excel2007";
+                }else{
+                    exit_json(-1, "文件类型错误, 请上传标准的excel文档");
+                }
+                //解析数据表格
+                $header = [
+                    ["A"=>"product_id", "B"=>"product_name", "C"=>"agent_commission", "D"=>"salesman_commission", "E"=>"parttime_commission", "F"=>"send_fee", "G"=>"is_index", "H"=>"is_hot", "I"=>"ord", "J"=>"cate_name", "K"=>"is_up"],
+                    ["A"=>"prop_id", "B"=>"product_id", "C"=>"product_name", "D"=>"prop_name", "E"=>"remain", "F"=>"price_one", "G"=>"price_comb"]
+                ];
+                try{
+                    $data = \Excel::parse($file_path, $header, $type);
+                    //处理商品数据信息
+                    $product_info = $data[0]['data'];
+                    $prop_info = $data[1]['data'];
+                    foreach ($product_info as $item){
+//                        die($item["ord"]);
+                        //TODO 处理商品分类信息
+                        model("Product")->save([
+                            "agent_commission"=>$item["agent_commission"],
+                            "salesman_commission"=>$item["salesman_commission"],
+                            "is_hot"=>$item["is_hot"]=="是"?1:0,
+                            "is_index"=>$item["is_index"]=="是"?1:0,
+                            "is_up"=>$item["is_up"]=="是"?1:0,
+                            "send_fee"=>$item["send_fee"]?:0,
+                            "parttime_commission"=>$item["parttime_commission"]?:0,
+                            "ord"=>$item["ord"]?:0,
+                            "name"=>$item["product_name"],
+                        ], ["id"=>$item["product_id"]]);
+                    }
+                    foreach($prop_info as $val){
+                        model("ProductAttr")->save([
+                            "price_one"=>$val["price_one"],
+                            "price_comb"=>$val["price_comb"],
+                            "remain"=>$val["remain"]
+                        ], ["id"=>$val["prop_id"], "product_id"=>$val["product_id"]]);
+                    }
+                    $code = 1;
+                    $msg = "上传更新成功";
 
+                }catch (Exception $e){
+                    $code = -1;
+                    $msg = $e->getMessage();
+                }
+                @unlink($file_path);
+            }else{
+                $code = -1;
+                $msg = $file->getError();
+            }
+            exit_json($code, $msg);
         }
         return $this->fetch();
     }

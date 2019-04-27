@@ -17,7 +17,7 @@
                 2.文件分两个工作区：产品列表和产品规格列表,顺序切勿搞错<br>
                 3.表格第一行字段顺序需严格按照图1-1，图1-2所示<br>
                 4.是否首页显示，显示标记为是，不显示标记为否，热销、上架设置同理<br>
-                5.分类设置：设置多个分类以英文模式下逗号分隔，具体可参考图2<br>
+                <!--5.分类设置：设置多个分类以英文模式下逗号分隔，具体可参考图2<br>-->
             </div>
         </div>
         <div class="row cl">
@@ -33,12 +33,12 @@
                         <span>图1-2</span>
                     </div>
                 </div>
-                <div>
-                    <div class="text-c inline pd-10">
-                        <img src="__STATIC__/images/tips3.png" alt="" style="display: block; width: 100%; cursor: pointer;">
-                        <span>图2</span>
-                    </div>
-                </div>
+                <!--<div>-->
+                    <!--<div class="text-c inline pd-10">-->
+                        <!--<img src="__STATIC__/images/tips3.png" alt="" style="display: block; width: 100%; cursor: pointer;">-->
+                        <!--<span>图2</span>-->
+                    <!--</div>-->
+                <!--</div>-->
             </div>
         </div>
         <div class="row cl">
@@ -72,8 +72,6 @@
                 url: '{:url("Product/loadExcel")}',
                 success: function (res) {
                     layer.close(ind);
-
-
                 }
             });
         });

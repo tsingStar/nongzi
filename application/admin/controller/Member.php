@@ -132,65 +132,148 @@ class Member extends BaseController
     public function userDetail()
     {
         $id = input('id');
-        $user = model('User')->where('id', $id)->find();
-        $user['sale_name'] = model('Admins')->where('vip_code', $user['vip_code'])->value('name');
-        $user['address'] = model('UserAddress')->where('user_id', $id)->select();
-        $this->assign('user', $user);
-        return $this->fetch();
+        $status = input("status");
+        $param = input("get.");
+        $this->assign("param", $param);
+        switch ($status){
+            case 1:
+                $template = "userAddress";
+                $user['address'] = model('UserAddress')->where('user_id', $id)->select();
+                $this->assign('user', $user);
+                break;
+            case 2:
+                $template = "userLogin";
+                $model = model("UserLoginLog");
+                if (isset($param['start_time']) && $param["start_time"] != "") {
+                    $model->where("create_time", "gt", strtotime($param["start_time"]));
+                }
+                if (isset($param['end_time']) && $param["end_time"] != "") {
+                    $model->where("create_time", "lt", strtotime($param["end_time"]) + 86400);
+                }
+                $list = $model->where("user_id", $id)->order("create_time desc")->paginate(20, false, ["query"=>$param]);
+                $this->assign("list", $list);
+                $this->assign("server", ["1" => "安卓", "2" => "苹果", "3" => "小程序", ""=>"未知"]);
+                break;
+            case 3:
+                $template = "keysCollect";
+                $model = model("KeysCollect");
+                if (isset($param['start_time']) && $param["start_time"] != "") {
+                    $model->where("create_time", "gt", strtotime($param["start_time"]));
+                }
+                if (isset($param['end_time']) && $param["end_time"] != "") {
+                    $model->where("create_time", "lt", strtotime($param["end_time"]) + 86400);
+                }
+                $list = $model->where("user_id", $id)->order("create_time desc")->paginate(20, false, ["query"=>$param]);
+                $this->assign("list", $list);
+                break;
+            case 4:
+                $template = "productCollect";
+                $model = model("CollectProduct");
+                if (isset($param['start_time']) && $param["start_time"] != "") {
+                    $model->where("create_time", "gt", strtotime($param["start_time"]));
+                }
+                if (isset($param['end_time']) && $param["end_time"] != "") {
+                    $model->where("create_time", "lt", strtotime($param["end_time"]) + 86400);
+                }
+                $list = $model->where("user_id", $id)->order("create_time desc")->paginate(20, false, ["query"=>$param]);
+                $this->assign("list", $list);
+                break;
+            case 5:
+                $template = "orderCollect";
+                $model = model("CollectOrder")->alias("a")->where("a.user_id", $id);
+
+                if (isset($param['start_time']) && $param["start_time"] != "") {
+                    $model->where("a.create_time", "gt", strtotime($param["start_time"]));
+                }
+                if (isset($param['end_time']) && $param["end_time"] != "") {
+                    $model->where("a.create_time", "lt", strtotime($param["end_time"]) + 86400);
+                }
+                $list = $model->join("Order c", "a.order_no=c.order_no")->field("a.*, c.id order_id")->order("a.create_time desc")->paginate(20, false, ["query"=>$param]);
+                $this->assign("list", $list);
+                break;
+            case 6:
+                $template = "followList";
+                $model = model("FollowOrder")->alias("a")->where("a.user_id", $id);
+                if (isset($param['start_time']) && $param["start_time"] != "") {
+                    $model->where("a.create_time", "gt", strtotime($param["start_time"]));
+                }
+                if (isset($param['end_time']) && $param["end_time"] != "") {
+                    $model->where("a.create_time", "lt", strtotime($param["end_time"]) + 86400);
+                }
+                $list = $model->join("follow_cate b", "a.cate_id=b.id", "left")->field("a.*, b.name cate_name")->order("a.create_time desc")->paginate(20, false, ["query"=>$param]);
+                $this->assign("user_id", $id);
+                $this->assign("list", $list);
+                break;
+        }
+        return $this->fetch($template);
     }
-
-
-    //TODO 待处理
 
     /**
-     * 更改会员状态
+     * 添加跟单记录
      */
-    public function changeStatus()
+    public function addFollow()
     {
-        $id = input('id');
-        $enable = input('enable');
-        $res = model('user')->save(['status' => $enable], ['id' => $id]);
-        if ($res) {
-            exit_json(1, '更新成功');
-        } else {
-            exit_json(1, '更新失败');
+        $user_id = input("user_id");
+        if(request()->isAjax()){
+            $res = model("FollowOrder")->save([
+                "admin_id"=>session("admin_id"),
+                "user_id"=>$user_id,
+                "cate_id"=>input("cate_id"),
+                "content"=>input("content")
+            ]);
+            if($res){
+                exit_json();
+            }else{
+                exit_json(-1, "添加失败");
+            }
         }
+        $this->assign("user_id", $user_id);
+        $cate = model("FollowCate")->column("name", "id");
+        $this->assign("cate", $cate);
+        return $this->fetch("addFollow");
     }
-
     /**
-     * 下载会员
+     * 编辑跟单记录
      */
-    public function downloadMember()
+    public function editFollow()
     {
-        if (request()->isPost()) {
-            $start_time = input('start_time');
-            $end_time = input('end_time');
-            $where['creattime'] = [
-                ['egt', strtotime($start_time)],
-                ['elt', strtotime($end_time . "+1 day")]
-            ];
-            $order_list = model('user')->where($where)->select();
-            $this->assign('list', $order_list);
-            $this->assign('filename', date('Y-m-d') . '.xls');
-            return $this->fetch('excel');
+        $id = input("id");
+        $fo = model("FollowOrder")->where("id", $id)->find();
+        if(request()->isAjax()){
+            $res = $fo->save([
+                "cate_id"=>input("cate_id"),
+                "content"=>input("content")
+            ]);
+            if($res){
+                exit_json();
+            }else{
+                exit_json(-1, "编辑失败");
+            }
         }
-        return $this->fetch();
+        if(!$fo){
+            die("记录不存在");
+        }
+        $this->assign("item", $fo);
+        $cate = model("FollowCate")->column("name", "id");
+        $this->assign("cate", $cate);
+        return $this->fetch("editFollow");
     }
 
-    /**
-     * 账户变动
-     */
-    public function accountList()
+    public function delFollow()
     {
-        $where = [];
-        $uname = input('uname');
-        if ($uname) {
-            $where['b.phone|b.username'] = $uname;
-        }
-        $list = model('money_log')->alias('a')->join('user b', 'a.user_id=b.id')->field('a.*, b.username, b.phone')->where($where)->order('create_time desc')->select();
-        $this->assign('list', $list);
-        return $this->fetch();
-    }
+        $id = input("id");
+        $fo = model("FollowOrder")->where("id", $id)->find();
+        if($fo){
+            if($fo->delete()){
+                exit_json();
+            }else{
+                exit_json(-1, "删除失败");
+            }
+        }else{
+            exit_json(-1, "记录不存在,刷新后重试");
 
+        }
+        
+    }
 
 }

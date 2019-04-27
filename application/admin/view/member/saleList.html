@@ -44,7 +44,15 @@
             <td>{$v.telephone}</td>
             <td>{$v.create_time}</td>
             <td>
-                <a href="javascript:;" class="btn btn-primary radius" onclick="userDetail('{$v.id}')"><i class="Hui-iconfont Hui-iconfont-list"></i>查看详情</a>
+                <a href="javascript:;" class="" onclick="userDetail1('{$v.id}')"><i class="Hui-iconfont Hui-iconfont-list"></i>查看详情</a>
+
+                <a href="javascript:;" class="" onclick="userDetail('收获地址', '{$v.id}', 1)"><i class="Hui-iconfont Hui-iconfont-list"></i>收获地址</a>
+                <a href="javascript:;" class="" onclick="userDetail('登录记录', '{$v.id}', 2)"><i class="Hui-iconfont Hui-iconfont-list"></i>登录记录</a>
+                <a href="javascript:;" class="" onclick="userDetail('搜索记录', '{$v.id}', 3)"><i class="Hui-iconfont Hui-iconfont-list"></i>搜索记录</a>
+                <br>
+                <a href="javascript:;" class="" onclick="userDetail('查看产品记录', '{$v.id}', 4)"><i class="Hui-iconfont Hui-iconfont-list"></i>查看产品记录</a>
+                <a href="javascript:;" class="" onclick="userDetail('订单情况', '{$v.id}', 5)"><i class="Hui-iconfont Hui-iconfont-list"></i>订单情况</a>
+                <a href="javascript:;" class="" onclick="userDetail('跟单情况', '{$v.id}', 6)"><i class="Hui-iconfont Hui-iconfont-list"></i>跟单情况</a>
             </td>
         </tr>
         {/foreach}
@@ -57,8 +65,11 @@
 <!--请在下方写此页面业务相关的脚本-->
 <script type="text/javascript">
 
+    function userDetail(title ,id, status){
+        window.parent.layer_show(title, '{:url("userDetail")}?id='+id+'&status='+status);
+    }
 
-    function userDetail(id){
+    function userDetail1(id){
         layer_show('客户详情', '{:url("userDetail")}?id='+id);
     }
     // $(function () {

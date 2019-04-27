@@ -127,7 +127,7 @@ class Product extends Model
      */
     public function getAllProducts()
     {
-        $product_list = $this->field("id product_id, cate_id, name product_name, agent_commission, salesman_commission, parttime_commission, send_fee, is_index, is_hot, ord, is_up")->select();
+        $product_list = $this->field("id product_id, cate_id, name product_name, agent_commission, salesman_commission, parttime_commission, send_fee, is_index, is_hot, ord, is_up")->order("id")->select();
         $data = [];
         foreach ($product_list as $item){
             $temp = [];
@@ -139,7 +139,7 @@ class Product extends Model
             $temp[] = $item["send_fee"];
             $temp[] = $item["is_index"]==1?"是":"否";
             $temp[] = $item["is_hot"]==1?"是":"否";
-            $temp[] = $item["ord"];
+            $temp[] = $item["ord"]?:0;
             //获取分类信息
             $cate_arr = \model("ProductCate")->whereIn("id", $item["cate_id"])->column("name");
             $temp[] = implode(",", $cate_arr);

@@ -80,7 +80,10 @@
                         <td>规格</td>
                         <td>价格</td>
                         <td>数量</td>
-                        <td>总价</td>
+                        <td>运费</td>
+                        <td>优惠</td>
+                        <td>商品总额</td>
+                        <td>优惠后总额</td>
                     </tr>
                     </thead>
                     <tbody>
@@ -90,7 +93,10 @@
                         <td>{$good.prop_name}</td>
                         <td>{$good.price}</td>
                         <td>{$good.num}</td>
+                        <td>{$good.send_fee}</td>
+                        <td>{$good.discount}</td>
                         <td>{:sprintf("%.2f", $good.price*$good.num)}</td>
+                        <td>{:sprintf("%.2f", $good.price*$good.num+$good.send_fee-$good.discount)}</td>
                     </tr>
                     {/foreach}
                     </tbody>

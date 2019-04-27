@@ -6,6 +6,18 @@
                                        href="javascript:location.replace(location.href);" title="刷新"><i
         class="Hui-iconfont">&#xe68f;</i></a></nav>
 <div class="page-container">
+    <form action="" method="get">
+        <input type="hidden" value="{$param.telephone}" name="telephone">
+        <input type="hidden" value="{$param.type}" name="type">
+        <div class="text-c"> 日期：
+            <input type="text" value="{$param.start_time||default=''}" class="input-text Wdate" style="width:250px" name="start_time" autocomplete="off" onfocus="WdatePicker()">-
+            <input type="text" value="{$param.end_time||default=''}" class="input-text Wdate" style="width:250px"  name="end_time" autocomplete="off" onfocus="WdatePicker()">
+            <button type="submit" class="btn btn-success" id="" name=""><i class="Hui-iconfont">&#xe665;</i> 查询
+            </button>
+            <button type="button" class="btn btn-success export-btn"><i class="Hui-iconfont Hui-iconfont-down"></i> 下载
+            </button>
+        </div>
+    </form>
     <table class="table table-border table-bordered table-bg">
         <thead>
         <tr>
@@ -31,14 +43,24 @@
         {/foreach}
         </tbody>
     </table>
+    {$list->render()}
 </div>
 {include file="pub/footer"/}
 
 <!--请在下方写此页面业务相关的脚本-->
 <script type="text/javascript">
-    $("table").dataTable({
-        "aaSorting": [[3, "desc"]],//默认第几个排序
-    });
+    // $("table").dataTable({
+    //     "aaSorting": [[3, "desc"]],//默认第几个排序
+    // });
+    $(function () {
+        $(".export-btn").click(function () {
+            var data = $("form").serialize();
+            var myWin = window.open("{:url('userDown')}?"+data);
+            myWin.onload = function () {
+                myWin.close();
+            }
+        });
+    })
 </script>
 </body>
 </html>

@@ -1,0 +1,53 @@
+{include file='pub/header'/}
+<title></title>
+</head>
+<body>
+<div class="page-container">
+    <form class="form form-horizontal" action="" target="_blank" id="open_time" method="post" enctype="multipart/form-data">
+        <input type="hidden" name="id" value="{$item.id}">
+        <div class="row cl">
+            <label class="form-label col-xs-4 col-sm-2">跟单分类：</label>
+            <div class="formControls col-xs-8 col-sm-9">
+                <span class="select-box">
+                    <select name="cate_id" class="select">
+                        {foreach $cate as $k=>$v}
+                        <option value="{$k}" {if $item.cate_id eq $k}selected{/if}>{$v}</option>
+                        {/foreach}
+                    </select>
+                </span>
+            </div>
+        </div>
+        <div class="row cl">
+            <label class="form-label col-xs-4 col-sm-2">跟单内容：</label>
+            <div class="formControls col-xs-8 col-sm-9">
+                <textarea name="content" id="" style="width: 100%;" rows="10">{$item.content}</textarea>
+            </div>
+        </div>
+        <div class="row cl">
+            <div class="col-xs-8 col-sm-9 col-xs-offset-4 col-sm-offset-2">
+                <button class="btn btn-secondary radius" type="submit"><i class="Hui-iconfont Hui-iconfont-save"></i>保存
+                </button>
+            </div>
+        </div>
+    </form>
+</div>
+
+
+{include file="pub/footer"/}
+<script type="text/javascript">
+    $(function () {
+        $("#open_time").validate({
+            submitHandler:function (form) {
+                $(form).ajaxSubmit(function(res){
+                    if(res.code == 1){
+                        parent.location.reload();
+                    }else{
+                        layer.msg(res.msg);
+                    }
+                })
+            }
+        });
+    });
+</script>
+</body>
+</html>

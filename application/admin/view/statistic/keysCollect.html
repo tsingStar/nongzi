@@ -6,12 +6,30 @@
                                        href="javascript:location.replace(location.href);" title="刷新"><i
         class="Hui-iconfont">&#xe68f;</i></a></nav>
 <div class="page-container">
+    <form action="" method="get">
+        <div class="text-c">
+            日期：
+            <input type="text" value="{$param.mintime || default=''}" onfocus="WdatePicker({maxDate:'#F{ $dp.$D(\'datemax\')}'})" id="datemin" name="mintime" autocomplete="off"
+                   class="input-text Wdate" style="width:120px;">
+            -
+            <input type="text" value="{$param.maxtime || default=''}" onfocus="WdatePicker({minDate:'#F{ $dp.$D(\'datemin\')}'})" id="datemax" name="maxtime" autocomplete="off"
+                   class="input-text Wdate" style="width:120px;">
+            用户名：
+            <input type="text" value="{$param.user_name||default=''}" class="input-text" style="width:200px" placeholder="输入会员/手机号名称/关键词" autocomplete="off" name="user_name">
+            <button type="submit" class="btn btn-success" id="" name=""><i class="Hui-iconfont">&#xe665;</i> 查询
+            </button>
+            <button type="button" class="btn btn-success export-btn"><i class="Hui-iconfont Hui-iconfont-down"></i> 下载
+            </button>
+        </div>
+    </form>
+
     <table class="table table-border table-bordered table-bg table-sort">
         <thead>
         <tr>
-            <th scope="col" colspan="9">分类统计</th>
+            <th scope="col" colspan="9">搜索统计</th>
         </tr>
         <tr class="text-c">
+            <th width="50">用户ID</th>
             <th width="50">日期</th>
             <th width="50">用户名称</th>
             <th width="50">手机号</th>
@@ -21,6 +39,7 @@
         <tbody>
         {foreach $list as $v}
         <tr class="text-c">
+            <td>{$v.user_id}</td>
             <td>{$v.create_time}</td>
             <td>{$v.user_name}</td>
             <td>{$v.telephone}</td>
@@ -29,14 +48,24 @@
         {/foreach}
         </tbody>
     </table>
+    {$list->render()}
 </div>
 {include file="pub/footer"/}
 
 <!--请在下方写此页面业务相关的脚本-->
 <script type="text/javascript">
-    $('.table-sort').dataTable({
-        "aaSorting": [[0, "desc"]],//默认第几个排序
-    });
+    // $('.table-sort').dataTable({
+    //     "aaSorting": [[0, "desc"]],//默认第几个排序
+    // });
+    $(function () {
+        $(".export-btn").click(function () {
+            var data = $("form").serialize();
+            var myWin = window.open("{:url('keysDown')}?"+data);
+            myWin.onload = function () {
+                myWin.close();
+            }
+        });
+    })
 </script>
 </body>
 </html>

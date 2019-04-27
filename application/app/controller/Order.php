@@ -11,6 +11,7 @@ namespace app\app\controller;
 
 
 use app\common\model\WeiXinPay;
+use app\common\model\AliPay;
 use think\Log;
 
 class Order extends BaseUser
@@ -44,6 +45,10 @@ class Order extends BaseUser
                 'num' => $c['num'],
                 'total_price' => $total_price,
                 'product_id' => $c['product_id'],
+                'agent_commission'=>$p["agent_commission"],
+                'salesman_commission'=>$p["salesman_commission"],
+                "parttime_commission"=>$p["parttime_commission"],
+                "send_fee"=>$p["send_fee"]
             ];
             if ($p['is_send'] != 1) {
                 $send_fee += $c['num'] * $p['send_fee'];
@@ -95,7 +100,11 @@ class Order extends BaseUser
                 'prop_name' => $prop_attr['prop_value_name'],
                 'num' => $num,
                 'total_price' => $total_money,
-                'product_id' => $product_id
+                'product_id' => $product_id,
+                'agent_commission'=>$p["agent_commission"],
+                'salesman_commission'=>$p["salesman_commission"],
+                "parttime_commission"=>$p["parttime_commission"],
+                "send_fee"=>$p["send_fee"]
             ]
         ];
         $send_fee = 0;
@@ -163,6 +172,11 @@ class Order extends BaseUser
                     'name' => $item['name'],
                     'prop_name' => $item['prop_name'],
                     'thumb_img' => $item['thumb_img'],
+                    'agent_commission'=>$item["agent_commission"],
+                    'salesman_commission'=>$item["salesman_commission"],
+                    "parttime_commission"=>$item["parttime_commission"],
+                    "pre_send_fee"=>$item["send_fee"]*$item["num"],
+                    "send_fee"=>$item["send_fee"]*$item["num"]
                 ];
                 $prop_attr = model('ProductAttr')->where('product_id', $item['product_id'])->where('prop_value_attr', $item['prop_value_attr'])->find();
                 if ($prop_attr['remain']<$item['num']){
@@ -239,20 +253,9 @@ class Order extends BaseUser
             "order_no_pre"=>$order_no_pre,
             "create_time"=>time()
         ]);
-//        $order_no1 = getOrderNo();
-//        $orderInfo->save(["order_no"=>$order_no1]);
-//        model("OrderDet")->save(["order_no"=>$order_no1], ["order_no"=>$order_no]);
         $order = model('Order')->where('order_no', $order_no)->find();
         if ($pay_type == 1) {
             $pay_data = [
-
-//                $inputObj->SetBody($orderInfo['subject']);
-//            $inputObj->SetDetail($orderInfo['body']);
-//            $inputObj->SetOut_trade_no($orderInfo['out_trade_no']);
-//            $inputObj->SetTotal_fee($orderInfo['total_amount'] * 100);
-//            $inputObj->SetNotify_url($notify_url);
-//            $inputObj->SetTrade_type($orderInfo['trade_type']);
-
                 'out_trade_no' => $order_no_pre,
                 'body' => "订单支付",
                 'total_fee' => $order['order_money'] * 100,
@@ -272,10 +275,16 @@ class Order extends BaseUser
                 $pay_info['wxpay'] = $result;
             }
         } else if ($pay_type == 2) {
-
-            $result = [];
+            $ali_pay = new AliPay();
+            $orderInfo = [
+                'subject' => '订单支付-镰刀农业',
+                'body' => '',
+                'out_trade_no' => $order_no_pre,
+                'total_amount' => $order['order_money'],
+                'trade_type' => 'APP',
+            ];
+            $result = $ali_pay->createAppPayOrder($orderInfo, config('notify.ali'));
             $pay_info['alipay'] = $result;
-
 
         } else if ($pay_type == 3) {
             $pay_data = [

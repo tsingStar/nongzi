@@ -92,6 +92,7 @@
                     <td>
                         <p><div style="width: 120px;">代理商：<input onblur="saveCommission(this)" class="input input-text" value="{$good.agent_commission}" data-type="1" data-pid="{$good.id}" type="text" style="width: 50px;">%</div></p>
                         <p><div style="width: 120px;">销售：<input onblur="saveCommission(this)"  class="input input-text" value="{$good.salesman_commission}" type="text" data-type="2" data-pid="{$good.id}" style="width: 50px;">%</div></p>
+                        <p><div style="width: 120px;">兼职代理：<input onblur="saveCommission(this)"  class="input input-text" value="{$good.parttime_commission}" type="text" data-type="3" data-pid="{$good.id}" style="width: 50px;">%</div></p>
                     </td>
                     <td>
                         <input type="text" class="input input-text" style="width: 50px;" onblur="saveShipping(this)" value="{$good.send_fee}" data-pid="{$good.id}">

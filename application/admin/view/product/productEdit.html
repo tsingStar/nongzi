@@ -5,348 +5,385 @@
 <div class="page-container">
 	<form class="form form-horizontal" id="form-product-add" enctype="multipart/form-data">
 		<input type="hidden" name="product_id" value="{$product.id}">
-		<div class="row cl">
-			<label class="form-label col-xs-4 col-sm-2"><span class="c-red">*</span>分类：</label>
-			<div class="formControls col-xs-8 col-sm-9">
-				<!--<span class="select-box" style="width: 300px;">-->
-					<!--<select id="cateId1" name="" class="select" size="1"></select>-->
-				<!--</span>-->
-				<!--<span class="select-box" style="width: 300px;">-->
-					<!--<select id="cateId2" name="cate_id" class="select" size="1"></select>-->
-				<!--</span>-->
-				{foreach $product_cate as $pc}
-				{if $pc.parent_id eq 0}
-				<span style="background-color: #ccc; padding: 2px;margin: 2px;">{$pc.name}<i class="Hui-iconfont Hui-iconfont-del" onclick="$(this).parent().remove()" style="cursor: pointer;"></i><input type="hidden" name="cate_ids[]" value="{$pc.id}"></span>
+		<div id="tab_demo" class="HuiTab">
+			<div class="tabBar clearfix">
+				<span>基础信息</span>
+				<span>规格设置</span>
+				<span>附加属性</span>
+				<span>商品详情</span>
+			</div>
+			<div class="tabCon">
+				<div class="row cl">
+					<label class="form-label col-xs-4 col-sm-2"><span class="c-red">*</span>分类：</label>
+					<div class="formControls col-xs-8 col-sm-9">
+						<!--<span class="select-box" style="width: 300px;">-->
+							<!--<select id="cateId1" name="" class="select" size="1"></select>-->
+						<!--</span>-->
+						<!--<span class="select-box" style="width: 300px;">-->
+							<!--<select id="cateId2" name="cate_id" class="select" size="1"></select>-->
+						<!--</span>-->
+						{foreach $product_cate as $pc}
+						{if $pc.parent_id eq 0}
+						<span style="background-color: #ccc; padding: 2px;margin: 2px;">{$pc.name}<i class="Hui-iconfont Hui-iconfont-del" onclick="$(this).parent().remove()" style="cursor: pointer;"></i><input type="hidden" name="cate_ids[]" value="{$pc.id}"></span>
+						{else/}
+						<span style="background-color: #ccc; padding: 2px;margin: 2px;">{$pc.parent_name}-{$pc.name}<i class="Hui-iconfont Hui-iconfont-del" onclick="$(this).parent().remove()" style="cursor: pointer;"></i><input type="hidden" name="cate_ids[]" value="{$pc.parent_id},{$pc.id}"></span>
+						{/if}
+						{/foreach}
+						<span class="select-box" style="width: 300px;">
+							<select id="cate" name="" class="select" size="1" required>
+								<option value="0">请选择分类</option>
+								{foreach $cateTree as $c1}
+									<option value="{$c1.id}">{$c1.name}</option>
+									{if count($c1.children)>0}
+									{foreach $c1.children as $c2}
+									<option value="{$c1.id},{$c2.id}">{$c1.name}-{$c2.name}</option>
+									{/foreach}
+									{/if}
+								{/foreach}
+
+							</select>
+						</span>
+					</div>
+				</div>
+				<div class="row cl">
+					<label class="form-label col-xs-4 col-sm-2"><span class="c-red">*</span>产品名称：</label>
+					<div class="formControls col-xs-8 col-sm-9">
+						<input type="text" class="input-text" value="{$product.name}" placeholder="" name="name">
+					</div>
+				</div>
+				<div class="row cl">
+					<label class="form-label col-xs-4 col-sm-2">商品展示缩略图：</label>
+					<div class="formControls col-xs-8 col-sm-9">
+						<div class="uploader-thum-container">
+							<div id="fileList" class="uploader-list">
+							</div>
+							<div id="filePicker">选择图片</div>
+						</div>
+					</div>
+				</div>
+				<div class="row cl">
+					<label class="form-label col-xs-4 col-sm-2">商品展示轮播图：</label>
+					<div class="formControls col-xs-8 col-sm-9">
+						<div class="uploader-thum-container">
+							<div id="fileList1" class="uploader-list">
+							</div>
+							<div id="filePicker1">选择图片</div>
+						</div>
+					</div>
+				</div>
+				<div class="row cl">
+					<label class="form-label col-xs-4 col-sm-2"><span class="c-red">*</span>产品扩充名称：</label>
+					<div class="formControls col-xs-8 col-sm-9">
+						<input type="text" class="input-text" value="{$product.bname}" placeholder="" name="bname">
+					</div>
+				</div>
+
+				<div class="row cl">
+					<label class="form-label col-xs-4 col-sm-2"><span class="c-red">*</span>产品排序值：</label>
+					<div class="formControls col-xs-8 col-sm-9">
+						<input type="text" class="input-text" value="{$product.ord}" placeholder="" name="ord">
+					</div>
+				</div>
+				<div class="row cl">
+					<label class="form-label col-xs-4 col-sm-2"><span class="c-red">*</span>是否首页显示：</label>
+					<div class="formControls col-xs-8 col-sm-9">
+						<select name="is_index" class="select">
+							<option value="0" {if $product.is_index eq 0}selected{/if}>否</option>
+							<option value="1" {if $product.is_index eq 1}selected{/if}>是</option>
+						</select>
+					</div>
+				</div>
+				<div class="row cl">
+					<label class="form-label col-xs-4 col-sm-2"><span class="c-red">*</span>代理商返利利率：</label>
+					<div class="formControls col-xs-8 col-sm-9">
+						<input type="text" class="input-text" value="{$product.agent_commission}" placeholder="" name="agent_commission">
+					</div>
+				</div>
+				<div class="row cl">
+					<label class="form-label col-xs-4 col-sm-2"><span class="c-red">*</span>业务员返利利率：</label>
+					<div class="formControls col-xs-8 col-sm-9">
+						<input type="text" class="input-text" value="{$product.salesman_commission}" placeholder="" name="salesman_commission">
+					</div>
+				</div>
+
+				<!--兼职代理返利利率-->
+				<div class="row cl">
+					<label class="form-label col-xs-4 col-sm-2"><span class="c-red">*</span>兼职代理返利利率：</label>
+					<div class="formControls col-xs-8 col-sm-9">
+						<input type="text" class="input-text" value="{$product.parttime_commission}" placeholder="" name="parttime_commission">
+					</div>
+				</div>
+				<div class="row cl">
+					<label class="form-label col-xs-4 col-sm-2"><span class="c-red">*</span>限购数量：</label>
+					<div class="formControls col-xs-8 col-sm-9">
+						<input type="text" class="input-text" value="{$product.limit_num}" placeholder="默认0为不限购" name="limit_num">
+					</div>
+				</div>
+				<div class="row cl">
+					<label class="form-label col-xs-4 col-sm-2"><span class="c-red">*</span>运费：</label>
+					<div class="formControls col-xs-8 col-sm-9">
+						<input type="text" class="input-text" value="{$product.send_fee}" placeholder="20.00" name="send_fee">
+					</div>
+				</div>
+				<div class="row cl">
+					<label class="form-label col-xs-4 col-sm-2"><span class="c-red">*</span>是否包邮：</label>
+					<div class="formControls col-xs-8 col-sm-9">
+						<span class="select-box">
+							<select name="is_send" class="select">
+								<option value="0" {if $product.is_send eq 0} selected {/if}>
+									否
+								</option>
+								<option value="1" {if $product.is_send eq 1} selected {/if}>
+									是
+								</option>
+							</select>
+						</span>
+					</div>
+				</div>
+			</div>
+			<div class="tabCon">
+				{foreach $prop_name as $k=>$v}
+				{if $v=="规格"}
+					<div class="row cl prop">
+						<label class="form-label col-xs-4 col-sm-2"><span class="c-red">*</span>{$v}：</label>
+						<div class="formControls col-xs-8 col-sm-9">
+							<div>
+								<input type="text" class="input-text prop_search" style="width: 200px;">
+								<button class="size-M btn btn-default prop_search_btn" type="button">查找</button>
+							</div>
+							{foreach $prop_value["$k"] as $k1=>$v1}
+							<label class="prop_value" {if in_array($k1, $prop_val)}style="display: inline-block;"{else/}style="display: none;"{/if} class="f-l"><input type="checkbox" onclick="loadProp()" name="prop[]" {if in_array($k1, $prop_val)}checked{/if} value="{$k}|{$v}:{$k1}|{$v1}" data-prop_value_id="{$k1}" data-prop_value="{$v1}" data-prop_name="{$v}" data-prop_id="{$k}">{$v1}&nbsp;&nbsp;</label>
+							{/foreach}
+						</div>
+					</div>
 				{else/}
-				<span style="background-color: #ccc; padding: 2px;margin: 2px;">{$pc.parent_name}-{$pc.name}<i class="Hui-iconfont Hui-iconfont-del" onclick="$(this).parent().remove()" style="cursor: pointer;"></i><input type="hidden" name="cate_ids[]" value="{$pc.parent_id},{$pc.id}"></span>
+					<div class="row cl prop">
+						<label class="form-label col-xs-4 col-sm-2"><span class="c-red">*</span>{$v}：</label>
+						<div class="formControls col-xs-8 col-sm-9">
+							{foreach $prop_value["$k"] as $k1=>$v1}
+							<label style="display: inline-block;" class="f-l"><input type="checkbox" onclick="loadProp()" name="prop[]" {if in_array($k1, $prop_val)}checked{/if} value="{$k}|{$v}:{$k1}|{$v1}" data-prop_value_id="{$k1}" data-prop_value="{$v1}" data-prop_name="{$v}" data-prop_id="{$k}">{$v1}&nbsp;&nbsp;</label>
+							{/foreach}
+						</div>
+					</div>
+
 				{/if}
 				{/foreach}
-				<span class="select-box" style="width: 300px;">
-					<select id="cate" name="" class="select" size="1" required>
-						<option value="0">请选择分类</option>
-						{foreach $cateTree as $c1}
-							<option value="{$c1.id}">{$c1.name}</option>
-							{if count($c1.children)>0}
-							{foreach $c1.children as $c2}
-							<option value="{$c1.id},{$c2.id}">{$c1.name}-{$c2.name}</option>
-							{/foreach}
-							{/if}
-						{/foreach}
 
-					</select>
-				</span>
-			</div>
-		</div>
-		<div class="row cl">
-			<label class="form-label col-xs-4 col-sm-2"><span class="c-red">*</span>产品名称：</label>
-			<div class="formControls col-xs-8 col-sm-9">
-				<input type="text" class="input-text" value="{$product.name}" placeholder="" name="name">
-			</div>
-		</div>
-		<div class="row cl">
-			<label class="form-label col-xs-4 col-sm-2"><span class="c-red">*</span>产品扩充名称：</label>
-			<div class="formControls col-xs-8 col-sm-9">
-				<input type="text" class="input-text" value="{$product.bname}" placeholder="" name="bname">
-			</div>
-		</div>
+				<script>
 
-		<div class="row cl">
-			<label class="form-label col-xs-4 col-sm-2"><span class="c-red">*</span>代理商返利利率：</label>
-			<div class="formControls col-xs-8 col-sm-9">
-				<input type="text" class="input-text" value="{$product.agent_commission}" placeholder="" name="agent_commission">
-			</div>
-		</div>
-		<div class="row cl">
-			<label class="form-label col-xs-4 col-sm-2"><span class="c-red">*</span>业务员返利利率：</label>
-			<div class="formControls col-xs-8 col-sm-9">
-				<input type="text" class="input-text" value="{$product.salesman_commission}" placeholder="" name="salesman_commission">
-			</div>
-		</div>
+					function loadProp(){
+						var prop_node = $(".prop");
+						var prop_arr = new Array();
+						$.each(prop_node, function(i,v){
+							var p_arr = $(v).find("input[type=checkbox]:checked");
+							if(p_arr.length>0){
+								var prop_name = "";
+								var prop_id = "";
+								var prop_value = new Array();
+								$.each(p_arr, function (i1, v1) {
+									prop_name = $(v1).data('prop_name');
+									prop_id = $(v1).data('prop_id');
+									var t1 = {
+										prop_value:$(v1).data('prop_value'),
+										prop_value_id:$(v1).data('prop_value_id')
+									}
+									prop_value.push(t1);
+								});
+								var t = {
+									prop_name:prop_name,
+									prop_id:prop_id,
+									prop_value:prop_value
+								};
+								prop_arr.push(t);
+							}
+						});
+						if(!prop_arr.length>0){
+							layer.msg('请选择规格值后再操作');
+							$(".table-prop").html('');
+							return false;
+						}
 
-		{foreach $prop_name as $k=>$v}
-		<div class="row cl prop">
-			<label class="form-label col-xs-4 col-sm-2"><span class="c-red">*</span>{$v}：</label>
-			<div class="formControls col-xs-8 col-sm-9">
-				{foreach $prop_value["$k"] as $k1=>$v1}
-				<label style="display: inline-block;" class="f-l"><input type="checkbox" onclick="loadProp()" name="prop[]" {if in_array($k1, $prop_val)}checked{/if} value="{$k}|{$v}:{$k1}|{$v1}" data-prop_value_id="{$k1}" data-prop_value="{$v1}" data-prop_name="{$v}" data-prop_id="{$k}">{$v1}&nbsp;&nbsp;</label>
-				{/foreach}
-			</div>
-		</div>
-		{/foreach}
+						var tableHtml = "";
+						tableHtml += "<table class='table table-border table-bordered'><thead><tr>";
+						$.each(prop_arr, function (i,v) {
+							tableHtml += "<th>"+v.prop_name+"</th>";
+						});
+						tableHtml += "<th>单价</th><th>件价</th><th>库存</th><th>库存预警数量</th><th>外部编码</th>";
+						tableHtml += "</tr></thead>";
+						tableHtml += "<tbody>";
+						var numsArr = new Array();
+						var idxArr = new Array();
+						for (var i = 0; i < prop_arr.length; i++) {
+							numsArr.push(prop_arr[i].prop_value.length);
+							idxArr[i] = 0;
+						}
 
-		<script>
+						var len = 1;
+						var rowsArr = new Array();
+						for (var i = 0; i < numsArr.length; i++) {
+							len = len * numsArr[i];
 
-            function loadProp(){
-                var prop_node = $(".prop");
-                var prop_arr = new Array();
-                $.each(prop_node, function(i,v){
-                    var p_arr = $(v).find("input[type=checkbox]:checked");
-                    if(p_arr.length>0){
-                        var prop_name = "";
-                        var prop_id = "";
-                        var prop_value = new Array();
-                        $.each(p_arr, function (i1, v1) {
-                            prop_name = $(v1).data('prop_name');
-                            prop_id = $(v1).data('prop_id');
-                            var t1 = {
-                                prop_value:$(v1).data('prop_value'),
-                                prop_value_id:$(v1).data('prop_value_id')
-                            }
-                            prop_value.push(t1);
-                        });
-                        var t = {
-                            prop_name:prop_name,
-                            prop_id:prop_id,
-                            prop_value:prop_value
-                        };
-                        prop_arr.push(t);
-                    }
-                });
-                if(!prop_arr.length>0){
-                    layer.msg('请选择规格值后再操作');
-                    $(".table-prop").html('');
-                    return false;
-                }
+							var tmpnum = 1;
+							for (var j = numsArr.length - 1; j > i; j--) {
+								tmpnum = tmpnum * numsArr[j];
+							}
+							rowsArr.push(tmpnum);
+						}
 
-                var tableHtml = "";
-                tableHtml += "<table class='table table-border table-bordered'><thead><tr>";
-                $.each(prop_arr, function (i,v) {
-                    tableHtml += "<th>"+v.prop_name+"</th>";
-                });
-                tableHtml += "<th>单价</th><th>件价</th><th>库存</th><th>库存预警数量</th><th>外部编码</th>";
-                tableHtml += "</tr></thead>";
-                tableHtml += "<tbody>";
-                var numsArr = new Array();
-                var idxArr = new Array();
-                for (var i = 0; i < prop_arr.length; i++) {
-                    numsArr.push(prop_arr[i].prop_value.length);
-                    idxArr[i] = 0;
-                }
+						for (var i = 0; i < len; i++) {
+							var id = "";
+							var prop_name = "";
+							tableHtml += '<tr data-row="' + (i+1) + '">';
+							for (var j = 0; j < prop_arr.length; j++) {
+								var n = parseInt(i / rowsArr[j]);
+								if (j == 0) {
+								} else if (j == prop_arr.length - 1) {
+									n = idxArr[j];
+									if (idxArr[j] + 1 >= numsArr[j]) {
+										idxArr[j] = 0;
+									} else {
+										idxArr[j]++;
+									}
+								} else {
+									var m = parseInt(i / rowsArr[j]);
+									n = m % numsArr[j];
+								}
+								var name = prop_arr[j].prop_value[n].prop_value;
+								var _id = prop_arr[j].prop_value[n].prop_value_id;
+								id += _id + '|';
+								prop_name += name + '|';
+								if (i % rowsArr[j] == 0) {
+									tableHtml += '<td rowspan="' + rowsArr[j] + '" data-rc="' +_id+ '">'+name+'</td>';
+								}
+							}
+							id = id.substr(0, id.length-1);
+							prop_name = prop_name.substr(0, prop_name.length-1);
+							tableHtml += '<td><input type="text" class="input-text" name="prop_attr['+id+'][price_one]" style="width: 60px;" required/></td>';
+							tableHtml += '<td><input type="text" class="input-text" name="prop_attr['+id+'][price_comb]" style="width: 60px;" required/></td>';
+							tableHtml += '<td><input type="text" class="input-text" name="prop_attr['+id+'][remain]" style="width: 60px;" required/></td>';
+							tableHtml += '<td><input type="text" class="input-text" name="prop_attr['+id+'][limit_remain]" style="width: 60px;" required/></td>';
+							tableHtml += '<td><input type="text" class="input-text" name="prop_attr['+id+'][gno]" style="width: 60px;"/></td>';
+							// tableHtml += '<td><input type="file" class="input-text" name="prop_attr['+id+'][img_url]" style="font-size: 12px;"/></td>';
+							tableHtml += '<input type="hidden" value="'+prop_name+'" name="prop_attr['+id+'][prop_name]"/>';
+							tableHtml += '</tr>';
+						}
+						tableHtml += "</tbody>";
+						tableHtml += "</table>";
+						$(".table-prop").html(tableHtml);
+					}
+				</script>
 
-                var len = 1;
-                var rowsArr = new Array();
-                for (var i = 0; i < numsArr.length; i++) {
-                    len = len * numsArr[i];
-
-                    var tmpnum = 1;
-                    for (var j = numsArr.length - 1; j > i; j--) {
-                        tmpnum = tmpnum * numsArr[j];
-                    }
-                    rowsArr.push(tmpnum);
-                }
-
-                for (var i = 0; i < len; i++) {
-                    var id = "";
-                    var prop_name = "";
-                    tableHtml += '<tr data-row="' + (i+1) + '">';
-                    for (var j = 0; j < prop_arr.length; j++) {
-                        var n = parseInt(i / rowsArr[j]);
-                        if (j == 0) {
-                        } else if (j == prop_arr.length - 1) {
-                            n = idxArr[j];
-                            if (idxArr[j] + 1 >= numsArr[j]) {
-                                idxArr[j] = 0;
-                            } else {
-                                idxArr[j]++;
-                            }
-                        } else {
-                            var m = parseInt(i / rowsArr[j]);
-                            n = m % numsArr[j];
-                        }
-                        var name = prop_arr[j].prop_value[n].prop_value;
-                        var _id = prop_arr[j].prop_value[n].prop_value_id;
-                        id += _id + '|';
-                        prop_name += name + '|';
-                        if (i % rowsArr[j] == 0) {
-                            tableHtml += '<td rowspan="' + rowsArr[j] + '" data-rc="' +_id+ '">'+name+'</td>';
-                        }
-                    }
-                    id = id.substr(0, id.length-1);
-                    prop_name = prop_name.substr(0, prop_name.length-1);
-                    tableHtml += '<td><input type="text" class="input-text" name="prop_attr['+id+'][price_one]" style="width: 60px;" required/></td>';
-                    tableHtml += '<td><input type="text" class="input-text" name="prop_attr['+id+'][price_comb]" style="width: 60px;" required/></td>';
-                    tableHtml += '<td><input type="text" class="input-text" name="prop_attr['+id+'][remain]" style="width: 60px;" required/></td>';
-                    tableHtml += '<td><input type="text" class="input-text" name="prop_attr['+id+'][limit_remain]" style="width: 60px;" required/></td>';
-                    tableHtml += '<td><input type="text" class="input-text" name="prop_attr['+id+'][gno]" style="width: 60px;"/></td>';
-                    // tableHtml += '<td><input type="file" class="input-text" name="prop_attr['+id+'][img_url]" style="font-size: 12px;"/></td>';
-                    tableHtml += '<input type="hidden" value="'+prop_name+'" name="prop_attr['+id+'][prop_name]"/>';
-                    tableHtml += '</tr>';
-                }
-                tableHtml += "</tbody>";
-                tableHtml += "</table>";
-                $(".table-prop").html(tableHtml);
-            }
-		</script>
-
-		<div class="row cl">
-			<label class="form-label col-xs-4 col-sm-2"><span class="c-red">*</span>销售属性：</label>
-			<div class="formControls col-xs-8 col-sm-9">
-				<button type="button" onclick="loadProp()" class="btn radius">生成商品销售属性表</button>
-			</div>
-		</div>
-
-		<div class="row cl">
-			<label class="form-label col-xs-4 col-sm-2"></label>
-			<div class="formControls col-xs-8 col-sm-9 table-prop">
-
-			</div>
-		</div>
-
-		<div class="row cl">
-			<label class="form-label col-xs-4 col-sm-2"><span class="c-red">*</span>产品排序值：</label>
-			<div class="formControls col-xs-8 col-sm-9">
-				<input type="text" class="input-text" value="{$product.ord}" placeholder="" name="ord">
-			</div>
-		</div>
-		<div class="row cl">
-			<label class="form-label col-xs-4 col-sm-2"><span class="c-red">*</span>是否首页显示：</label>
-			<div class="formControls col-xs-8 col-sm-9">
-				<select name="is_index" class="select">
-					<option value="0" {if $product.is_index eq 0}selected{/if}>否</option>
-					<option value="1" {if $product.is_index eq 1}selected{/if}>是</option>
-				</select>
-			</div>
-		</div>
-		<div class="row cl">
-			<label class="form-label col-xs-4 col-sm-2"><span class="c-red">*</span>页面标题：</label>
-			<div class="formControls col-xs-8 col-sm-9">
-				<input type="text" class="input-text" value="{$product.web_title}" placeholder="" name="web_title">
-			</div>
-		</div>
-		<div class="row cl">
-			<label class="form-label col-xs-4 col-sm-2"><span class="c-red">*</span>页面关键字：</label>
-			<div class="formControls col-xs-8 col-sm-9">
-				<input type="text" class="input-text" value="{$product.web_keywords}" placeholder="" name="web_keywords">
-			</div>
-		</div>
-		<div class="row cl">
-			<label class="form-label col-xs-4 col-sm-2"><span class="c-red">*</span>页面描述：</label>
-			<div class="formControls col-xs-8 col-sm-9">
-				<input type="text" class="input-text" value="{$product.web_description}" placeholder="" name="web_description">
-			</div>
-		</div>
-
-		<div class="row cl">
-			<div class="row col-xs-4">
-				<label class="form-label col-xs-4 col-sm-6">农药登记证号：</label>
-				<div class="formControls col-xs-8 col-sm-6">
-					<input type="text" class="input-text" value="{$product.load_id}" placeholder="" name="load_id">
-				</div>
-			</div>
-			<div class="row col-xs-4">
-				<label class="form-label col-xs-4 col-sm-6">农药成分：</label>
-				<div class="formControls col-xs-8 col-sm-6">
-					<input type="text" class="input-text" value="{$product.component}" placeholder="" name="component">
-				</div>
-			</div>
-			<div class="row col-xs-4">
-				<label class="form-label col-xs-4 col-sm-6">生产企业：</label>
-				<div class="formControls col-xs-8 col-sm-6">
-					<input type="text" class="input-text" value="{$product.enterprise}" placeholder="" name="enterprise">
-				</div>
-			</div>
-			<div class="row col-xs-4">
-				<label class="form-label col-xs-4 col-sm-6">有效成分含量高：</label>
-				<div class="formControls col-xs-8 col-sm-6">
-					<input type="text" class="input-text" value="{$product.effect_ratio}" placeholder="" name="effect_ratio">
-				</div>
-			</div>
-			<div class="row col-xs-4">
-				<label class="form-label col-xs-4 col-sm-6">生产许可证：</label>
-				<div class="formControls col-xs-8 col-sm-6">
-					<input type="text" class="input-text" value="{$product.produce_code}" placeholder="" name="produce_code">
-				</div>
-			</div>
-			<div class="row col-xs-4">
-				<label class="form-label col-xs-4 col-sm-6">剂型：</label>
-				<div class="formControls col-xs-8 col-sm-6">
-					<input type="text" class="input-text" value="{$product.dosage_form}" placeholder="" name="dosage_form">
-				</div>
-			</div>
-			<div class="row col-xs-4">
-				<label class="form-label col-xs-4 col-sm-6">毒性：</label>
-				<div class="formControls col-xs-8 col-sm-6">
-					<input type="text" class="input-text" value="{$product.toxicity}" placeholder="" name="toxicity">
-				</div>
-			</div>
-			<div class="row col-xs-4">
-				<label class="form-label col-xs-4 col-sm-6">品牌：</label>
-				<div class="formControls col-xs-8 col-sm-6">
-					<input type="text" class="input-text" value="{$product.brand}" placeholder="" name="brand">
-				</div>
-			</div>
-			<div class="row col-xs-4">
-				<label class="form-label col-xs-4 col-sm-6">农药产品标准证号：</label>
-				<div class="formControls col-xs-8 col-sm-6">
-					<input type="text" class="input-text" value="{$product.standard_number}" placeholder="" name="standard_number">
-				</div>
-			</div>
-			<div class="row col-xs-4">
-				<label class="form-label col-xs-4 col-sm-6">防治对象：</label>
-				<div class="formControls col-xs-8 col-sm-6">
-					<input type="text" class="input-text" value="{$product.prevent}" placeholder="" name="prevent">
-				</div>
-			</div>
-		</div>
-		<div class="row cl">
-			<label class="form-label col-xs-4 col-sm-2"><span class="c-red">*</span>限购数量：</label>
-			<div class="formControls col-xs-8 col-sm-9">
-				<input type="text" class="input-text" value="{$product.limit_num}" placeholder="默认0为不限购" name="limit_num">
-			</div>
-		</div>
-		<div class="row cl">
-			<label class="form-label col-xs-4 col-sm-2"><span class="c-red">*</span>运费：</label>
-			<div class="formControls col-xs-8 col-sm-9">
-				<input type="text" class="input-text" value="{$product.send_fee}" placeholder="20.00" name="send_fee">
-			</div>
-		</div>
-		<div class="row cl">
-			<label class="form-label col-xs-4 col-sm-2"><span class="c-red">*</span>是否包邮：</label>
-			<div class="formControls col-xs-8 col-sm-9">
-				<span class="select-box">
-					<select name="is_send" class="select">
-						<option value="0" {if $product.is_send eq 0} selected {/if}>
-							否
-						</option>
-						<option value="1" {if $product.is_send eq 1} selected {/if}>
-							是
-						</option>
-					</select>
-				</span>
-			</div>
-		</div>
-		<div class="row cl">
-			<label class="form-label col-xs-4 col-sm-2">商品展示缩略图：</label>
-			<div class="formControls col-xs-8 col-sm-9">
-				<div class="uploader-thum-container">
-					<div id="fileList" class="uploader-list">
+				<div class="row cl">
+					<label class="form-label col-xs-4 col-sm-2"><span class="c-red">*</span>销售属性：</label>
+					<div class="formControls col-xs-8 col-sm-9">
+						<button type="button" onclick="loadProp()" class="btn radius">生成商品销售属性表</button>
 					</div>
-					<div id="filePicker">选择图片</div>
 				</div>
-			</div>
-		</div>
-		<div class="row cl">
-			<label class="form-label col-xs-4 col-sm-2">商品展示轮播图：</label>
-			<div class="formControls col-xs-8 col-sm-9">
-				<div class="uploader-thum-container">
-					<div id="fileList1" class="uploader-list">
+
+				<div class="row cl">
+					<label class="form-label col-xs-4 col-sm-2"></label>
+					<div class="formControls col-xs-8 col-sm-9 table-prop">
+
 					</div>
-					<div id="filePicker1">选择图片</div>
 				</div>
 			</div>
-		</div>
-		<div class="row cl">
-			<label class="form-label col-xs-4 col-sm-2">移动端商品详情：</label>
-			<div class="formControls col-xs-8 col-sm-9">
-				<script id="editor" name="mob_detail" type="text/plain" style="width:100%;height:400px;">{$product.mob_detail}</script>
-            </div>
-            </div>
-            <div class="row cl">
-                <label class="form-label col-xs-4 col-sm-2">PC端商品详情：</label>
-            <div class="formControls col-xs-8 col-sm-9">
-                <script id="editor1" name="web_detail" type="text/plain" style="width:100%;height:400px;">{$product.web_detail}</script>
+			<div class="tabCon">
+				<div class="row cl">
+					<label class="form-label col-xs-4 col-sm-2"><span class="c-red">*</span>页面标题：</label>
+					<div class="formControls col-xs-8 col-sm-9">
+						<input type="text" class="input-text" value="{$product.web_title}" placeholder="" name="web_title">
+					</div>
+				</div>
+				<div class="row cl">
+					<label class="form-label col-xs-4 col-sm-2"><span class="c-red">*</span>页面关键字：</label>
+					<div class="formControls col-xs-8 col-sm-9">
+						<input type="text" class="input-text" value="{$product.web_keywords}" placeholder="" name="web_keywords">
+					</div>
+				</div>
+				<div class="row cl">
+					<label class="form-label col-xs-4 col-sm-2"><span class="c-red">*</span>页面描述：</label>
+					<div class="formControls col-xs-8 col-sm-9">
+						<input type="text" class="input-text" value="{$product.web_description}" placeholder="" name="web_description">
+					</div>
+				</div>
+
+				<div class="row cl">
+					<div class="row col-xs-4">
+						<label class="form-label col-xs-4 col-sm-6">农药登记证号：</label>
+						<div class="formControls col-xs-8 col-sm-6">
+							<input type="text" class="input-text" value="{$product.load_id}" placeholder="" name="load_id">
+						</div>
+					</div>
+					<div class="row col-xs-4">
+						<label class="form-label col-xs-4 col-sm-6">农药成分：</label>
+						<div class="formControls col-xs-8 col-sm-6">
+							<input type="text" class="input-text" value="{$product.component}" placeholder="" name="component">
+						</div>
+					</div>
+					<div class="row col-xs-4">
+						<label class="form-label col-xs-4 col-sm-6">生产企业：</label>
+						<div class="formControls col-xs-8 col-sm-6">
+							<input type="text" class="input-text" value="{$product.enterprise}" placeholder="" name="enterprise">
+						</div>
+					</div>
+					<div class="row col-xs-4">
+						<label class="form-label col-xs-4 col-sm-6">有效成分含量高：</label>
+						<div class="formControls col-xs-8 col-sm-6">
+							<input type="text" class="input-text" value="{$product.effect_ratio}" placeholder="" name="effect_ratio">
+						</div>
+					</div>
+					<div class="row col-xs-4">
+						<label class="form-label col-xs-4 col-sm-6">生产许可证：</label>
+						<div class="formControls col-xs-8 col-sm-6">
+							<input type="text" class="input-text" value="{$product.produce_code}" placeholder="" name="produce_code">
+						</div>
+					</div>
+					<div class="row col-xs-4">
+						<label class="form-label col-xs-4 col-sm-6">剂型：</label>
+						<div class="formControls col-xs-8 col-sm-6">
+							<input type="text" class="input-text" value="{$product.dosage_form}" placeholder="" name="dosage_form">
+						</div>
+					</div>
+					<div class="row col-xs-4">
+						<label class="form-label col-xs-4 col-sm-6">毒性：</label>
+						<div class="formControls col-xs-8 col-sm-6">
+							<input type="text" class="input-text" value="{$product.toxicity}" placeholder="" name="toxicity">
+						</div>
+					</div>
+					<div class="row col-xs-4">
+						<label class="form-label col-xs-4 col-sm-6">品牌：</label>
+						<div class="formControls col-xs-8 col-sm-6">
+							<input type="text" class="input-text" value="{$product.brand}" placeholder="" name="brand">
+						</div>
+					</div>
+					<div class="row col-xs-4">
+						<label class="form-label col-xs-4 col-sm-6">农药产品标准证号：</label>
+						<div class="formControls col-xs-8 col-sm-6">
+							<input type="text" class="input-text" value="{$product.standard_number}" placeholder="" name="standard_number">
+						</div>
+					</div>
+					<div class="row col-xs-4">
+						<label class="form-label col-xs-4 col-sm-6">防治对象：</label>
+						<div class="formControls col-xs-8 col-sm-6">
+							<input type="text" class="input-text" value="{$product.prevent}" placeholder="" name="prevent">
+						</div>
+					</div>
+				</div>
 			</div>
-		</div>
+			<div class="tabCon">
+				<div class="row cl">
+						<label class="form-label col-xs-4 col-sm-2">移动端商品详情：</label>
+						<div class="formControls col-xs-8 col-sm-9">
+							<script id="editor" name="mob_detail" type="text/plain" style="width:100%;height:400px;">{$product.mob_detail}</script>
+						</div>
+						</div>
+						<div class="row cl">
+							<label class="form-label col-xs-4 col-sm-2">PC端商品详情：</label>
+						<div class="formControls col-xs-8 col-sm-9">
+							<script id="editor1" name="web_detail" type="text/plain" style="width:100%;height:400px;">{$product.web_detail}</script>
+						</div>
+					</div>
+			</div>
 		<div class="row cl">
 			<div class="col-xs-8 col-sm-9 col-xs-offset-4 col-sm-offset-2">
 				<button class="btn btn-secondary radius" type="submit"><i class="Hui-iconfont">&#xe632;</i> 保存商品</button>
@@ -364,8 +401,88 @@
 <script type="text/javascript">
 
     $(function(){
-        var ue = UE.getEditor('editor');
-        var ue1 = UE.getEditor('editor1');
+        var ue = UE.getEditor('editor',{toolbars: [
+				[
+					'anchor', //锚点
+					'undo', //撤销
+					'redo', //重做
+					'bold', //加粗
+					'indent', //首行缩进
+					'italic', //斜体
+					'underline', //下划线
+					'strikethrough', //删除线
+					'subscript', //下标
+					'superscript', //上标
+					'formatmatch', //格式刷
+					'horizontal', //分隔线
+					'removeformat', //清除格式
+					'time', //时间
+					'date', //日期
+					'fontfamily', //字体
+					'fontsize', //字号
+					'paragraph', //段落格式
+					'simpleupload', //单图上传
+					'insertimage', //多图上传
+					'spechars', //特殊字符
+					'searchreplace', //查询替换
+					'justifyleft', //居左对齐
+					'justifyright', //居右对齐
+					'justifycenter', //居中对齐
+					'justifyjustify', //两端对齐
+					'forecolor', //字体颜色
+					'imagecenter', //居中
+					'lineheight', //行间距
+					'customstyle', //自定义标题
+					'autotypeset', //自动排版
+					'touppercase', //字母大写
+					'tolowercase', //字母小写
+					'background', //背景
+				]
+			],
+			autoHeightEnabled: true,
+			autoFloatEnabled: false
+		});
+        var ue1 = UE.getEditor('editor1',{toolbars: [
+				[
+					'anchor', //锚点
+					'undo', //撤销
+					'redo', //重做
+					'bold', //加粗
+					'indent', //首行缩进
+					'italic', //斜体
+					'underline', //下划线
+					'strikethrough', //删除线
+					'subscript', //下标
+					'superscript', //上标
+					'formatmatch', //格式刷
+					'horizontal', //分隔线
+					'removeformat', //清除格式
+					'time', //时间
+					'date', //日期
+					'fontfamily', //字体
+					'fontsize', //字号
+					'paragraph', //段落格式
+					'simpleupload', //单图上传
+					'insertimage', //多图上传
+					'spechars', //特殊字符
+					'searchreplace', //查询替换
+					'justifyleft', //居左对齐
+					'justifyright', //居右对齐
+					'justifycenter', //居中对齐
+					'justifyjustify', //两端对齐
+					'forecolor', //字体颜色
+					'imagecenter', //居中
+					'lineheight', //行间距
+					'customstyle', //自定义标题
+					'autotypeset', //自动排版
+					'touppercase', //字母大写
+					'tolowercase', //字母小写
+					'background', //背景
+				]
+			],
+			autoHeightEnabled: true,
+			autoFloatEnabled: false
+		});
 
         $("#cate").change(function () {
             var cate_id = $(this).val();
@@ -419,7 +536,45 @@
             $("input[name='prop_attr["+i+"][gno]']").val(v.gno);
             $("input[name='prop_attr["+i+"][prop_name]']").val(v.prop_value_name);
         });
+
+		$(".prop_search_btn").click(function () {
+			var key = $.trim($(".prop_search").val());
+			console.log(key)
+			if(key == ""){
+				$(".prop_value").css("display","inline-block");
+			}else{
+				//过滤已选中选项
+				$.each($(".prop_value"), function (i,v) {
+					//查看是否选中
+					if(!$(v).find("input[type=checkbox]").prop("checked")){
+						var pname = $(v).text();
+						console.log(pname);
+						if(pname.indexOf(key) != -1){
+							$(v).css("display", "inline-block");
+						}else{
+							$(v).css("display", "none");
+						}
+					}
+				})
+			}
+		});
+		$.Huitab("#tab_demo .tabBar span","#tab_demo .tabCon","current","click","0");
     });
+
+	jQuery.Huitab =function(tabBar,tabCon,class_name,tabEvent,i){
+		var $tab_menu=$(tabBar);
+		// 初始化操作
+		$tab_menu.removeClass(class_name);
+		$(tabBar).eq(i).addClass(class_name);
+		$(tabCon).hide();
+		$(tabCon).eq(i).show();
+
+		$tab_menu.bind(tabEvent,function(){
+			$tab_menu.removeClass(class_name);
+			$(this).addClass(class_name);
+			var index=$tab_menu.index(this);
+			$(tabCon).hide();
+			$(tabCon).eq(index).show()})}
 </script>
 </body>
 </html>

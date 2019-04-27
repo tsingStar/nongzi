@@ -1,0 +1,29 @@
+{include file='pub/header'/}
+<title></title>
+</head>
+<body>
+<div class="page-container">
+    <table class="table table-bordered table-border text-c">
+        <tr>
+            <td>姓名</td>
+            <td>电话</td>
+            <td>地址</td>
+        </tr>
+        {if count($user.address)>0}
+        {foreach $user.address as $item}
+        <tr>
+            <td>{$item.user_name}</td>
+            <td>{$item.user_telephone}</td>
+            <td>{$item.province}-{$item.city}-{$item.county}-{$item.address}</td>
+        </tr>
+        {/foreach}
+        {else/}
+        <tr>
+            <td colspan="3">暂无地址信息</td>
+        </tr>
+        {/if}
+    </table>
+</div>
+{include file="pub/footer"/}
+</body>
+</html>

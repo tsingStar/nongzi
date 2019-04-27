@@ -1,0 +1,79 @@
+{include file='pub/header'/}
+<title>跟单记录</title>
+</head>
+<body>
+<nav class="breadcrumb"><a class="btn btn-success radius r" style="line-height:1.6em;margin-top:3px"
+                           href="javascript:location.replace(location.href);" title="刷新"><i
+        class="Hui-iconfont">&#xe68f;</i></a></nav>
+<div class="page-container">
+
+    <form action="" method="get">
+        日期：
+        <input type="text" value="{$param.start_time||default=''}" onfocus="WdatePicker({maxDate:'#F{ $dp.$D(datemax)}'})" id="datemin" autocomplete="off"
+               name="start_time" class="input-text Wdate" style="width:120px;">-
+        <input type="text" value="{$param.end_time||default=''}" onfocus="WdatePicker({minDate:'#F{ $dp.$D(datemin)}'})" id="datemax" autocomplete="off"
+               name="end_time" class="input-text Wdate" style="width:120px;">
+        <button class="btn btn-success" type="submit">
+            <i class="Hui-iconfont">&#xe665;</i>查询
+        </button>
+        <button class="btn btn-success" type="button" onclick="addFollow()">
+            <i class="Hui-iconfont Hui-iconfont-add"></i>添加记录
+        </button>
+    </form>
+    <table class="table table-border table-bordered table-bg table-sort">
+        <thead>
+        <tr>
+            <th scope="col" colspan="5">跟单记录</th>
+        </tr>
+        <tr class="text-c">
+            <th width="50">跟单分类</th>
+            <th width="50">跟单内容</th>
+            <th width="50">跟单时间</th>
+            <th width="50">更新时间</th>
+            <th width="50">操作</th>
+        </tr>
+        </thead>
+        <tbody>
+        {foreach $list as $v}
+        <tr class="text-c">
+            <td>{$v.cate_name}</td>
+            <td>{:mb_substr($v.content, 0, 20)}</td>
+            <td>{$v.create_time}</td>
+            <td>{$v.update_time}</td>
+            <td>
+                <a href="javascript:;" onclick="editFollow('{$v.id}')">编辑</a>
+                <a href="javascript:;" onclick="delFollow('{$v.id}')">删除</a>
+            </td>
+        </tr>
+        {/foreach}
+        </tbody>
+    </table>
+    {$list->render()}
+</div>
+{include file="pub/footer"/}
+
+<!--请在下方写此页面业务相关的脚本-->
+<script type="text/javascript">
+    // $('.table-sort').dataTable({
+    //     "aaSorting": [[0, "desc"]],//默认第几个排序
+    // });
+    //添加跟单记录
+    function addFollow() {
+        layer_show("添加跟单记录", "{:url('addFollow', ['user_id'=>$user_id])}");
+    }
+    function editFollow(id) {
+        layer_show("编辑跟单记录", "{:url('editFollow')}?id="+id);
+    }
+    function delFollow(id) {
+        layer.confirm("确定删除此记录?", function (r) {
+            $.post("{:url('delFollow')}", {id:id}, function (res) {
+                if(res.code == 1){
+                    location.reload();
+                }
+                layer.msg(res.msg);
+            });
+        });
+    }
+</script>
+</body>
+</html>

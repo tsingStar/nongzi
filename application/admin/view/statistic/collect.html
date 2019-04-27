@@ -8,15 +8,17 @@
 <div class="page-container">
     <form action="" method="get">
         <div class="text-c"> 日期：
-            <input type="text" value="{$param.mintime || default=''}" onfocus="WdatePicker({maxDate:'#F{ $dp.$D(\'datemax\')}'})" id="datemin" name="mintime"
+            <input type="text" value="{$param.mintime || default=''}" onfocus="WdatePicker({maxDate:'#F{ $dp.$D(\'datemax\')}'})" id="datemin" name="mintime" autocomplete="off"
                    class="input-text Wdate" style="width:120px;">
             -
-            <input type="text" value="{$param.maxtime || default=''}" onfocus="WdatePicker({minDate:'#F{ $dp.$D(\'datemin\')}'})" id="datemax" name="maxtime"
+            <input type="text" value="{$param.maxtime || default=''}" onfocus="WdatePicker({minDate:'#F{ $dp.$D(\'datemin\')}'})" id="datemax" name="maxtime" autocomplete="off"
                    class="input-text Wdate" style="width:120px;">
 
-            会员手机号：<input type="text" value="{$param.telephone|| default=''}" name="telephone" class="input-text" style="width: 150px;">
+            会员手机号：<input type="text" value="{$param.telephone|| default=''}" autocomplete="off" name="telephone" class="input-text" id="telephone" style="width: 150px;">
 
             <button type="submit" class="btn btn-success" id="" name=""><i class="Hui-iconfont">&#xe665;</i> 查询
+            </button>
+            <button type="button" class="btn btn-success export-btn"><i class="Hui-iconfont Hui-iconfont-down"></i> 导出
             </button>
         </div>
     </form>
@@ -154,10 +156,17 @@
 
 <!--请在下方写此页面业务相关的脚本-->
 <script type="text/javascript">
-    // $('.table-sort').dataTable({
-    //     "aaSorting": [[0, "desc"]],//默认第几个排序
-    //     "bStateSave": true,//状态保存
-    // });
+    $(function () {
+        $(".export-btn").click(function () {
+            var start = $("#datemin").val();
+            var end = $("#datemax").val();
+            var telephone = $("#telephone").val();
+            var win = window.open("{:url('collectExcel')}?start="+start+"&end="+end+"&telephone="+telephone);
+            win.onload = function () {
+                win.close();
+            }
+        });
+    })
     function checkDetail1(type, title){
         var start_time = $("input[name='mintime']").val();
         var end_time = $("input[name='maxtime']").val();
@@ -173,7 +182,7 @@
                 url='{:url("productCollect")}?container=1&start_time='+start_time+'&end_time='+end_time;
                 break;
             case 4:
-                url='{:url("keysCollect")}?container=1&start_time='+start_time+'&end_time='+end_time;
+                url='{:url("keysCollect")}?container=1&mintime='+start_time+'&maxtime='+end_time;
                 break;
             case 5:
                 url='{:url("supplyCollect")}?container=1&start_time='+start_time+'&end_time='+end_time;
@@ -191,7 +200,7 @@
                 url='{:url("payCollect")}?container=1&start_time='+start_time+'&end_time='+end_time;
                 break;
         }
-        layer_show(title, url);
+        window.parent.layer_show(title, url);
     }
 
     function checkDetail(type, status){
@@ -231,7 +240,7 @@
         var telephone = $("input[name='telephone']").val();
         var start_time = $("input[name='mintime']").val();
         var end_time = $("input[name='maxtime']").val();
-        layer_show(title, '{:url("checkDetail")}?type='+type+'&start_time='+start_time+'&end_time='+end_time+'&telephone='+telephone);
+        window.parent.layer_show(title, '{:url("checkDetail")}?type='+type+'&start_time='+start_time+'&end_time='+end_time+'&telephone='+telephone);
     }
 </script>
 </body>

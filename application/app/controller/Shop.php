@@ -65,9 +65,6 @@ class Shop extends Controller
         exit_json(1, '请求成功', $list);
     }
 
-
-
-    //TODO 太他妈恶心了
     /**
      * 获取分类信息及商品信息
      */
@@ -326,6 +323,8 @@ class Shop extends Controller
      */
     public function getBuyAndSupply()
     {
+        set_time_limit(120);
+        @ini_set("max_input_time", 120);
         $product_name = input('product_name');
         $num = input('num');
         $telephone = input('telephone');

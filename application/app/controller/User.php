@@ -30,12 +30,15 @@ class User extends BaseUser
     {
         $data = model('user')->formatOne(USER_ID);
         if ($data) {
-            model("UserLoginLog")->save([
-                "user_id"=>$data["user_id"],
-                "type"=>input("type"),
-                "create_time"=>time(),
-                "update_time"=>time()
-            ]);
+            $ex = model("UserLoginLog")->where("user_id", $data["user_id"])->order("create_time desc")->find();
+            if($ex["create_time"]+600<time()){
+                model("UserLoginLog")->save([
+                    "user_id"=>$data["user_id"],
+                    "type"=>input("type"),
+                    "create_time"=>time(),
+                    "update_time"=>time()
+                ]);
+            }
             exit_json(1, '请求成功', $data);
         } else {
             exit_json(-1, '会员信息不存在');

@@ -1,108 +1,92 @@
-{include file='pub/header'/}
-<title>基础统计</title>
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>订单</title>
+    <style>
+        table td{
+            text-align: center;
+        }
+    </style>
 </head>
 <body>
-<nav class="breadcrumb">{$breadNav} <a class="btn btn-success radius r" style="line-height:1.6em;margin-top:3px"
-                                       href="javascript:location.replace(location.href);" title="刷新"><i
-        class="Hui-iconfont">&#xe68f;</i></a></nav>
-<div class="page-container">
-    <form action="" method="get">
-        <div class="text-c"> 日期：
-            <input type="text" value="{$param.mintime || default=''}" onfocus="WdatePicker({maxDate:'#F{ $dp.$D(\'datemax\')}'})" id="datemin" name="mintime"
-                   class="input-text Wdate" autocomplete="off" style="width:120px;">
-            -
-            <input type="text" value="{$param.maxtime || default=''}" onfocus="WdatePicker({minDate:'#F{ $dp.$D(\'datemin\')}'})" id="datemax" name="maxtime"
-                   class="input-text Wdate" autocomplete="off" style="width:120px;">
-            <button type="submit" class="btn btn-success" id="" name=""><i class="Hui-iconfont">&#xe665;</i> 查询
-            </button>
-            <button type="button" class="btn btn-success export-btn"><i class="Hui-iconfont Hui-iconfont-down"></i> 下载
-            </button>
-
-        </div>
-    </form>
-    <table class="table table-border table-bordered table-bg table-sort">
-        <thead>
-        <tr>
-            <th scope="col" colspan="9">基础统计(<span style="color:red;">由于数据关联过多，查询/下载请控制在一个月以内</span>)</th>
-        </tr>
-        <tr class="text-c">
-            <th>日期</th>
-            <th>新增会员数量</th>
-            <th>安卓启动次数</th>
-            <th>苹果启动次数</th>
-            <th>小程序启动次数</th>
-            <th>产品分类访问数量</th>
-            <th>产品详情访问数量</th>
-            <th>产品搜索访问数量</th>
-            <th>用户登录次数</th>
-        </tr>
-        </thead>
-        <tbody>
-        {foreach $list as $v}
-        <tr class="text-c">
-            <td>{$v.date}</td>
-            <td>{$v.user_num}</td>
-            <td>{$v.android}</td>
-            <td>{$v.ios}</td>
-            <td>{$v.wapp}</td>
-            <td>{$v.cate_count}</td>
-            <td>{$v.product_count}</td>
-            <td>{$v.keys_count}</td>
-            <td>{$v.login_count}</td>
-        </tr>
-        {/foreach}
-        </tbody>
-    </table>
-</div>
-
-<table id="data" style="display: none;">
+<table border="1" id="aaa" style="margin:0px;padding:0px; display: none;" cellspacing="0">
     <thead>
-    <tr>
-        <th scope="col" colspan="9">基础统计</th>
-    </tr>
-    <tr class="text-c">
-        <th>日期</th>
-        <th>新增会员数量</th>
-        <th>安卓启动次数</th>
-        <th>苹果启动次数</th>
-        <th>小程序启动次数</th>
-        <th>产品分类访问数量</th>
-        <th>产品详情访问数量</th>
-        <th>产品搜索访问数量</th>
-        <th>用户登录次数</th>
-    </tr>
+        <tr>
+            <th rowspan="2">订单编号</th>
+            <th rowspan="2">支付订单号</th>
+            <th rowspan="2">下单时间</th>
+            <th rowspan="2">下单客户</th>
+            <th rowspan="2">归属客服</th>
+            <th rowspan="2">订单状态</th>
+            <th rowspan="2">支付方式</th>
+            <th>商品详情</th>
+            <th rowspan="2">订单金额</th>
+            <th rowspan="2">发货时间</th>
+            <th rowspan="2">收货时间</th>
+        </tr>
+        <tr>
+            <th>
+            <table>
+                <tr>
+                <td>商品名称</td>
+                <td>价格</td>
+                <td>数量</td>
+                <td>运费</td>
+                <td>优惠</td>
+                <td>总额</td>
+                <td>优惠后金额</td>
+                </tr>
+            </table>
+            </th>
+        </tr>
     </thead>
     <tbody>
-    {foreach $list as $v}
-    <tr class="text-c">
-        <td>{$v.date}</td>
-        <td>{$v.user_num}</td>
-        <td>{$v.android}</td>
-        <td>{$v.ios}</td>
-        <td>{$v.wapp}</td>
-        <td>{$v.cate_count}</td>
-        <td>{$v.product_count}</td>
-        <td>{$v.keys_count}</td>
-        <td>{$v.login_count}</td>
-    </tr>
-    {/foreach}
+        {foreach $order_list as $item}
+        <tr>
+            <td style="mso-number-format:'\@';">{$item.order_no}</td>
+            <td style="mso-number-format:'\@';">{$item.order_no_pre}</td>
+            <td>{$item.create_time}</td>
+            <td>{$item.user_name}</td>
+            <td>{$item.agent_name}</td>
+            <td>{:config('order_status')[$item.order_status]}</td>
+            <td>{:config('pay_type')[$item.pay_type]}</td>
+            <td>
+                <table>
+                    {foreach $item.product_list as $p}
+                    <tr>
+                        <td>{$p.name}</td>
+                        <td>{$p.price}</td>
+                        <td>{$p.num}</td>
+                        <td>{$p.send_fee}</td>
+                        <td>{$p.discount}</td>
+                        <td>{$p.price*$p.num}</td>
+                        <td>{$p.price*$p.num+$p.send_fee-$p.discount}</td>
+                    </tr>
+                    {/foreach}
+                </table>
+
+            </td>
+            <td>
+                {$item.order_money}
+            </td>
+            <td>
+                {$item.send_time}
+            </td>
+            <td>
+                {$item.sure_time}
+            </td>
+        </tr>
+        {/foreach}
     </tbody>
 </table>
-<a href="" style="display: none;" id="dlink"></a>
-{include file="pub/footer"/}
-
-<!--请在下方写此页面业务相关的脚本-->
-<script type="text/javascript">
-    $('.table-sort').dataTable({
-        "aaSorting": [[0, "desc"]],//默认第几个排序
-        "bStateSave": true,//状态保存
-    });
+<a id="dlink" href="" style="display: none"></a>
+</body>
+<script type="text/javascript" src="__STATIC__/lib/jquery/1.9.1/jquery.min.js"></script>
+<script>
     $(function () {
-        $(".export-btn").click(function () {
-            method1(data, "基础统计", "基础统计.xls");
-        });
-    })
-
+        method1("aaa", "订单详情", "{$filename}");
+    });
     var idTmr;
 
     function getExplorer() {
@@ -204,5 +188,4 @@
         }
     })();
 </script>
-</body>
 </html>

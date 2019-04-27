@@ -6,26 +6,56 @@
     <form class="form form-horizontal" id="product_add" method="post">
         <input type="hidden" name="order_id" value="{$order['id']}">
         <div class="row cl">
-            <label class="form-label col-xs-4 col-sm-2"><span class="c-red">*</span>原订单运费：</label>
+            <label class="form-label col-xs-4 col-sm-2"><span class="c-red">*</span>订单总运费：</label>
             <div class="formControls col-xs-8 col-sm-9">
                 {$order['send_fee']}
             </div>
         </div>
         <div class="row cl">
-            <label class="form-label col-xs-4 col-sm-2"><span class="c-red">*</span>新运费：</label>
+            <label class="form-label col-xs-4 col-sm-2"><span class="c-red">*</span>订单总优惠：</label>
             <div class="formControls col-xs-8 col-sm-9">
-                <input type="number" value="{$order.send_fee}" name="send_fee" class="input-text" required>
+                {$order['discount_fee']}
             </div>
         </div>
         <div class="row cl">
-            <label class="form-label col-xs-4 col-sm-2"><span class="c-red">*</span>优惠金额：</label>
+            <label class="form-label col-xs-4 col-sm-2"><span class="c-red">*</span>优惠调整：</label>
             <div class="formControls col-xs-8 col-sm-9">
-                <input type="number" value="{$order.discount_fee}" name="discount_fee" class="input-text" required>
+                <table class="table table-border table-bordered text-c">
+                    <tr>
+                        <th width="30">商品名称</th>
+                        <th width="30">规格</th>
+                        <th width="5">数量</th>
+                        <th width="10">价格</th>
+                        <th width="15">原始运费</th>
+                        <th width="15">原始优惠</th>
+                        <th width="15">调整后运费</th>
+                        <th width="15">调整后优惠</th>
+                    </tr>
+                    {foreach $product_list as $p}
+                    <tr>
+                        <input type="hidden" name="order_det[det_id][]" value="{$p.id}">
+                        <td>{$p.name}</td>
+                        <td>{$p.prop_name}</td>
+                        <td>{$p.num}</td>
+                        <td>{$p.price}</td>
+                        <td>{$p.pre_send_fee}</td>
+                        <td>{$p.pre_discount}</td>
+                        <td>
+                            <input type="number" name="order_det[send_fee][]" class="input-text" value="{$p.send_fee}">
+                        </td>
+                        <td>
+                            <input type="number" name="order_det[discount_fee][]" class="input-text" value="{$p.discount}">
+                        </td>
+                    </tr>
+                    {/foreach}
+                </table>
             </div>
         </div>
         <div class="row cl">
             <div class="col-xs-8 col-sm-9 col-xs-offset-4 col-sm-offset-2">
-                <a href="javascript:;" class="btn btn-secondary radius" onclick="$('form').submit()"><i class="Hui-iconfont">&#xe632;</i>确定
+                <a href="javascript:;" class="btn btn-primary radius" onclick="$('form').submit()"><i class="Hui-iconfont">&#xe632;</i>确定
+                </a>
+                <a href="javascript:;" class="btn btn-default radius" onclick="layer_close()"><i class="Hui-iconfont Hui-iconfont-close"></i>取消
                 </a>
             </div>
         </div>

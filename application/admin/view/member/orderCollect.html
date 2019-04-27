@@ -6,19 +6,16 @@
                                        href="javascript:location.replace(location.href);" title="刷新"><i
         class="Hui-iconfont">&#xe68f;</i></a></nav>
 <div class="page-container">
+
     <form action="" method="get">
-        <div class="text-c">
-            日期：
-            <input type="text" value="{$param.start_time || default=''}" onfocus="WdatePicker({maxDate:'#F{ $dp.$D(\'datemax\')}'})" id="datemin" name="start_time" autocomplete="off"
-                   class="input-text Wdate" style="width:120px;">
-            -
-            <input type="text" value="{$param.end_time || default=''}" onfocus="WdatePicker({minDate:'#F{ $dp.$D(\'datemin\')}'})" id="datemax" name="end_time" autocomplete="off"
-                   class="input-text Wdate" style="width:120px;">
-            <button type="submit" class="btn btn-success" id="" name=""><i class="Hui-iconfont">&#xe665;</i> 查询
-            </button>
-            <button type="button" class="btn btn-success export-btn"><i class="Hui-iconfont Hui-iconfont-down"></i> 下载
-            </button>
-        </div>
+        日期：
+        <input type="text" value="{$param.start_time||default=''}" onfocus="WdatePicker({maxDate:'#F{ $dp.$D(datemax)}'})" id="datemin" autocomplete="off"
+               name="start_time" class="input-text Wdate" style="width:120px;">-
+        <input type="text" value="{$param.end_time||default=''}" onfocus="WdatePicker({minDate:'#F{ $dp.$D(datemin)}'})" id="datemax" autocomplete="off"
+               name="end_time" class="input-text Wdate" style="width:120px;">
+        <button class="btn btn-success" type="submit">
+            <i class="Hui-iconfont">&#xe665;</i>查询
+        </button>
     </form>
     <table class="table table-border table-bordered table-bg">
         <thead>
@@ -26,25 +23,25 @@
             <th scope="col" colspan="9">订单页面统计（点击订单号查看订单详情）</th>
         </tr>
         <tr class="text-c">
-            <th>用户ID</th>
-            <th>用户名</th>
-            <th>手机号</th>
             <th>订单编号</th>
             <th>查询次数</th>
             <th>操作时间</th>
         </tr>
         </thead>
         <tbody>
+        {if count($list)>0}
         {foreach $list as $v}
         <tr class="text-c">
-            <td>{$v.user_id}</td>
-            <td>{$v.user_name}</td>
-            <td>{$v.telephone}</td>
             <td><a href="javascript:;" onclick="open_detail('{$v.order_id}')">{$v.order_no}</a></td>
             <td>{$v.nums}</td>
             <td>{$v.create_time}</td>
         </tr>
         {/foreach}
+        {else/}
+        <tr>
+            <td colspan="3">暂无查询订单记录</td>
+        </tr>
+        {/if}
         </tbody>
     </table>
     {$list->render()}
@@ -56,16 +53,6 @@
     // $("table").dataTable({
     //     "aaSorting": [[4, "desc"]],//默认第几个排序
     // });
-
-    $(function () {
-        $(".export-btn").click(function () {
-            var data = $("form").serialize();
-            var myWin = window.open("{:url('orderDown')}?"+data);
-            myWin.onload = function () {
-                myWin.close();
-            }
-        });
-    })
     
     function open_detail(order_id) {
         layer_show("订单详情", "{:url('Order/order_detail')}?order_id="+order_id);

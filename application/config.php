@@ -15,9 +15,9 @@ return [
     // +----------------------------------------------------------------------
 
     // 应用调试模式
-    'app_debug' => false,
+    'app_debug' => true,
     // 应用Trace
-    'app_trace' => false,
+    'app_trace' => true,
     // 应用模式状态
     'app_status' => '',
     // 是否支持多模块
@@ -149,7 +149,8 @@ return [
     // +----------------------------------------------------------------------
 
     // 异常页面的模板文件
-    'exception_tmpl' => THINK_PATH . 'tpl' . DS . '404.tpl',
+    'exception_tmpl' => THINK_PATH . 'tpl' . DS . 'think_exception.tpl',
+//    'exception_tmpl' => THINK_PATH . 'tpl' . DS . '404.tpl',
 
     // 错误显示信息,非调试模式有效
     'error_message' => '页面错误！请稍后再试～',
@@ -260,8 +261,8 @@ return [
     'default_img' => __URL__ . '/default_img.jpg',
     'rongyunKey' => '',
     'rongyunSecret' => '',
-    'jiguangKey' => '',
-    'jiguangSecret' => '',
+    'jiguangKey' => '8c3a1cdb9af5d81dcebfd2a0',
+    'jiguangSecret' => 'ca4167f88ac7e556053c12e1',
     'geo_web_key' => '',
     'geo_ios_key' => '',
     //支付宝配置参数

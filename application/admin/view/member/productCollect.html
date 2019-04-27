@@ -2,7 +2,7 @@
 <title>基础统计</title>
 </head>
 <body>
-<nav class="breadcrumb">{$breadNav} <a class="btn btn-success radius r" style="line-height:1.6em;margin-top:3px"
+<nav class="breadcrumb"><a class="btn btn-success radius r" style="line-height:1.6em;margin-top:3px"
                                        href="javascript:location.replace(location.href);" title="刷新"><i
         class="Hui-iconfont">&#xe68f;</i></a></nav>
 <div class="page-container">
@@ -16,20 +16,14 @@
                        <button class="btn btn-success" type="submit">
                     <i class="Hui-iconfont">&#xe665;</i>查询
                 </button>
-            <button type="button" class="btn btn-success export-btn"><i class="Hui-iconfont Hui-iconfont-down"></i> 下载
-            </button>
     </form>
     <table class="table table-border table-bordered table-bg table-sort">
         <thead>
         <tr>
-            <th scope="col" colspan="9">产品详情统计</th>
+            <th scope="col" colspan="9">查看产品记录</th>
         </tr>
         <tr class="text-c">
             <th width="50">日期</th>
-            <th width="50">用户名</th>
-            <th width="50">用户ID</th>
-            <th width="50">手机号</th>
-            <th width="50">所属客服</th>
             <th width="50">商品id</th>
             <th width="80">商品名称</th>
         </tr>
@@ -38,10 +32,6 @@
         {foreach $list as $v}
         <tr class="text-c">
             <td>{$v.create_time}</td>
-            <td>{$v.user_name}</td>
-            <td>{$v.user_id}</td>
-            <td>{$v.telephone}</td>
-            <td>{$v.name}</td>
             <td>{$v.product_id}</td>
             <td>{$v.product_name}</td>
         </tr>
@@ -57,19 +47,7 @@
     // $('.table-sort').dataTable({
     //     "aaSorting": [[0, "desc"]],//默认第几个排序
     // });
-    $(function () {
-        $(".export-btn").click(function () {
-            var data = $("form").serialize();
-            if($("input[name='start_time']").val() == "" || $("input[name='end_time']").val() == ""){
-                layer.alert("请选择时间段再下载");
-                return;
-            }
-            var myWin = window.open("{:url('productDown')}?"+data);
-            myWin.onload = function () {
-                myWin.close();
-            }
-        });
-    })
+
 </script>
 </body>
 </html>

@@ -11,6 +11,7 @@ namespace app\admin\controller;
 
 
 use app\common\model\WeiXinPay;
+use app\common\model\AliPay;
 use think\Controller;
 use think\Log;
 
@@ -98,7 +99,10 @@ class PayResult extends Controller
                         }
                         $num = model("Order")->where("user_id", $order["user_id"])->count();
                         $is_first = $num==1?1:0;
-                        $order->save(['out_transaction_id' => $transaction_id, 'pay_type' => $pay_type, 'pay_status' => 1, 'pay_time' => $result['time_end'], 'order_status'=>1, 'order_no_pre'=>$order_pre, "is_first"=>$is_first]);
+                        //统计首单奖励金额
+                        $vip_code = model("User")->where("id", $order['user_id'])->value("vip_code");
+                        $agent = model("Admins")->where("vip_code", $vip_code)->find();
+                        $order->save(['out_transaction_id' => $transaction_id, 'pay_type' => $pay_type, 'pay_status' => 1, 'pay_time' => $result['time_end'], 'order_status'=>1, 'order_no_pre'=>$order_pre, "is_first"=>$is_first, "first_money"=>$agent['first_order']]);
                         try{
                             $this->orderSolve($order_no);
                         } catch (\Exception $e){
@@ -115,6 +119,71 @@ class PayResult extends Controller
             }
         }
         echo '<xml><return_code><![CDATA[SUCCESS]]></return_code><return_msg><![CDATA[OK]]></return_msg></xml>';
+
+    }
+    /**
+     * 支付宝支付回调
+     */
+    public function aliPay()
+    {
+        //支付宝支付来源
+        $pay_type = 1;
+        $log_path = LOG_PATH . 'ali';
+        if ($_POST['trade_status'] == 'TRADE_FINISHED') {
+            $is_refund = 0;
+        }elseif ($_POST['trade_status'] == 'TRADE_SUCCESS'){
+
+        }else{
+            Log::error("订单关闭");
+            echo 'SUCCESS';
+            exit();
+        }
+        if(!is_dir($log_path)){
+            mkdir($log_path);
+        }
+        file_put_contents($log_path . DS . date('Y-m-d') . '.txt', date('H:m:s') . json_encode($_POST) . '\n', FILE_APPEND);
+        $alipay = new AliPay();
+        $result = $alipay->rechargeValidate();
+        if($result == false){
+            Log::error('签名错误');
+            echo 'SUCCESS';
+            exit;
+        }else{
+            if ($_POST['result_code'] != 'SUCCESS') {
+                Log::error("支付状态失败");
+                echo 'SUCCESS';
+                exit;
+            }
+            $order_info = $this->formatRes($result, 1);
+            $order_pre = $order_info['out_trade_no'];
+            $transaction_id = $order_info['transaction_id'];
+            $pre_order = model("OrderPre")->where("order_no_pre", $order_pre)->find();
+            if ($pre_order) {
+                $pre_order->save(["status"=>1]);
+                $order = model('Order')->where('order_no', $pre_order["order_no"])->find();
+                $order_no = $pre_order['order_no'];
+                if (((float)$order['order_money']) == $result['total_fee']/100) {
+                    $pay_type = 2;
+                    $num = model("Order")->where("user_id", $order["user_id"])->count();
+                    $is_first = $num==1?1:0;
+                    //统计首单奖励金额
+                    $vip_code = model("User")->where("id", $order['user_id'])->value("vip_code");
+                    $agent = model("Admins")->where("vip_code", $vip_code)->find();
+                    $order->save(['out_transaction_id' => $transaction_id, 'pay_type' => $pay_type, 'pay_status' => 1, 'pay_time' => $result['time_end'], 'order_status'=>1, 'order_no_pre'=>$order_pre, "is_first"=>$is_first, "first_money"=>$agent['first_order']]);
+                    try{
+                        $this->orderSolve($order_no);
+                    } catch (\Exception $e){
+                        Log::error('库存处理异常'.$order_no);
+                    }
+                } else {
+                    Log::error('支付金额错误' . $order_no);
+                }
+            } else {
+                Log::error('支付订单不存在' . $order_pre);
+            }
+        }
+        echo 'SUCCESS';
+        exit;
 
     }
 

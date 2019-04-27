@@ -1,0 +1,81 @@
+{include file='pub/header'/}
+<title>跟单记录</title>
+</head>
+<body>
+<nav class="breadcrumb">{$breadNav} <a class="btn btn-success radius r" style="line-height:1.6em;margin-top:3px"
+                                       href="javascript:location.replace(location.href);" title="刷新"><i
+        class="Hui-iconfont">&#xe68f;</i></a></nav>
+<div class="page-container">
+    <form action="" method="get">
+        日期：
+        <input type="text" value="{$param.start_time||default=''}" onfocus="WdatePicker({maxDate:'#F{ $dp.$D(datemax)}'})" id="datemin" autocomplete="off"
+               name="start_time" class="input-text Wdate" style="width:120px;">-
+        <input type="text" value="{$param.end_time||default=''}" onfocus="WdatePicker({minDate:'#F{ $dp.$D(datemin)}'})" id="datemax" autocomplete="off"
+               name="end_time" class="input-text Wdate" style="width:120px;">
+        <button class="btn btn-success" type="submit">
+            <i class="Hui-iconfont">&#xe665;</i>查询
+        </button>
+    </form>
+    <div class="mt-20">
+        <table class="table table-border table-bordered table-bg table-hover table-sort">
+            <thead>
+            <tr class="text-c">
+                <th width="40">客户ID</th>
+                <th width="100">客户</th>
+                <th width="100">跟单客服</th>
+                <th width="100">跟单分类</th>
+                <th width="100">跟单内容</th>
+                <th width="100">跟单时间</th>
+                <th width="100">更新时间</th>
+                <th width="150">操作</th>
+            </tr>
+            </thead>
+            <tbody>
+            {foreach $cateList as $list}
+            <tr class="text-c">
+                <td>{$list.user_id}</td>
+                <td>{$list.user_name}</td>
+                <td class="text-l">{$list.admin_name}</td>
+                <td>{$list.cate_name}</td>
+                <td><p title="{$list.content}">{:mb_substr($list.content, 0, 20)}</p></td>
+                <td>{$list.create_time}</td>
+                <td>{$list.update_time}</td>
+                <td class="td-manage">
+                    <a style="text-decoration:none" class="ml-5" onClick="category_del(this,'{$list.id}')"
+                       href="javascript:;" title="删除"><i class="Hui-iconfont">&#xe6e2;</i>删除</a>
+                </td>
+            </tr>
+            {/foreach}
+            </tbody>
+        </table>
+    </div>
+</div>
+
+{include file="pub/footer"/}
+<script type="text/javascript">
+
+    /*分类-删除*/
+    function category_del(obj, id) {
+        layer.confirm('确认要删除吗？', function (index) {
+            $.ajax({
+                type: 'POST',
+                url: '{:url("Member/delFollow")}',
+                data: {id: id},
+                dataType: 'json',
+                success: function (data) {
+                    if(data.code == 1){
+                        $(obj).parents("tr").remove();
+                        layer.msg('已删除!', {icon: 1, time: 1000});
+                    }else{
+                        layer.msg(data.msg);
+                    }
+                },
+                error: function (data) {
+                    console.log(data.msg);
+                },
+            });
+        });
+    }
+</script>
+</body>
+</html>
