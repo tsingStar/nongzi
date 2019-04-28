@@ -136,7 +136,7 @@ class Admin extends BaseController
             }
             $vip_code = model("Admins")->where("id", $data["id"])->value("vip_code");
             model("User")->save(["vip_code"=>$data["vip_code"]], ["vip_code"=>$vip_code]);
-            $res = $this->adminModel->allowField(['role_id', 'uname', 'describe', 'name', 'department_id', 'department_pid', 'telephone', 'vip_code', 'province_id', 'city_id', 'country_id', 'agent_level', 'person_money', 'first_order'])->save($data, ['id'=>$data['id']]);
+            $res = $this->adminModel->allowField(['role_id', 'uname', 'describe', 'name', 'department_id', 'department_pid', 'telephone', 'vip_code', 'province_id', 'city_id', 'country_id', 'agent_level', 'person_money', 'first_order', 'agent_cate'])->save($data, ['id'=>$data['id']]);
             if($res){
                 if(in_array(15, $role_id_arr)){
                     model("AgentLog")->save([

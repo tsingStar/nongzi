@@ -169,7 +169,7 @@ class PayResult extends Controller
                     //统计首单奖励金额
                     $vip_code = model("User")->where("id", $order['user_id'])->value("vip_code");
                     $agent = model("Admins")->where("vip_code", $vip_code)->find();
-                    $order->save(['out_transaction_id' => $transaction_id, 'pay_type' => $pay_type, 'pay_status' => 1, 'pay_time' => $result['time_end'], 'order_status'=>1, 'order_no_pre'=>$order_pre, "is_first"=>$is_first, "first_money"=>$agent['first_order']]);
+                    $order->save(['out_transaction_id' => $transaction_id, 'pay_type' => $pay_type, 'pay_status' => 1, 'pay_time' => $result['time_end'], 'order_status'=>1, 'order_no_pre'=>$order_pre, "is_first"=>$is_first, "first_money"=>$agent['first_order']?:0]);
                     try{
                         $this->orderSolve($order_no);
                     } catch (\Exception $e){

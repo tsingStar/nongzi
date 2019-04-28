@@ -8,7 +8,7 @@ ADD COLUMN `salesman_commission` decimal(10, 2) NULL DEFAULT 0 AFTER `agent_comm
 ADD COLUMN `parttime_commission` decimal(10, 2) NULL DEFAULT 0 AFTER `salesman_commission`,
 ADD COLUMN `discount` decimal(10, 2) NULL DEFAULT 0 COMMENT '优惠金额' AFTER `parttime_commission`,
 ADD COLUMN `pre_send_fee` decimal(10, 2) NULL DEFAULT 0 COMMENT '原始运费' AFTER `discount`,
-ADD COLUMN `send_fee` decimal(10, 2) NULL DEFAULT 0 COMMENT '修改后运费' AFTER `pre_send_fee`;
+ADD COLUMN `send_fee` decimal(10, 2) NULL DEFAULT 0 COMMENT '修改后运费' AFTER `pre_send_fee`,
 ADD COLUMN `pre_discount` decimal(10, 2) NULL DEFAULT 0 COMMENT '原始优惠' AFTER `parttime_commission`;
 ##增加跟单目录处理
 INSERT INTO `shop`.`ybt_menu`(`id`, `name`, `url`, `display`, `describe`, `parent_id`, `level`, `create_time`, `update_time`) VALUES (10080, '跟单管理', 'admin/followOrder', 1, '', 1, 2, 1555774484, 1555774484);
@@ -39,3 +39,10 @@ CREATE TABLE `ybt_follow_order` (
 ##添加首单佣金
 ALTER TABLE `shop`.`ybt_order`
 ADD COLUMN `first_money` decimal(12, 2) NULL DEFAULT 0 COMMENT '首单佣金' AFTER `is_trash`;
+##添加代理商分类
+ALTER TABLE `shop`.`ybt_admins`
+ADD COLUMN `agent_cate` tinyint(1) NULL DEFAULT 1 COMMENT '代理商类型  1 代理商 2 兼职代理商' AFTER `able_commission`;
+##添加vip_code 索引
+ALTER TABLE `shop`.`ybt_admins`
+DROP INDEX `vip_code`,
+ADD UNIQUE INDEX `vip_code`(`vip_code`) USING HASH;

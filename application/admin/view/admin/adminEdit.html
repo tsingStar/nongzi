@@ -52,15 +52,26 @@
 		</div>
 
 		<div class="row cl agent" {if !in_array(15, $roleArr)} style="display: none;"{/if}>
-			<label class="form-label col-xs-4 col-sm-3">代理商等级：</label>
-			<div class="formControls col-xs-8 col-sm-9">
+		<label class="form-label col-xs-4 col-sm-3">代理商等级：</label>
+		<div class="formControls col-xs-8 col-sm-9">
                 <span class="select-box" style="width: auto;">
                     <select name="agent_level" class="select">
                         <option value="1" {if $admin.agent_level eq 1}selected{/if}>市级代理</option>
-                        <option value="2" {if $admin.agent_level eq 2}selected{/if}>区县级代理</option>
+						<option value="2" {if $admin.agent_level eq 2}selected{/if}>区县级代理</option>
                     </select>
                 </span>
-			</div>
+		</div>
+		</div>
+		<div class="row cl agent" {if !in_array(15, $roleArr)} style="display: none;"{/if}>
+		<label class="form-label col-xs-4 col-sm-3">代理商类型：</label>
+		<div class="formControls col-xs-8 col-sm-9">
+                <span class="select-box" style="width: auto;">
+                    <select name="agent_cate" class="select">
+                        <option value="1" {if $admin.agent_cate eq 1}selected{/if}>代理商</option>
+						<option value="2" {if $admin.agent_cate eq 2}selected{/if}>兼职代理商</option>
+                    </select>
+                </span>
+		</div>
 		</div>
 		<div class="row cl agent" {if !in_array(15, $roleArr)} style="display: none;"{/if}>
 			<label class="form-label col-xs-4 col-sm-3">推广用户佣金金额：</label>

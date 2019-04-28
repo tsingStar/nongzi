@@ -586,9 +586,21 @@ class Order extends BaseController
     public function getOrderCommission($order_no)
     {
         $commission = 0;
+        $user_id = model('Order')->where("order_no", $order_no)->value("user_id");
+        $vip_code = model("User")->where("id", $user_id)->value("vip_code");
+        $agent = model("Admins")->where("vip_code", $vip_code)->find();
+        if(in_array(15, explode(',', $agent['role_id']))){
+            if($agent['agent_cate'] == 1){
+                $c_type = "agent_commission";
+            }else{
+                $c_type = "parttime_commission";
+            }
+        }else{
+            $c_type = 'salesman_commission';
+        }
         $list = model("OrderDet")->where("order_no", $order_no)->select();
         foreach ($list as $value) {
-            $commission += $value["price"] * $value["num"] * $value["agent_commission"] / 100;
+            $commission += $value["price"] * $value["num"] * $value["$c_type"] / 100;
         }
         return round($commission, 2);
     }
@@ -741,6 +753,26 @@ class Order extends BaseController
             exit("订单不存在");
         }else{
             $det_list = model("OrderDet")->where("order_no", $order_no)->select();
+            $user = model("User")->where("id", $order["user_id"])->find();
+            $agent = model("Admins")->where("vip_code", $user['vip_code'])->find();
+            $this->assign("agent", $agent);
+            if(in_array(15, explode(',', $agent['role_id']))){
+                $is_agent = 1;
+            }else{
+                $is_agent = 0;
+            }
+            $this->assign("is_agent", 0);
+            foreach ($det_list as &$value){
+                if($is_agent){
+                    $value['commission'] = $value['salesman_commission'];
+                }else{
+                    if($agent['agent_cate'] == 1){
+                        $value['commission'] = $value['agent_commission'];
+                    }else{
+                        $value['commission'] = $value['parttime_commission'];
+                    }
+                }
+            }
             $this->assign("item", $order);
             $this->assign("list", $det_list);
             return $this->fetch('checkDetail');

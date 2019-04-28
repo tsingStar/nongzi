@@ -23,6 +23,28 @@
             </div>
         </div>
         <div class="row cl">
+            <label class="form-label col-xs-4 col-sm-2"><span class="c-red">*</span>推广人：</label>
+            <div class="formControls col-xs-8 col-sm-9">
+                {$agent.name}
+            </div>
+        </div>
+        <div class="row cl">
+            <label class="form-label col-xs-4 col-sm-2"><span class="c-red">*</span>推广人类型：</label>
+            <div class="formControls col-xs-8 col-sm-9">
+                {if $is_agent eq 1}
+                    代理商-
+                    {if $agent.agent_cate eq 1}
+                        代理商
+                    {else/}
+                        兼职代理商
+                    {/if}
+                {else/}
+                平台
+                {/if}
+
+            </div>
+        </div>
+        <div class="row cl">
             <label class="form-label col-xs-4 col-sm-2"><span class="c-red">*</span>首单佣金：</label>
             <div class="formControls col-xs-8 col-sm-9">
                 {$item.first_money}
@@ -34,14 +56,22 @@
                 <table class="table table-border table-bordered">
                     <tr>
                         <th>商品名称</th>
+                        <th>价格</th>
                         <th>商品数量</th>
-                        <th>返佣</th>
-                        <th>商品名称</th>
-                        <th>商品名称</th>
-
+                        <th>返佣比例</th>
+                        <th>返佣金额</th>
                     </tr>
-
-
+                    {foreach $list as $det}
+                    <tr>
+                        <td>{$det.name}</td>
+                        <td>{$det.price}</td>
+                        <td>{$det.num}</td>
+                        <td>
+                            {$det.commission}
+                        </td>
+                        <td>{:round($det.num*$det.price*$det.commission/100, 2)}</td>
+                    </tr>
+                    {/foreach}
                 </table>
             </div>
         </div>
@@ -52,24 +82,24 @@
                 <!--<button class="btn btn-primary radius" data-status="1" type="button" onclick="order_check('{$item.order_no}', this)">审核通过</button>-->
                 <!--<button class="btn btn-primary radius" data-status="2" type="button" onclick="order_check('{$item.order_no}', this)">拒绝审核</button>-->
                 {if $item.is_comp eq 0}
-                <a style="text-decoration:none" class="ml-5" data-status="1" onClick="order_check('{$item.order_no}', this)"
+                <a style="text-decoration:none" class="ml-5 btn btn-primary size-M" data-status="1" onClick="order_check('{$item.order_no}', this)"
                    href="javascript:;" title="结算">
                     审核结算
                 </a>
-                <a style="text-decoration:none" class="ml-5" data-status="2" onClick="order_check('{$item.order_no}', this)"
+                <a style="text-decoration:none" class="ml-5 btn btn-primary size-M" data-status="2" onClick="order_check('{$item.order_no}', this)"
                    href="javascript:;" title="结算">
                     拒绝结算
                 </a>
                 {/if}
 
                 {if $item.is_comp eq 1}
-                <a style="text-decoration:none" class="ml-5" data-status="3" onClick="order_check('{$item.order_no}', this)"
+                <a style="text-decoration:none" class="ml-5 btn btn-primary size-M" data-status="3" onClick="order_check('{$item.order_no}', this)"
                    href="javascript:;" title="结算">
                     撤销结算
                 </a>
                 {/if}
                 {if $item.is_comp eq 2}
-                <a style="text-decoration:none" class="ml-5"
+                <a style="text-decoration:none" class="ml-5 btn btn-primary size-M"
                    href="javascript:;">
                     已取消结算
                 </a>
@@ -77,23 +107,23 @@
 
                 {if $item.is_first eq 1}
                 {if $item.is_first_comp eq 0}
-                <a style="text-decoration:none" class="ml-5" data-status="1" onClick="order_first('{$item.order_no}', this)"
+                <a style="text-decoration:none" class="ml-5 btn btn-primary size-M" data-status="1" onClick="order_first('{$item.order_no}', this)"
                    href="javascript:;" title="结算">
                     首单结算
                 </a>
-                <a style="text-decoration:none" class="ml-5" data-status="2" onClick="order_first('{$item.order_no}', this)"
+                <a style="text-decoration:none" class="ml-5 btn btn-primary size-M" data-status="2" onClick="order_first('{$item.order_no}', this)"
                    href="javascript:;" title="结算">
                     拒绝首单结算
                 </a>
                 {/if}
                 {if $item.is_first_comp eq 1}
-                <a style="text-decoration:none" class="ml-5" data-status="3" onClick="order_first('{$item.order_no}', this)"
+                <a style="text-decoration:none" class="ml-5 btn btn-primary size-M" data-status="3" onClick="order_first('{$item.order_no}', this)"
                    href="javascript:;" title="结算">
                     首单撤销结算
                 </a>
                 {/if}
                 {if $item.is_first_comp eq 2}
-                <a style="text-decoration:none" class="ml-5"
+                <a style="text-decoration:none" class="ml-5 btn btn-primary size-M"
                    href="javascript:;">
                     首单已取消结算
                 </a>
@@ -120,6 +150,21 @@
                     }
                 }
             });
+    }
+    function order_first(order_no, o){
+        var status = $(o).data("status");
+        $.post('{:url("order_first")}', {order_no:order_no, status:status}, function (res) {
+            if(res.code == 1){
+                if(status == 1){
+                    $(o).data("status", 3);
+                    $(o).next().remove();
+                    $(o).html("首单撤销结算");
+                }else{
+                    $(o).unbind();
+                    $(o).html("已取消首单结算");
+                }
+            }
+        });
     }
 </script>
 </body>
