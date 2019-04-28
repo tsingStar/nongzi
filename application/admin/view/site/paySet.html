@@ -1,0 +1,61 @@
+{include file='pub/header'/}
+<link href="__STATIC__/lib/webuploader/0.1.5/webuploader.css" rel="stylesheet" type="text/css" />
+<title>支付设置</title>
+</head>
+<body>
+<div class="page-container">
+    <form class="form form-horizontal" id="report" method="post" enctype="multipart/form-data">
+        <div class="row cl">
+            <label class="form-label col-xs-4 col-sm-2">线下付款银行卡号：</label>
+            <div class="formControls col-xs-8 col-sm-9">
+                <input type="text" class="input-text" autocomplete="off" name="bank_card" value="{$item.bank_card||default=''}"/>
+            </div>
+        </div>
+        <div class="row cl">
+            <label class="form-label col-xs-4 col-sm-2">开户行名称：</label>
+            <div class="formControls col-xs-8 col-sm-9">
+                <input type="text" class="input-text" autocomplete="off" name="bank_name" value="{$item.bank_name||default=''}"/>
+            </div>
+        </div>
+        <div class="row cl">
+            <label class="form-label col-xs-4 col-sm-2">银行卡姓名：</label>
+            <div class="formControls col-xs-8 col-sm-9">
+                <input type="text" class="input-text" autocomplete="off" name="card_user_name" value="{$item.card_user_name||default=''}"/>
+            </div>
+        </div>
+        <div class="row cl">
+            <div class="col-xs-8 col-sm-9 col-xs-offset-4 col-sm-offset-2">
+                <button class="btn btn-secondary radius" type="submit"><i class="Hui-iconfont">&#xe632;</i> 保存信息
+                </button>
+            </div>
+        </div>
+    </form>
+</div>
+{include file="pub/footer"/}
+<script type="text/javascript">
+    $(function () {
+        $("#report").validate({
+            onkeyup: false,
+            focusCleanup: true,
+            success: "valid",
+            submitHandler: function (form) {
+                $(form).ajaxSubmit({
+                    type: 'post',
+                    url: location.href,
+                    success: function (res) {
+                        if (1 == res.code) {
+                            layer.msg(res.msg, {icon: 6, time: 1000});
+                            setTimeout(function () {
+                                location.reload();
+                            }, 888);
+                        } else {
+                            layer.msg(res.msg, {icon: 5, time: 1000});
+                        }
+                    }
+                });
+            }
+        });
+    });
+</script>
+</body>
+</html>

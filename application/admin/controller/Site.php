@@ -177,6 +177,36 @@ class Site extends BaseController
         }
     }
 
+    /**
+     * 支付设置
+     */
+    public function paySet()
+    {
+        $item = db("bank_info")->find();
+        if(request()->isAjax()){
+            $data = input("post.");
+            $data['update_time'] = time();
+            if($item){
+                $res = db("bank_info")->where("1=1")->update($data);
+            }else{
+                $res = db("bank_info")->insert($data);
+            }
+            if($res){
+                exit_json();
+            }else{
+                exit_json(-1, '更新失败');
+            }
+
+
+        }else{
+            $item = db("bank_info")->find();
+            $this->assign("item", $item);
+            return $this->fetch('paySet');
+        }
+
+
+    }
+
 
 
 }
