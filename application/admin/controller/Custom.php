@@ -26,6 +26,28 @@ class Custom extends BaseController
         if (isset($param["telephone"]) && $param["telephone"] != "") {
             $model->where("c.telephone", $param["telephone"])->whereOr("c.name", "like", "%".$param['telephone']."%");
         }
+        if(isset($param['status']) && $param['status'] != ""){
+            switch ($param['status']){
+                case 1:
+                    $model->where("a.is_ok", 0);
+                    break;
+                case 2:
+                    $model->where("a.is_ok", 1);
+                    break;
+                case 3 :
+                    $model->where("a.is_ok", 2);
+                    break;
+                case 4:
+                    $model->where("a.is_ok", 1)->where("is_comp", 1);
+                    break;
+                case 5:
+                    $model->where("a.is_ok", 1)->where("is_comp", 0);
+                    break;
+                case 6:
+                    $model->where("is_comp", 2);
+                    break;
+            }
+        }
         $list = $model->field("a.*, b.user_name nick_name,b.create_time regist_time, b.spread_money, c.name admin_name")->order("a.create_time desc")->paginate(10, false, ["query"=>$param]);
         $this->assign("param", $param);
         $this->assign("list", $list);

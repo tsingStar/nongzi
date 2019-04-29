@@ -149,9 +149,18 @@ class Index extends BaseAgent
     public function getOrderCommission($order_no)
     {
         $commission = 0;
-        $list = model("OrderDet")->alias("a")->join("Product b", "a.product_id=b.id")->where("a.order_no", $order_no)->field("a.*, b.agent_commission, b.salesman_commission")->select();
-        foreach ($list as $value){
-            $commission += $value["price"]*$value["num"]*$value["agent_commission"]/100;
+        $list = model("OrderDet")->where("order_no", $order_no)->select();
+        if(in_array(15, explode(',', $this->agent['role_id']))){
+            if($this->agent['agent_cate'] == 1){
+                $c_type = "agent_commission";
+            }else{
+                $c_type = "parttime_commission";
+            }
+        }else{
+            $c_type = 'salesman_commission';
+        }
+        foreach ($list as $value) {
+            $commission += $value["price"] * $value["num"] * $value["$c_type"] / 100;
         }
         return round($commission, 2);
     }

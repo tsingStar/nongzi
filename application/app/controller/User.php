@@ -31,7 +31,7 @@ class User extends BaseUser
         $data = model('user')->formatOne(USER_ID);
         if ($data) {
             $ex = model("UserLoginLog")->where("user_id", $data["user_id"])->order("create_time desc")->find();
-            if($ex["create_time"]+600<time()){
+            if(strtotime($ex["create_time"])+600<time()){
                 model("UserLoginLog")->save([
                     "user_id"=>$data["user_id"],
                     "type"=>input("type"),
@@ -39,6 +39,10 @@ class User extends BaseUser
                     "update_time"=>time()
                 ]);
             }
+            $data['total_order'] = model("Order")->where('user_id', USER_ID)->where("is_trash", 0)->count();
+            $data['pay_order'] = model("Order")->where('user_id', USER_ID)->where("is_trash", 0)->where("pay_status", 0)->count();
+            $data['rec_order'] = model("Order")->where('user_id', USER_ID)->where("is_trash", 0)->where("order_status", 2)->count();
+            $data['sh_order'] = model("Order")->where("user_id", USER_ID)->where("is_trash", 0)->where('order_status', 4)->count();
             exit_json(1, '请求成功', $data);
         } else {
             exit_json(-1, '会员信息不存在');
@@ -188,6 +192,57 @@ class User extends BaseUser
                 exit_json(-1, '绑定失败');
             }
         }
+    }
+
+    /**
+     * 获取未读消息总数
+     */
+    public function getTipsNum()
+    {
+        $nums = db('user_tips')->where("user_id", USER_ID)->where("is_read", 0)->count();
+        $act_num = db("user_tips")->where("user_id", USER_ID)->where("cate", 3)->where("is_read", 0)->count();
+        $kefu_num = db("user_tips")->where("user_id", USER_ID)->where("cate", 2)->where("is_read", 0)->count();
+        $sys_num = db("user_tips")->where("user_id", USER_ID)->where("cate", 1)->where("is_read", 0)->count();
+        exit_json(1, "", ["num"=>$nums, "act_num"=>$act_num, "kefu_num"=>$kefu_num, "sys_num"=>$sys_num]);
+    }
+
+    /**
+     * 获取消息列表
+     */
+    public function getTips()
+    {
+        $type = input("type");
+        $page = input("page")?:1;
+        $list = db("user_tips")->where("user_id", USER_ID)->where("cate", $type)->order("create_time desc")->limit(($page-1)*10, 10)->field("id, title, msg, is_read, create_time")->select();
+        foreach ($list as &$item){
+            $item['create_time'] = date('m/d H:i');
+        }
+        exit_json(1, "请求成功", $list);
+
+    }
+
+    /**
+     * 获取消息详情
+     */
+    public function getTipsInfo()
+    {
+        $id = input("id");
+        $tip = db("user_tips")->where("id", $id)->where("user_id", USER_ID)->find();
+        if($tip){
+            db("user_tips")->where("id", $id)->update(['is_read'=>1]);
+            $t = model("tips")->where("id", $tip['tips_id'])->field("title, msg, content, author, create_time")->find();
+//            $t["create_time"] = date("m/d H:i", strtotime($t['create_time']));
+            if($t){
+                exit_json(1, '请求成功', $t);
+            }else{
+                exit_json(-1, "消息不存在");
+            }
+        }else{
+            exit_json(-1, "消息不存在");
+        }
+
+
+
     }
 
 

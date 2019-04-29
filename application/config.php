@@ -248,7 +248,7 @@ return [
         'reset' => true,
         'useZh' => false
     ],
-    //网易云信配置参数
+    //天瑞云短信
     'sms' => [
         'accesskey' => 'pxuF1v2KQcS7WEXz',
         'secret' => 'vgw42Mh3MDRBWS0ThYWn2rEjG4COjxPG',

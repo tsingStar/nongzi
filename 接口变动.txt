@@ -1,0 +1,105 @@
+1. 注册接口添加
+    register_id:极光推送id
+    register_src: 注册来源 1 安卓 2 iOS
+2.登录接口添加
+    register_id:极光推送id
+3.用户信息接口
+   返回增加:
+       total_order:全部订单数量
+       pay_order:待支付订单数量
+       rec_order:待收货数量
+       sh_order:待收货数量
+4.获取未读消息总数
+   请求地址:/app/User/getTipsNum
+   入参:
+       user_id:用户id
+   返回:
+       {
+           "code": 1,
+           "msg": "",
+           "data": {
+               "num": 2,
+               "act_num": 0,
+               "kefu_num": 0,
+               "sys_num": 2
+           }
+       }
+5.获取消息列表
+    请求地址:/app/User/getTips
+    入参:
+        user_id:用户id
+        type:消息类型  1 系统消息 2 客服消息 3 活动
+        page:页码 默认1
+    返回:
+        {
+            "code": 1,
+            "msg": "请求成功",
+            "data": [
+                {
+                    "id": 4031,  //消息id
+                    "title": "测试系统消息",
+                    "msg": "测试测试测试测试测试测试",
+                    "is_read": 0,
+                    "create_time": "04/29 22:12"
+                },
+                {
+                    "id": 20,
+                    "title": "测试系统消息",
+                    "msg": "测试测试测试测试测试测试",
+                    "is_read": 0,
+                    "create_time": "04/29 22:12"
+                }
+            ]
+        }
+6.获取消息详情
+    请求地址:/app/User/getTipsInfo
+    入参:
+        user_id:用户id
+        id:消息id
+    返回:
+        {
+            "code": 1,
+            "msg": "请求成功",
+            "data": {
+                "title": "测试系统消息",
+                "msg": "测试测试测试测试测试测试",
+                "content": "<p>测试测试测试测试测试测试测试测试测试测试测试测试测试测试测试测试测试测试</p>",
+                "author": "抢农资网",
+                "create_time": "2019-04-29 16:11:40"
+            }
+        }
+
+7.获取启动图信息
+    请求地址:/app/Pub/getLogo
+    入参:
+    返回:
+        {
+            "code": 1,
+            "msg": "请求成功",
+            "data": {
+                "id": 1,
+                "image": "/upload/20190429/f2a4c2ddba761ee4bf98cc4fd3f95ec8.png",
+                "create_time": "2019-04-29 14:14:12",
+                "update_time": "2019-04-29 23:11:42",
+                "type": "good", //跳转类型 为空则不跳转  good 跳转商品
+                "good_id": 15,  //商品id
+                "is_show": 1,
+                "delay_time": 1,  //等待时间 单位秒
+                "is_skip": 0      //是否可跳过
+            }
+        }
+
+8.获取线下支付银行信息
+    请求地址:/app/Pub/getBankInfo
+    入参:
+    返回:
+        {
+            "code": 1,
+            "msg": "请求成功",
+            "data": {
+                "bank_card": "622845332511422222",
+                "bank_name": "农业银行",
+                "card_user_name": "淄博镰刀农业" //持卡人信息
+            }
+        }
+20190429

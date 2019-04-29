@@ -28,11 +28,11 @@
                 <td>{$item.id}</td>
                 <td>
                     <img height="45px;" class="picture-thumb" src="{$item.image}"
-                         onclick="picture_show('{$item.name}', '{$item.image}')">
+                         onclick="picture_show('图片预览', '{$item.image}')">
                 </td>
                 <td>
                     {if $item.is_show eq 1}
-                    <button onclick="changeStatus('{$$item.id}', 0)" class="btn btn-primary size-MINI radius">是</button>
+                    <button onclick="changeStatus('{$item.id}', 0)" class="btn btn-primary size-MINI radius">是</button>
                     {else/}
                     <button onclick="changeStatus('{$item.id}', 1)" class="btn btn-default size-MINI radius">否</button>
                     {/if}
@@ -54,15 +54,6 @@
 
 {include file="pub/footer"/}
 <script type="text/javascript">
-    // $('.table-sort').dataTable({
-    //     "aaSorting": [[1, "asc"]],//默认第几个排序
-    //     "bStateSave": true,//状态保存
-    //     "aoColumnDefs": [
-    //         //{"bVisible": false, "aTargets": [ 3 ]} //控制列的隐藏显示
-    //         {"orderable": false, "aTargets": [0, 3, 6]}// 制定列不参与排序
-    //     ]
-    // });
-
     function changeStatus(id, status) {
         $.post('{:url("changeLogoStatus")}', {id:id, is_show:status}, function (res) {
             if(res.code == 1){

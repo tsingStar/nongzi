@@ -132,9 +132,9 @@ function test_password($password, $len = 6, $preg = "/^(?![^a-zA-Z]+$)(?!\D+$)/"
     if(strlen($password)<$len){
         return ['code'=>0, 'msg'=>'密码不足'.$len.'位'];
     }
-    if(!preg_match($preg, $password)){
-        return ['code'=>0, 'msg'=>'密码必须为数字和字母，不包含特殊字符'];
-    }
+//    if(!preg_match($preg, $password)){
+//        return ['code'=>0, 'msg'=>'密码必须为数字和字母，不包含特殊字符'];
+//    }
     return ['code'=>1];
 }
 
@@ -324,7 +324,7 @@ function getOrderNo()
 {
     $millisecond = get_millisecond();
     $millisecond = str_pad($millisecond, 3, '0', STR_PAD_RIGHT);
-    return date("YmdHis") . $millisecond . rand(1000, 9999);
+    return date("YmdHis") . $millisecond . rand(100, 999);
 }
 
 /**

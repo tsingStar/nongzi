@@ -36,7 +36,6 @@ class Pub extends Controller
         }
     }
 
-
     public function test()
     {
 
@@ -54,6 +53,7 @@ class Pub extends Controller
 
         $telephone = input('telephone');
         $password = input('password');
+        $register_id = input("register_id");
         $userModel = new User();
         $user = $userModel->where('telephone', 'eq', $telephone)->find();
         if ($user) {
@@ -67,10 +67,29 @@ class Pub extends Controller
                 "create_time"=>time(),
                 "update_time"=>time()
             ]);
+            $user->save(['register_id'=>$register_id]);
             exit_json(1, '登陆成功', $userModel->formatOne($user['id']));
         } else {
             exit_json(-1, '会员不存在');
         }
+    }
+
+    /**
+     * 获取启动图
+     */
+    public function getLogo()
+    {
+        $logo = model('LoginLogo')->where("is_show", 1)->find();
+        exit_json(1, "请求成功", $logo);
+    }
+
+    /**
+     * 获取线下支付信息
+     */
+    public function getBankInfo()
+    {
+        $bank = db("bank_info")->field("bank_card, bank_name, card_user_name")->find();
+        exit_json(1, "请求成功", $bank);
     }
 
     /**
@@ -98,6 +117,8 @@ class Pub extends Controller
     {
         $telephone = input('telephone');
         $password = input('password');
+        $register_id = input("register_id");
+        $register_src = input("register_src");
         $tp = test_password($password);
         if ($tp['code'] === 0) {
             exit_json(-1, $tp['msg']);
@@ -122,7 +143,7 @@ class Pub extends Controller
             if (!$sms) {
                 exit_json(-1, '验证码错误');
             }
-            $res = model('user')->isUpdate(false)->save(['telephone' => $telephone, 'password' => md5($password), 'vip_code' => $vip_code, 'user_name' => uniqid(), 'spread_money'=>$admin["person_money"]]);
+            $res = model('user')->isUpdate(false)->save(['telephone' => $telephone, 'password' => md5($password), 'vip_code' => $vip_code, 'user_name' => uniqid(), 'spread_money'=>$admin["person_money"], 'register_id'=>$register_id, 'register_src'=>$register_src]);
             if ($res) {
                 $sms->save(['status' => 1]);
                 $user_id = model('user')->getAttr('id');
@@ -325,7 +346,7 @@ class Pub extends Controller
             if ($user['open_id']) {
                 exit_json(-1, '手机号已被绑定过，请重新绑定');
             }
-            $data = ['head_img' => $head_img, 'open_id' => $open_id, 'user_name' => $user_name];
+            $data = ['head_img' => $head_img, 'open_id' => $open_id, 'user_name' => $user_name, 'register_src'=>3];
             if (!$user['vip_code']) {
                 $data['vip_code'] = $vip_code;
             }

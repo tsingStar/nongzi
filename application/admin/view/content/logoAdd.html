@@ -4,63 +4,58 @@
 <body>
 <div class="page-container">
     <form class="form form-horizontal" id="form-category-add">
+        <input type="hidden" value="{$item.id|default=0}" name="id">
+        <input type="hidden" value="{$item.image|default=''}" name="image">
         <div class="row cl">
-            <label class="form-label col-xs-4 col-sm-2"><span class="c-red">*</span>分类名称：</label>
-            <div class="formControls col-xs-8 col-sm-9">
-                <input type="text" class="input-text" value="" placeholder="" id="name" name="name">
-            </div>
-        </div>
-        <div class="row cl">
-            <label class="form-label col-xs-4 col-sm-2">排序值：</label>
-            <div class="formControls col-xs-8 col-sm-9">
-                <input type="text" class="input-text" value="50" placeholder="" id="orderid" name="ord">
-            </div>
-        </div>
-        <div class="row cl">
-            <label class="form-label col-xs-4 col-sm-2">分类图标：</label>
+            <label class="form-label col-xs-4 col-sm-2">启动图：</label>
             <div class="formControls col-xs-8 col-sm-9">
                 <div class="uploader-thum-container">
                     <div id="fileList" class="uploader-list">
+                        {if $item.image neq ''}
+                        <img src="{$item.image}" alt="" style="width: 120px; height: auto;">
+                        {/if}
                     </div>
                     <div id="filePicker">选择图片</div>
                 </div>
             </div>
         </div>
         <div class="row cl">
-            <label class="form-label col-xs-4 col-sm-2">分类文字图标：</label>
+            <label class="form-label col-xs-4 col-sm-2">等待时间：</label>
             <div class="formControls col-xs-8 col-sm-9">
                 <div class="uploader-thum-container">
-                    <div id="fileList1" class="uploader-list">
-                    </div>
-                    <div id="filePicker1">选择图片</div>
+                    <input type="number" step="1" min="1" value="{$item.delay_num|default='1'}" name="delay_time" class="input-text">
                 </div>
             </div>
         </div>
         <div class="row cl">
-            <label class="form-label col-xs-4 col-sm-2">导航是否显示：</label>
+            <label class="form-label col-xs-4 col-sm-2">是否支持跳过：</label>
             <div class="formControls col-xs-8 col-sm-9">
                 <div class="uploader-thum-container">
-                    <label for=""><input type="radio" value="1" class="check-box" placeholder="" name="is_index">是</label>
-                    <label for=""><input type="radio" value="0" class="check-box" checked placeholder="" name="is_index">否</label>
+                    <label for=""><input type="radio" {if $item.is_skip eq 1} checked {/if} value="1" class="check-box" placeholder="" name="is_skip">是</label>
+                    <label for=""><input type="radio" value="0" {if $item.is_skip eq 0} checked {/if} class="check-box" checked placeholder="" name="is_skip">否</label>
                 </div>
             </div>
         </div>
         <div class="row cl">
-            <label class="form-label col-xs-4 col-sm-2">首页推荐：</label>
+            <label class="form-label col-xs-4 col-sm-2">点击跳转类型：</label>
             <div class="formControls col-xs-8 col-sm-9">
-                <label for=""><input type="radio" value="1" class="check-box" placeholder="" name="is_recommond">是</label>
-                <label for=""><input type="radio" value="0" class="check-box" placeholder="" checked name="is_recommond">否</label>
+                <span class="select-box">
+                    <select name="type" id="jumpType" class="select">
+                        <option value="">无跳转</option>
+                        <option value="good">指定商品</option>
+                    </select>
+                </span>
             </div>
         </div>
-        <div class="row cl">
-            <label class="form-label col-xs-4 col-sm-2">推荐商品数量：</label>
+        <div class="row cl" style="display: none;" id="good_id">
+            <label class="form-label col-xs-4 col-sm-2">商品id：</label>
             <div class="formControls col-xs-8 col-sm-9">
-                <input type="number" class="input-text" value="8" placeholder="" name="show_num">
+                <input type="number" class="input-text" value="" placeholder="" name="good_id" min="1">
             </div>
         </div>
         <div class="row cl">
             <div class="col-xs-8 col-sm-9 col-xs-offset-4 col-sm-offset-2">
-                <button class="btn btn-secondary radius" type="submit"><i class="Hui-iconfont">&#xe632;</i> 保存分类
+                <button class="btn btn-secondary radius" type="submit"><i class="Hui-iconfont">&#xe632;</i> 保存
                 </button>
                 <button onClick="layer_close();" class="btn btn-default radius" type="button">
                     &nbsp;&nbsp;取消&nbsp;&nbsp;
@@ -74,31 +69,23 @@
 {include file="pub/footer"/}
 <script type="text/javascript">
     $(function () {
-        $('.skin-minimal input').iCheck({
-            checkboxClass: 'icheckbox-blue',
-            radioClass: 'iradio-blue',
-            increaseArea: '20%'
+        $("#jumpType").change(function () {
+            var t = $(this).val();
+            if(t == 'good'){
+                $("#good_id").show();
+            }else{
+                $("#good_id").hide();
+            }
         });
         uploadImage($("#fileList"), null, $("#form-category-add"), "image");
-        uploadImage($("#fileList1"), null, $("#form-category-add"), "word_image", "#filePicker1", 1);
         $("#form-category-add").validate({
-            rules: {
-                name: {
-                    required: true
-                }
-            },
-            messages: {
-                name: {
-                    required: '分类名称不能为空'
-                }
-            },
             onkeyup: false,
             focusCleanup: true,
             success: "valid",
             submitHandler: function (form) {
                 $(form).ajaxSubmit({
                     type: 'post',
-                    url: '{:url("Category/categoryAdd")}',
+                    url: '{:url("Content/logoAdd")}',
                     success: function (res) {
                         if (1 == res.code) {
                             var index = parent.layer.getFrameIndex(window.name);

@@ -8,7 +8,18 @@
 <div class="page-container">
     <div class="mb-15">
     <form action="" method="get">
-            <input type="text" value="{$param.telephone||default=''}" class="input-text" style="width:250px" placeholder="输入代理商名称/手机号" name="telephone">
+        <input type="text" value="{$param.telephone||default=''}" class="input-text" style="width:250px" placeholder="输入代理商名称/手机号" name="telephone">
+        <span class="select-box" style="width: auto;">
+            <select name="status" class="select">
+                <option value="">全部</option>
+                <option value="1" {if isset($param.status) && $param.status eq 1}selected{/if}>未审核</option>
+                <option value="2" {if isset($param.status) && $param.status eq 2}selected{/if}>通过</option>
+                <option value="3" {if isset($param.status) && $param.status eq 3}selected{/if}>驳回</option>
+                <option value="4" {if isset($param.status) && $param.status eq 4}selected{/if}>结算</option>
+                <option value="5" {if isset($param.status) && $param.status eq 5}selected{/if}>未结算</option>
+                <option value="6" {if isset($param.status) && $param.status eq 6}selected{/if}>已撤销</option>
+            </select>
+        </span>
             <button type="submit" class="btn btn-success" id="" name=""><i class="Hui-iconfont">&#xe665;</i> 查询
             </button>
     </form>
@@ -20,6 +31,7 @@
         </tr>
         <tr class="text-c">
             <th>代理商姓名</th>
+            <th>店名</th>
             <th>会员昵称</th>
             <th>手机号</th>
             <th>会员名</th>
@@ -34,6 +46,7 @@
         {foreach $list as $v}
         <tr class="text-c">
             <td>{$v.admin_name}</td>
+            <td>{$v.store_name}</td>
             <td>{$v.nick_name}</td>
             <td>{$v.user_telephone}</td>
             <td>{$v.user_name}</td>
@@ -41,7 +54,7 @@
             <td>
                 <img onclick="showImg('{$v.img}')" src="{$v.img}" style="width: 200px;" alt="">
             </td>
-            <td>{$v.regist_time}</td>
+            <td>{:date('y-m-d H:i',$v.regist_time)}</td>
             <td>{$v.create_time}</td>
             <td>
                 {if $v.is_ok eq 0}
@@ -53,6 +66,7 @@
                 已拒绝
                 {/if}
                 {if $v.is_ok eq 1 && $v.is_comp eq 0}
+                <a class="btn btn-primary radius size-MINI" href="javascript:;" onclick="refuse('{$v.id}')">二次拒绝</a>
                 <a class="btn btn-primary radius size-MINI" href="javascript:;" onclick="comp('{$v.id}', 1)">结算</a>
                 {/if}
                 {if $v.is_comp eq 1}

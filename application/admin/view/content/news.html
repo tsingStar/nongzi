@@ -1,0 +1,169 @@
+{include file='pub/header'/}
+<title>App启动图管理</title>
+</head>
+<body>
+<nav class="breadcrumb">{$breadNav} <a class="btn btn-success radius r" style="line-height:1.6em;margin-top:3px"
+                                       href="javascript:location.replace(location.href);" title="刷新"><i
+        class="Hui-iconfont">&#xe68f;</i></a></nav>
+<div class="page-container">
+    <div class="cl pd-5 bg-1 bk-gray mt-20">
+        <span class="l">
+            <a class="btn btn-primary radius" onclick="category_add('添加消息','{:url(\'Content/tipsAdd\')}')"
+               href="javascript:;"><i class="Hui-iconfont">&#xe600;</i> 添加消息</a>
+        </span>
+    </div>
+    <div class="mt-20">
+        <table class="table table-border table-bordered table-bg table-hover table-sort">
+            <thead>
+            <tr class="text-c">
+                <th width="40">ID</th>
+                <th width="100">标题</th>
+                <th width="100">简介</th>
+                <th width="100">作者</th>
+                <th width="100">类型</th>
+                <th width="100">发送数量</th>
+                <th width="100">创建时间</th>
+                <th width="100">推送时间</th>
+                <th width="150">操作</th>
+            </tr>
+            </thead>
+            <tbody>
+            {foreach $list as $item}
+            <tr class="text-c">
+                <td>{$item.id}</td>
+                <td>
+                    <p>{$item.title}</p>
+                </td>
+                <td class="text-l">
+                    <p title="{$item.msg}">
+                        {if mb_strlen($item.msg)>20}
+                        {:mb_substr($item.msg, 0, 20)}....
+                        {else/}
+                        {$item.msg}
+                        {/if}
+                    </p>
+                </td>
+                <td>
+                    {$item.author}
+                </td>
+                <td>
+                    {$item.cate}
+                </td>
+                <td>
+                    {$item.nums}
+                </td>
+                <td>
+                    {$item.create_time}
+                </td>
+                <td>
+                    {$item.send_time}
+                </td>
+                <td class="td-manage">
+                    <a style="text-decoration:none" class="ml-5" onClick="category_edit('编辑消息', '{:url(\'Content/tipsAdd\', [\'id\'=>$item.id])}')"
+                       href="javascript:;"><i class="Hui-iconfont Hui-iconfont-edit"></i>编辑</a>
+                    <a style="text-decoration:none" class="ml-5" onClick="send('{$item.id}', 1)"
+                       href="javascript:;"><i class="Hui-iconfont Hui-iconfont-fabu"></i>平台推送</a>
+                    <a style="text-decoration:none" class="ml-5" onClick="send('{$item.id}', 2)"
+                       href="javascript:;"><i class="Hui-iconfont Hui-iconfont-fabu"></i>选择用户</a>
+                    <a style="text-decoration:none" class="ml-5" onClick="category_del(this,'{$item.id}')"
+                       href="javascript:;" title="删除"><i class="Hui-iconfont">&#xe6e2;</i>删除</a>
+                </td>
+            </tr>
+            {/foreach}
+            </tbody>
+        </table>
+        {$list->render()}
+    </div>
+</div>
+
+{include file="pub/footer"/}
+<script type="text/javascript">
+
+    function send(id, t){
+        if(t == 1){
+            layer.confirm('确定全平台推送?', function () {
+                $.post('{:url("sendTips")}', {uids:'', status:1, id:id}, function (res) {
+                    if(res.code == 1){
+                        layer.msg("发送成功");
+                        setTimeout(function () {
+                            location.reload();
+                        }, 666)
+                    }else{
+                        layer.msg(res.msg);
+                    }
+                });
+            });
+            return ;
+        }
+        if(t == 2){
+            // layer_show('选择用户', '{:url("checkUser")}?id='+id, '800', '600');
+            layer.prompt({
+                formType: 2,
+                value: '多个用户以英文逗号,分隔开',
+                title: '请输入用户id'
+            }, function (val) {
+                var patt = new RegExp("^[0-9,]+$");
+                if(patt.test(val)){
+                    $.post('{:url("sendTips")}', {uids:val, status:2, id:id}, function (res) {
+                        if(res.code == 1){
+                            layer.msg("发送成功");
+                            setTimeout(function () {
+                                location.reload();
+                            }, 666)
+                        }else{
+                            layer.msg(res.msg);
+                        }
+                    });
+                }else{
+                    layer.msg("提交数据格式错误");
+                }
+            })
+            return ;
+        }
+        layer.msg('参数错误');
+    }
+
+    /*分类-添加*/
+    function category_add(title, url) {
+        var index = layer.open({
+            type: 2,
+            title: title,
+            area: ['600px', '450px'],
+            content: url
+        });
+        layer.full(index);
+    }
+
+
+    /*分类-编辑*/
+    function category_edit(title, url, id) {
+        var index = layer.open({
+            type: 2,
+            title: title,
+            content: url,
+            area: ['600px', '450px']
+        });
+        layer.full(index);
+    }
+
+    /*分类-删除*/
+    function category_del(obj, id) {
+        layer.confirm('确认要删除吗？', function (index) {
+            $.ajax({
+                type: 'POST',
+                url: '{:url("Content/delTips")}',
+                data: {id: id},
+                dataType: 'json',
+                success: function (data) {
+                    $(obj).parents("tr").remove();
+                    layer.msg('已删除!', {icon: 1, time: 1000});
+                },
+                error: function (data) {
+                    console.log(data.msg);
+                },
+            });
+        });
+    }
+</script>
+</body>
+</html>
