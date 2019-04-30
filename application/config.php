@@ -253,7 +253,10 @@ return [
         'accesskey' => 'pxuF1v2KQcS7WEXz',
         'secret' => 'vgw42Mh3MDRBWS0ThYWn2rEjG4COjxPG',
         'sign' => '6650',
-        'tempId'=>'8730'
+        'tempId'=>'8730',
+        'payId'=>'43993',
+        'sendId'=>'43992',
+        'sureId'=>'43994'
     ],
     'sitename' => '大镰刀农业',
     'shopKey' => 'shop_id',

@@ -48,7 +48,7 @@ class Custom extends BaseController
                     break;
             }
         }
-        $list = $model->field("a.*, b.user_name nick_name,b.create_time regist_time, b.spread_money, c.name admin_name")->order("a.create_time desc")->paginate(10, false, ["query"=>$param]);
+        $list = $model->field("a.*, b.register_src, b.user_name nick_name,b.create_time regist_time, b.spread_money, c.name admin_name")->order("a.create_time desc")->paginate(10, false, ["query"=>$param]);
         $this->assign("param", $param);
         $this->assign("list", $list);
         return $this->fetch();

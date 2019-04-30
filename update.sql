@@ -70,6 +70,7 @@ INSERT INTO `shop`.`ybt_menu`(`id`, `name`, `url`, `display`, `describe`, `paren
 INSERT INTO `shop`.`ybt_menu`(`id`, `name`, `url`, `display`, `describe`, `parent_id`, `level`, `create_time`, `update_time`) VALUES (10086, '推送消息', 'admin/Content/tips', 1, '', 10084, 3, 1556522880, 1556522880);
 -- INSERT INTO `shop`.`ybt_menu`(`id`, `name`, `url`, `display`, `describe`, `parent_id`, `level`, `create_time`, `update_time`) VALUES (10087, '新闻列表', 'admin/Content/news', 1, '', 10084, 3, 1556539472, 1556539472);
 -- INSERT INTO `shop`.`ybt_menu`(`id`, `name`, `url`, `display`, `describe`, `parent_id`, `level`, `create_time`, `update_time`) VALUES (10088, '新闻分类', 'admin/Content/newsCate', 1, '', 10084, 3, 1556539932, 1556539932);
+INSERT INTO `shop`.`ybt_menu`(`id`, `name`, `url`, `display`, `describe`, `parent_id`, `level`, `create_time`, `update_time`) VALUES (10090, '首页广告', 'admin/Content/adv', 1, '', 10084, 3, 1556627501, 1556627501);
 
 
 
@@ -127,3 +128,16 @@ ADD COLUMN `store_name` varchar(255) NULL COMMENT '店铺名称' AFTER `user_nam
 --   `update_time` int(11) NOT NULL,
 --   PRIMARY KEY (`id`)
 -- ) ENGINE=MyISAM DEFAULT CHARSET=utf8 COMMENT='新闻分类库';
+-- 添加首页广告位
+CREATE TABLE `ybt_adv` (
+  `id` int(11) NOT NULL AUTO_INCREMENT,
+  `title` varchar(255) NOT NULL,
+  `image` varchar(255) NOT NULL,
+  `content` text NOT NULL,
+  `is_show` tinyint(1) NOT NULL DEFAULT '1',
+  PRIMARY KEY (`id`)
+) ENGINE=InnoDB AUTO_INCREMENT=2 DEFAULT CHARSET=utf8 COMMENT='广告';
+CREATE TABLE `ybt_base_info` (
+  `config` text
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+INSERT INTO `shop`.`ybt_menu`(`id`, `name`, `url`, `display`, `describe`, `parent_id`, `level`, `create_time`, `update_time`) VALUES (10091, '基础设置', 'admin/Site/baseInfo', 1, '', 10013, 3, 1556632287, 1556632287);

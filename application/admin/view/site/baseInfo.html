@@ -1,0 +1,88 @@
+{include file='pub/header'/}
+<link href="__STATIC__/lib/webuploader/0.1.5/webuploader.css" rel="stylesheet" type="text/css" />
+</head>
+<body>
+<div class="page-container">
+    <form class="form form-horizontal" id="report" method="post" enctype="multipart/form-data">
+        <div class="row cl">
+            <label class="form-label col-xs-4 col-sm-2">app版本号：</label>
+            <div class="formControls col-xs-8 col-sm-9">
+                <input type="text" class="input-text" name="app_version" value="{$item.app_version|default=''}"/>
+            </div>
+        </div>
+        <div class="row cl">
+            <label class="form-label col-xs-4 col-sm-2">apk地址：</label>
+            <div class="formControls col-xs-8 col-sm-9">
+                <input type="text" class="input-text" name="apk_url" id="apk_url" readonly value="{$item.apk_url|default=''}">
+                <label for="apk" class="btn btn-primary radius">
+                    <input type="file" id="apk" name="apk" style="display: none;">
+                    选择文件
+                </label>
+            </div>
+        </div>
+        <div class="row cl">
+            <label class="form-label col-xs-4 col-sm-2">订单未支付超时发送短信：</label>
+            <div class="formControls col-xs-8 col-sm-9">
+                <input type="number" step="1" min="1" class="input-text" name="chaoshi_order" value="{$item.chaoshi_order|default=1}"/>分钟
+            </div>
+        </div>
+
+        <!--<div class="row cl">-->
+            <!--<label class="form-label col-xs-4 col-sm-2">内容：</label>-->
+            <!--<div class="formControls col-xs-8 col-sm-9">-->
+                <!--<script id="editor" name="content" type="text/plain" style="width:100%;height:400px;"></script>-->
+            <!--</div>-->
+        <!--</div>-->
+        <div class="row cl">
+            <div class="col-xs-8 col-sm-9 col-xs-offset-4 col-sm-offset-2">
+                <button class="btn btn-secondary radius" type="submit"><i class="Hui-iconfont">&#xe632;</i> 保存信息
+                </button>
+            </div>
+        </div>
+    </form>
+</div>
+{include file="pub/footer"/}
+
+<script type="text/javascript">
+    $(function () {
+        // UE.getEditor('editor');
+        $("#report").validate({
+            onkeyup: false,
+            focusCleanup: true,
+            success: "valid",
+            submitHandler: function (form) {
+                $(form).ajaxSubmit({
+                    type: 'post',
+                    url: '{:url("Site/baseInfo")}',
+                    success: function (res) {
+                        if (1 == res.code) {
+                            layer.msg(res.msg, {icon: 6, time: 1000});
+                            setTimeout(function () {
+                                location.reload();
+                            }, 888);
+                        } else {
+                            layer.msg(res.msg, {icon: 5, time: 1000});
+                        }
+                    }
+                });
+            }
+        });
+        $("#apk").change(function () {
+            layer.load('上传中。。。');
+            $("form").ajaxSubmit({
+                type:"post",
+                url:"{:url('uploadApk')}",
+                success:function (res) {
+                    layer.closeAll();
+                    if(res.code == 1){
+                        $("#apk_url").val(res.data.url)
+                    }
+                    layer.msg(res.msg);
+                }
+
+            })
+        });
+    });
+</script>
+</body>
+</html>

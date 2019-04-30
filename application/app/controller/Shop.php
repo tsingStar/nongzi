@@ -403,5 +403,24 @@ class Shop extends Controller
 
     }
 
+    /**
+     * 获取首页广告图
+     */
+    public function getIndexLogo()
+    {
+        $list = db("adv")->where("is_show", 1)->select();
+        exit_json(1, "请求成功", $list);
+    }
+
+    /**
+     * 获取首页广告详情
+     */
+    public function getIndexLogoDetail()
+    {
+        $id = input("id");
+        $item = db("adv")->where("id", $id)->find();
+        exit_json(1, "请求成功", $item);
+    }
+
 
 }

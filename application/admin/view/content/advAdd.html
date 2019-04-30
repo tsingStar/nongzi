@@ -1,0 +1,119 @@
+{include file='pub/header'/}
+<title>新增分类</title>
+</head>
+<body>
+<div class="page-container">
+    <form class="form form-horizontal" id="form-category-add">
+        <input type="hidden" value="{$item.id|default=0}" name="id">
+        <input type="hidden" value="{$item.image|default=''}" name="image">
+        <div class="row cl">
+            <label class="form-label col-xs-4 col-sm-2">标题：</label>
+            <div class="formControls col-xs-8 col-sm-9">
+                <input autocomplete="off" type="text" value="{$item.title|default=''}" name="title" class="input-text">
+            </div>
+        </div>
+        <div class="row cl">
+            <label class="form-label col-xs-4 col-sm-2">启动图：</label>
+            <div class="formControls col-xs-8 col-sm-9">
+                <div class="uploader-thum-container">
+                    <div id="fileList" class="uploader-list">
+                        {if $item.image neq ''}
+                        <img src="{$item.image}" alt="" style="width: 120px; height: auto;">
+                        {/if}
+                    </div>
+                    <div id="filePicker">选择图片</div>
+                </div>
+            </div>
+        </div>
+        <div class="row cl">
+            <label class="form-label col-xs-4 col-sm-2">详情：</label>
+            <div class="formControls col-xs-8 col-sm-9">
+                <script id="editor" name="content" type="text/plain" style="width:100%;height:400px;">{$item.content|default=''}</script>
+            </div>
+        </div>
+        <div class="row cl">
+            <div class="col-xs-8 col-sm-9 col-xs-offset-4 col-sm-offset-2">
+                <button class="btn btn-secondary radius" type="submit"><i class="Hui-iconfont">&#xe632;</i> 保存
+                </button>
+                <button onClick="layer_close();" class="btn btn-default radius" type="button">
+                    &nbsp;&nbsp;取消&nbsp;&nbsp;
+                </button>
+            </div>
+        </div>
+    </form>
+</div>
+
+
+{include file="pub/footer"/}
+
+<script type="text/javascript" src="__STATIC__/lib/ueditor/1.4.3/ueditor.config.js"></script>
+<script type="text/javascript" src="__STATIC__/lib/ueditor/1.4.3/ueditor.all.min.js"> </script>
+<script type="text/javascript" src="__STATIC__/lib/ueditor/1.4.3/lang/zh-cn/zh-cn.js"></script>
+<script type="text/javascript">
+            var ue = UE.getEditor('editor',{toolbars: [
+                    [
+                        'anchor', //锚点
+                        'undo', //撤销
+                        'redo', //重做
+                        'bold', //加粗
+                        'indent', //首行缩进
+                        'italic', //斜体
+                        'underline', //下划线
+                        'strikethrough', //删除线
+                        'subscript', //下标
+                        'superscript', //上标
+                        'formatmatch', //格式刷
+                        'horizontal', //分隔线
+                        'removeformat', //清除格式
+                        'time', //时间
+                        'date', //日期
+                        'fontfamily', //字体
+                        'fontsize', //字号
+                        'paragraph', //段落格式
+                        'simpleupload', //单图上传
+                        'justifyleft', //居左对齐
+                        'justifyright', //居右对齐
+                        'justifycenter', //居中对齐
+                        'justifyjustify', //两端对齐
+                        'forecolor', //字体颜色
+                        'imagecenter', //居中
+                        'lineheight', //行间距
+                        'customstyle', //自定义标题
+                        'autotypeset', //自动排版
+                        'touppercase', //字母大写
+                        'tolowercase', //字母小写
+                        'background', //背景
+                    ]
+                ],
+                autoHeightEnabled: true,
+                autoFloatEnabled: false
+            });
+    $(function () {
+        uploadImage($("#fileList"), null, $("#form-category-add"), "image");
+        $("#form-category-add").validate({
+            onkeyup: false,
+            focusCleanup: true,
+            success: "valid",
+            submitHandler: function (form) {
+                $(form).ajaxSubmit({
+                    type: 'post',
+                    url: '{:url("Content/advAdd")}',
+                    success: function (res) {
+                        if (1 == res.code) {
+                            var index = parent.layer.getFrameIndex(window.name);
+                            layer.msg(res.msg, {icon: 6, time: 1000});
+                            setTimeout(function () {
+                                parent.location.reload();
+                                parent.layer.close(index);
+                            }, 1000);
+                        } else {
+                            layer.msg(res.msg, {icon: 5, time: 1000});
+                        }
+                    }
+                });
+            }
+        });
+    });
+</script>
+</body>
+</html>

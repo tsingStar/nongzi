@@ -207,6 +207,50 @@ class Site extends BaseController
 
     }
 
+    /**
+     * 基础设置
+     */
+    public function baseInfo()
+    {
+        if(request()->isAjax()){
+            $data = input("post.");
+            $info = serialize($data);
+            db("base_info")->where("1=1")->delete();
+            $res = db("base_info")->insert(['config'=>$info]);
+            if($res){
+                exit_json();
+            }else{
+                exit_json(-1, "保存失败");
+            }
+
+        }else{
+            $item = db("base_info")->find();
+            $info = unserialize($item['config']);
+            $this->assign("item", $info);
+            return $this->fetch('baseInfo');
+        }
+
+    }
+
+    public function uploadApk()
+    {
+        set_time_limit(0);
+        $file = request()->file("apk");
+        $file_info = $file->getInfo();
+        if(pathinfo($file_info['name'], PATHINFO_EXTENSION) != "apk"){
+            exit_json(-1, "请上传apk文件");
+        }
+        $file_name = date("YmdHis");
+        $res = $file->move(ROOT_PATH, $file_name);
+        if($res){
+            exit_json(1, "上传成功", ['url'=>$file_name.".apk"]);
+        }else{
+            exit_json(-1, "上传失败");
+        }
+
+
+    }
+
 
 
 }

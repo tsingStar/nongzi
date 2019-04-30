@@ -132,6 +132,12 @@
                             <i class="Hui-iconfont">&#xe623;</i>发货
                         </a>
                         {/if}
+                        {if $item.order_status eq 2 and $item.is_send eq 1}
+                        <a style="text-decoration:none" class="ml-5" onClick="send_sure('{$item.order_no}')"
+                           href="javascript:;" title="提醒收货">
+                            <i class="Hui-iconfont">&#xe623;</i>提醒收货
+                        </a>
+                        {/if}
                         {if $item.order_status eq 0}
                         <a style="text-decoration:none" class="ml-5" onClick="send_fee_change('{$item.id}')"
                            href="javascript:;" title="运费调整">
@@ -178,6 +184,18 @@
     function order_pay(order_no) {
         layer.confirm("确定当前订单已经线下支付?", function () {
             layer_show("添加支付信息", "{:url('addPayInfo')}?order_no="+order_no);
+        });
+    }
+    function send_sure(order_no) {
+
+        layer.confirm("确定发送收货提醒?", function () {
+            $.post("{:url('send_sure_msg')}", {order_no:order_no}, function (res) {
+                if(res.code == 1){
+                    layer.msg("发送成功");
+                }else{
+                    layer.msg(res.msg);
+                }
+            });
         });
     }
 

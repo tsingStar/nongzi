@@ -71,6 +71,16 @@ class Content extends BaseController
         model("LoginLogo")->where("id", $id)->setField('is_show', $is_show);
         exit_json();
     }
+    /**
+     * 更改展示
+     */
+    public function changeIndexStatus()
+    {
+        $id = input("id");
+        $is_show = input("is_show");
+        db("adv")->where("id", $id)->update(['is_show'=>$is_show]);
+        exit_json();
+    }
 
     /**
      * 推送消息
@@ -109,7 +119,58 @@ class Content extends BaseController
             return $this->fetch();
         }
     }
+    /**
+     * 推送消息
+     */
+    public function adv()
+    {
 
+        $list = db("adv")->order("id desc")->paginate(15);
+        $this->assign("list", $list);
+        return $this->fetch("adv");
+    }
+
+    /**
+     * 添加logo图
+     */
+    public function advAdd()
+    {
+        $id = input("id");
+        $logo = db("adv")->where("id", $id)->find();
+        if(request()->isAjax()){
+            if(!$logo){
+                $res = db("adv")->insert([
+                    'title'=>input('title'),
+                    'image'=>input('image'),
+                    'content'=>input('content')
+                ]);
+            }else{
+                $res = db('adv')->where("id", $id)->update([
+                    'title'=>input('title'),
+                    'image'=>input('image'),
+                    'content'=>input('content')
+                ]);
+            }
+            if($res){
+                exit_json();
+            }else{
+                exit_json(-1, '操作失败');
+            }
+        }else{
+            $this->assign("item", $logo);
+            return $this->fetch();
+        }
+    }
+
+    public function delAdv()
+    {
+        $id = input("id");
+        if(db('adv')->where("id", $id)->delete()){
+            exit_json();
+        }else{
+            exit_json(-1, "删除失败");
+        }
+    }
     public function delTips()
     {
         $id = input("id");

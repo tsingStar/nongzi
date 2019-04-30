@@ -103,3 +103,39 @@
             }
         }
 20190429
+
+9.获取首页广告图
+    请求地址：/app/Shop/getIndexLogo
+    入参：
+    返回：
+        {
+            "code": 1,
+            "msg": "请求成功",
+            "data": [
+                {
+                    "id": 1,
+                    "title": "1234113",
+                    "image": "/upload/20190430/698b5d6c55afcc86a80d18bb8eb418fb.png",
+                    "content": "<p>12441412dsgsdfgsdfdfgfsdfgsdfddddddddddddddddddddddddd</p>",
+                    "is_show": 1
+                }
+            ]
+        }
+10.获取广告详情
+
+    请求地址：/app/Shop/getIndexLogo
+    入参：id:广告id
+    返回：
+        {
+            "code": 1,
+            "msg": "请求成功",
+            "data":
+                {
+                    "id": 1,
+                    "title": "1234113",
+                    "image": "/upload/20190430/698b5d6c55afcc86a80d18bb8eb418fb.png",
+                    "content": "<p>12441412dsgsdfgsdfdfgfsdfgsdfddddddddddddddddddddddddd</p>",
+                    "is_show": 1
+                }
+
+        }

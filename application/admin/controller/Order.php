@@ -10,6 +10,7 @@
 namespace app\admin\controller;
 
 
+use app\common\model\SendSms;
 use app\common\model\WeiXinPay;
 use think\Log;
 
@@ -27,10 +28,10 @@ class Order extends BaseController
     {
         $order_no = input("order_no");
         $order = model("Order")->where("order_no", $order_no)->find();
-        if(request()->isAjax()){
+        if (request()->isAjax()) {
             $num = model("Order")->where("user_id", $order["user_id"])->count();
-            $is_first = $num==1?1:0;
-            $order->save(['out_transaction_id' => input("pay_no"), 'pay_type' => 4, 'pay_status' => 1, 'pay_time' => date("Y-m-d H:i:s"), 'order_status'=>1, 'order_no_pre'=>input("pay_no"), "is_first"=>$is_first]);
+            $is_first = $num == 1 ? 1 : 0;
+            $order->save(['out_transaction_id' => input("pay_no"), 'pay_type' => 4, 'pay_status' => 1, 'pay_time' => date("Y-m-d H:i:s"), 'order_status' => 1, 'order_no_pre' => input("pay_no"), "is_first" => $is_first]);
             $order_det = model('OrderDet')->where('order_no', $order_no)->select();
             foreach ($order_det as $item) {
                 model('ProductAttr')->where('product_id', $item['product_id'])->where('prop_value_attr', $item['prop_value_attr'])->setDec('remain', $item['num']);
@@ -52,20 +53,20 @@ class Order extends BaseController
         $this->assign('is_admin', 1);
         $param = input("get.");
         $order = model('order')->alias("a")->join('user b', 'a.user_id=b.id', 'left')->join("Admins c", "b.vip_code=c.vip_code", 'left');
-        if((isset($param["searchKey"]) && $param["searchKey"] !="") && (isset($param["searchValue"]) && $param["searchValue"] != "")){
-            $order->where($param["searchKey"], 'like', "%".$param["searchValue"]."%");
+        if ((isset($param["searchKey"]) && $param["searchKey"] != "") && (isset($param["searchValue"]) && $param["searchValue"] != "")) {
+            $order->where($param["searchKey"], 'like', "%" . $param["searchValue"] . "%");
         }
-        if(isset($param["order_status"]) && $param["order_status"] !== ""){
+        if (isset($param["order_status"]) && $param["order_status"] !== "") {
             $order->where("a.order_status", $param["order_status"]);
         }
-        if(isset($param["start_time"]) && $param["start_time"] !=""){
+        if (isset($param["start_time"]) && $param["start_time"] != "") {
             $order->where("a.create_time", "egt", strtotime($param["start_time"]));
         }
-        if(isset($param["end_time"]) && $param["end_time"] != ""){
-            $order->where("a.create_time", "elt", strtotime($param["end_time"])+86400);
+        if (isset($param["end_time"]) && $param["end_time"] != "") {
+            $order->where("a.create_time", "elt", strtotime($param["end_time"]) + 86400);
         }
-        if(isset($param["agent_name"]) && $param["agent_name"] != ""){
-            $order->where("c.name", "like", "%".$param["agent_name"]."%");
+        if (isset($param["agent_name"]) && $param["agent_name"] != "") {
+            $order->where("c.name", "like", "%" . $param["agent_name"] . "%");
         }
 
 //        if (request()->isPost()) {
@@ -91,7 +92,7 @@ class Order extends BaseController
 //                ];
 //            }
         $order->where("is_trash", 0);
-        $order_list = $order->field('a.*, b.user_name, b.telephone, c.name agent_name')->order("a.create_time desc")->paginate(20,false, ["query"=>$param]);
+        $order_list = $order->field('a.*, b.user_name, b.telephone, c.name agent_name')->order("a.create_time desc")->paginate(20, false, ["query" => $param]);
         $this->assign('list', $order_list);
         $this->assign("param", $param);
         return $this->fetch('orderList');
@@ -129,21 +130,21 @@ class Order extends BaseController
 
         $param = input("get.");
         $order = model('order')->alias("a")->join('user b', 'a.user_id=b.id')->where("a.user_id", "in", $user_ids)->join("Admins c", "c.vip_code=b.vip_code");
-        if((isset($param["searchKey"]) && $param["searchKey"] !="") && (isset($param["searchValue"]) && $param["searchValue"] != "")){
+        if ((isset($param["searchKey"]) && $param["searchKey"] != "") && (isset($param["searchValue"]) && $param["searchValue"] != "")) {
             $order->where($param["searchKey"], $param["searchValue"]);
         }
-        if(isset($param["order_status"]) && $param["order_status"] !== ""){
+        if (isset($param["order_status"]) && $param["order_status"] !== "") {
             $order->where("a.order_status", $param["order_status"]);
         }
-        if(isset($param["start_time"]) && $param["start_time"] !=""){
+        if (isset($param["start_time"]) && $param["start_time"] != "") {
             $order->where("a.create_time", "egt", strtotime($param["start_time"]));
         }
-        if(isset($param["end_time"]) && $param["end_time"] != ""){
-            $order->where("a.create_time", "elt", strtotime($param["end_time"])+86400);
+        if (isset($param["end_time"]) && $param["end_time"] != "") {
+            $order->where("a.create_time", "elt", strtotime($param["end_time"]) + 86400);
         }
         $order->where("is_trash", 0);
 
-        $orderList = $order->field('a.*, b.user_name, b.telephone, c.name agent_name')->order("a.create_time desc")->paginate(20, false, ["query"=>$param]);
+        $orderList = $order->field('a.*, b.user_name, b.telephone, c.name agent_name')->order("a.create_time desc")->paginate(20, false, ["query" => $param]);
         $this->assign('list', $orderList);
         $this->assign('is_show', 1);
         $this->assign("param", $param);
@@ -158,13 +159,13 @@ class Order extends BaseController
         $order_no = input("order_no");
         $status = input("status");
         $order = model("Order")->where("order_no", $order_no)->find();
-        if($order){
-            if($order->save(["is_trash"=>$status])){
+        if ($order) {
+            if ($order->save(["is_trash" => $status])) {
                 exit_json();
-            }else{
+            } else {
                 exit_json(-1, "操作失败");
             }
-        }else{
+        } else {
             exit_json(-1, "订单不存在");
         }
     }
@@ -174,20 +175,20 @@ class Order extends BaseController
         $this->assign('is_admin', 1);
         $param = input("get.");
         $order = model('order')->alias("a")->join('user b', 'a.user_id=b.id')->join("Admins c", "b.vip_code=c.vip_code");
-        if((isset($param["searchKey"]) && $param["searchKey"] !="") && (isset($param["searchValue"]) && $param["searchValue"] != "")){
+        if ((isset($param["searchKey"]) && $param["searchKey"] != "") && (isset($param["searchValue"]) && $param["searchValue"] != "")) {
             $order->where($param["searchKey"], $param["searchValue"]);
         }
-        if(isset($param["order_status"]) && $param["order_status"] !== ""){
+        if (isset($param["order_status"]) && $param["order_status"] !== "") {
             $order->where("a.order_status", $param["order_status"]);
         }
-        if(isset($param["start_time"]) && $param["start_time"] !=""){
+        if (isset($param["start_time"]) && $param["start_time"] != "") {
             $order->where("a.create_time", "egt", strtotime($param["start_time"]));
         }
-        if(isset($param["end_time"]) && $param["end_time"] != ""){
-            $order->where("a.create_time", "elt", strtotime($param["end_time"])+86400);
+        if (isset($param["end_time"]) && $param["end_time"] != "") {
+            $order->where("a.create_time", "elt", strtotime($param["end_time"]) + 86400);
         }
         $order->where("is_trash", 1);
-        $order_list = $order->field('a.*, b.user_name, b.telephone, c.name agent_name')->order('a.create_time desc')->paginate(20, false, ["query"=>$param]);
+        $order_list = $order->field('a.*, b.user_name, b.telephone, c.name agent_name')->order('a.create_time desc')->paginate(20, false, ["query" => $param]);
         $this->assign('list', $order_list);
         $this->assign("param", $param);
         return $this->fetch('orderList');
@@ -215,12 +216,41 @@ class Order extends BaseController
             if ($order['order_status'] == 1) {
                 $res = $order->save(['order_status' => 2, 'send_time' => date('Y-m-d H:i'), 'is_send' => 1]);
                 if ($res) {
+                    $order_no = strlen($order_no)>20?(substr($order_no, 0, 8)."****".substr($order_no, -8)):$order_no;
+                    $content = urlencode($order_no);
+                    $send = new SendSms($order['receiver_telephone'], config('sms.sendId'), $content);
+                    $res = $send->sendVcode();
+                    if ($res) {
+                        model('SmsLog')->save(['telephone' => $order['receiver_telephone'], 'type' => 1002]);
+                    }
                     exit_json();
                 } else {
                     exit_json(-1, '操作失败');
                 }
             } else {
                 exit_json(-1, '订单状态异常');
+            }
+        } else {
+            exit_json(-1, '订单不存在');
+        }
+    }
+
+    public function send_sure_msg()
+    {
+        $order_no = input("order_no");
+        $order = model('Order')->where('order_no', $order_no)->find();
+        if ($order) {
+            $l = model("SmsLog")->where("code", $order['id'])->where("type", 1003)->find();
+            if ($l) {
+                exit_json(-1, "已提醒过");
+            }
+            $order_no = strlen($order_no)>20?(substr($order_no, 0, 8)."****".substr($order_no, -8)):$order_no;
+            $content = urlencode($order_no);
+            $send = new SendSms($order['receiver_telephone'], config('sms.sureId'), $content);
+            $res = $send->sendVcode();
+            if ($res) {
+                model('SmsLog')->save(['telephone' => $order['receiver_telephone'], 'type' => 1003, 'code' => $order['id']]);
+                exit_json();
             }
         } else {
             exit_json(-1, '订单不存在');
@@ -261,7 +291,7 @@ class Order extends BaseController
                 $order_det = input("order_det/a");
                 $discount_fee = 0;
                 $send_fee = 0;
-                foreach ($order_det['det_id'] as $key=>$val){
+                foreach ($order_det['det_id'] as $key => $val) {
                     //重置运费和优惠
                     $odt = model("OrderDet")->find($val);
                     $odt->send_fee = $order_det["send_fee"][$key];
@@ -272,8 +302,8 @@ class Order extends BaseController
                 }
                 $res = $order->save([
                     'send_fee' => $send_fee,
-                    'discount_fee'=>$discount_fee,
-                    'order_money' => $order['total_money'] + $send_fee-$discount_fee
+                    'discount_fee' => $discount_fee,
+                    'order_money' => $order['total_money'] + $send_fee - $discount_fee
                 ]);
                 if ($res) {
                     exit_json();
@@ -281,7 +311,7 @@ class Order extends BaseController
                     exit_json(-1, '修改失败,刷新重试');
                 }
             } else {
-                $product_list = model("OrderDet")->where("order_no",$order["order_no"])->select();
+                $product_list = model("OrderDet")->where("order_no", $order["order_no"])->select();
                 $this->assign('order', $order);
                 $this->assign("product_list", $product_list);
                 return $this->fetch();
@@ -589,13 +619,13 @@ class Order extends BaseController
         $user_id = model('Order')->where("order_no", $order_no)->value("user_id");
         $vip_code = model("User")->where("id", $user_id)->value("vip_code");
         $agent = model("Admins")->where("vip_code", $vip_code)->find();
-        if(in_array(15, explode(',', $agent['role_id']))){
-            if($agent['agent_cate'] == 1){
+        if (in_array(15, explode(',', $agent['role_id']))) {
+            if ($agent['agent_cate'] == 1) {
                 $c_type = "agent_commission";
-            }else{
+            } else {
                 $c_type = "parttime_commission";
             }
-        }else{
+        } else {
             $c_type = 'salesman_commission';
         }
         $list = model("OrderDet")->where("order_no", $order_no)->select();
@@ -645,32 +675,32 @@ class Order extends BaseController
         set_time_limit(0);
         $req_data = json_decode($key, true);
         $param = [];
-        foreach ($req_data as $item){
+        foreach ($req_data as $item) {
             $param[$item["name"]] = $item["value"];
         }
 //        print_r($param);
         $order = model('order')->alias("a")->join('user b', 'a.user_id=b.id', 'left')->join("Admins c", "b.vip_code=c.vip_code", 'left');
-        if((isset($param["searchKey"]) && $param["searchKey"] !="") && (isset($param["searchValue"]) && $param["searchValue"] != "")){
-            $order->where($param["searchKey"], 'like', "%".$param["searchValue"]."%");
+        if ((isset($param["searchKey"]) && $param["searchKey"] != "") && (isset($param["searchValue"]) && $param["searchValue"] != "")) {
+            $order->where($param["searchKey"], 'like', "%" . $param["searchValue"] . "%");
         }
-        if(isset($param["order_status"]) && $param["order_status"] !== ""){
+        if (isset($param["order_status"]) && $param["order_status"] !== "") {
             $order->where("a.order_status", $param["order_status"]);
         }
-        if(isset($param["start_time"]) && $param["start_time"] !=""){
+        if (isset($param["start_time"]) && $param["start_time"] != "") {
             $order->where("a.create_time", "egt", strtotime($param["start_time"]));
         }
-        if(isset($param["end_time"]) && $param["end_time"] != ""){
-            $order->where("a.create_time", "elt", strtotime($param["end_time"])+86400);
+        if (isset($param["end_time"]) && $param["end_time"] != "") {
+            $order->where("a.create_time", "elt", strtotime($param["end_time"]) + 86400);
         }
-        if(isset($param["agent_name"]) && $param["agent_name"] != ""){
-            $order->where("c.name", "like", "%".$param["agent_name"]."%");
+        if (isset($param["agent_name"]) && $param["agent_name"] != "") {
+            $order->where("c.name", "like", "%" . $param["agent_name"] . "%");
         }
         $order->where("is_trash", 0);
 //        （1）订单编号 、支付订单号、下单时间、下单客户、归属客服、订单状态、支付方式、商品名称、商品价格、商品件数、运费（按照产品单独设置运费）、优惠金额（按照产品单独设置）商品总额（商品价格*商品件数）、商品优惠后金额（商品总额+运费-优惠金额）、支付总金的（整个订单的金额）、发货时间、收货时间
 
         $order_list = $order->field('a.id, a.order_no, a.order_no_pre, a.create_time, b.user_name, c.name agent_name, a.order_status, a.order_money, a.pay_type, a.send_time, a.sure_time')->order("a.create_time desc")->select();
 //        $data = [];
-        foreach ($order_list as $item){
+        foreach ($order_list as $item) {
             $product_list = model("OrderDet")->where("order_no", $item['order_no'])->select();
             $item["product_list"] = $product_list;
         }
@@ -678,7 +708,6 @@ class Order extends BaseController
         $this->assign("filename", "订单列表.xls");
         return $this->fetch();
     }
-
 
 
     /**
@@ -749,26 +778,26 @@ class Order extends BaseController
     {
         $order_no = input("order_no");
         $order = model("Order")->where("order_no", $order_no)->find();
-        if(!$order){
+        if (!$order) {
             exit("订单不存在");
-        }else{
+        } else {
             $det_list = model("OrderDet")->where("order_no", $order_no)->select();
             $user = model("User")->where("id", $order["user_id"])->find();
             $agent = model("Admins")->where("vip_code", $user['vip_code'])->find();
             $this->assign("agent", $agent);
-            if(in_array(15, explode(',', $agent['role_id']))){
+            if (in_array(15, explode(',', $agent['role_id']))) {
                 $is_agent = 1;
-            }else{
+            } else {
                 $is_agent = 0;
             }
             $this->assign("is_agent", 0);
-            foreach ($det_list as &$value){
-                if($is_agent){
+            foreach ($det_list as &$value) {
+                if ($is_agent) {
                     $value['commission'] = $value['salesman_commission'];
-                }else{
-                    if($agent['agent_cate'] == 1){
+                } else {
+                    if ($agent['agent_cate'] == 1) {
                         $value['commission'] = $value['agent_commission'];
-                    }else{
+                    } else {
                         $value['commission'] = $value['parttime_commission'];
                     }
                 }

@@ -32,6 +32,8 @@
         <tr class="text-c">
             <th>代理商姓名</th>
             <th>店名</th>
+            <th>会员ID</th>
+            <th>注册来源</th>
             <th>会员昵称</th>
             <th>手机号</th>
             <th>会员名</th>
@@ -47,6 +49,19 @@
         <tr class="text-c">
             <td>{$v.admin_name}</td>
             <td>{$v.store_name}</td>
+            <td>{$v.user_id}</td>
+            <td>
+                {if $v.register_src eq 1}
+                    安卓
+                {elseif $v.register_src eq 2}
+                    苹果
+                {elseif $v.register_src eq 3}
+                    小程序
+                {else}
+                    未知
+                {/if}
+
+            </td>
             <td>{$v.nick_name}</td>
             <td>{$v.user_telephone}</td>
             <td>{$v.user_name}</td>

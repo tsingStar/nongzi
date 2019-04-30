@@ -47,7 +47,7 @@
         $.post("{:url('sureSend')}", {order_no:$order_no}, function (res) {
             if(res.code == 1){
                 layer.msg('操作成功');
-                layer_close();
+                parent.location.reload();
             }else{
                 layer.msg(res.msg);
             }
