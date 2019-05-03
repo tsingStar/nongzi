@@ -200,7 +200,8 @@ class Order extends BaseUser
                     model('OrderDet')->commit();
                     cache(USER_ID . 'order', null);
                     exit_json(1, '订单生成成功', [
-                        'order_no' => $order_no
+                        'order_no' => $order_no,
+                        "order_money"=>$order_data['order_money']
                     ]);
                 } else {
                     model('Order')->rollback();

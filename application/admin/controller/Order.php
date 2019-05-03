@@ -218,7 +218,8 @@ class Order extends BaseController
                 if ($res) {
                     $order_no = strlen($order_no)>20?(substr($order_no, 0, 8)."****".substr($order_no, -8)):$order_no;
                     $content = urlencode($order_no);
-                    $send = new SendSms($order['receiver_telephone'], config('sms.sendId'), $content);
+                    $telephone = model("User")->where("id", $order['user_id'])->value("telephone");
+                    $send = new SendSms($telephone, config('sms.sendId'), $content);
                     $res = $send->sendVcode();
                     if ($res) {
                         model('SmsLog')->save(['telephone' => $order['receiver_telephone'], 'type' => 1002]);
@@ -246,7 +247,8 @@ class Order extends BaseController
             }
             $order_no = strlen($order_no)>20?(substr($order_no, 0, 8)."****".substr($order_no, -8)):$order_no;
             $content = urlencode($order_no);
-            $send = new SendSms($order['receiver_telephone'], config('sms.sureId'), $content);
+            $telephone = model("User")->where("id", $order['user_id'])->value("telephone");
+            $send = new SendSms($telephone, config('sms.sureId'), $content);
             $res = $send->sendVcode();
             if ($res) {
                 model('SmsLog')->save(['telephone' => $order['receiver_telephone'], 'type' => 1003, 'code' => $order['id']]);

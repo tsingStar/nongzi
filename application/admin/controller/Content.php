@@ -9,6 +9,8 @@
 namespace app\admin\controller;
 
 
+use think\Log;
+
 class Content extends BaseController
 {
     protected function _initialize()
@@ -212,11 +214,12 @@ class Content extends BaseController
                 'update_time'=>time(),
                 'is_read'=>0
             ];
-            if(!$u['register_id']){
+            if($u['register_id']){
                 $push_data[] = $u['register_id'];
             }
         }
         //准备推送
+        Log::error($push_data);
         pushMess($tip['msg'], ['tips_id'=>$id], ['registration_id'=>$push_data], $tip['title']);
         $res = db("user_tips")->insertAll($insert_data);
         if($res){

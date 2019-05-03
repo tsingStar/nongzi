@@ -199,6 +199,7 @@ function pushMess($content = "显示内容", $extras = array(), $receive = "all"
     $result = $pushObj->push($receive, $title, $content, $extras, $m_time, $is_notify);
     if ($result) {
         $res_arr = json_decode($result, true);
+        \think\Log::error($res_arr);
         if (isset($res_arr['error'])) {   //如果返回了error则证明失败
             //错误信息 错误码
             return $res_arr['error']['message'] . '：' . $res_arr['error']['code'];

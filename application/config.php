@@ -264,8 +264,8 @@ return [
     'default_img' => __URL__ . '/default_img.jpg',
     'rongyunKey' => '',
     'rongyunSecret' => '',
-    'jiguangKey' => '8c3a1cdb9af5d81dcebfd2a0',
-    'jiguangSecret' => 'ca4167f88ac7e556053c12e1',
+    'jiguangKey' => 'd8123769c372d190702464e9',
+    'jiguangSecret' => 'fb508fb0679cf5d5a89e83b5',
     'geo_web_key' => '',
     'geo_ios_key' => '',
     //支付宝配置参数

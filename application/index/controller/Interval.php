@@ -28,7 +28,7 @@ class Interval extends Controller
     {
         $c = db("base_info")->find();
         $time = unserialize($c['config'])['chaoshi_order'];
-        $list = model("Order")->where("is_trash", 0)->where("create_time", "gt", time() - $time*60)->where("create_time", "lt", time()+60-$time*60)->where("pay_status", 0)->select();
+        $list = model("Order")->alias("a")->join("User b", "a.user_id=b.id")->where("a.is_trash", 0)->where("a.create_time", "gt", time() - $time*60)->where("a.create_time", "lt", time()+60-$time*60)->where("a.pay_status", 0)->field("a.*, b.telephone")->select();
         foreach ($list as $item){
             $telephone = $item['receiver_telephone'];
             $order_no = strlen($item['order_no'])>20?(substr($item['order_no'], 0, 8)."****".substr($item['order_no'], -8)):$item['order_no'];
