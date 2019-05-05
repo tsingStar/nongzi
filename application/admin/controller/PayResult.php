@@ -149,11 +149,11 @@ class PayResult extends Controller
             echo 'SUCCESS';
             exit;
         }else{
-            if ($_POST['result_code'] != 'SUCCESS') {
-                Log::error("支付状态失败");
-                echo 'SUCCESS';
-                exit;
-            }
+//            if ($_POST['result_code'] != 'SUCCESS') {
+//                Log::error("支付状态失败");
+//                echo 'SUCCESS';
+//                exit;
+//            }
             $order_info = $this->formatRes($result, 1);
             $order_pre = $order_info['out_trade_no'];
             $transaction_id = $order_info['transaction_id'];
