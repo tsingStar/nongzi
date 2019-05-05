@@ -110,7 +110,7 @@ class AliPay
     /**
      * @param array $order 退款基本信息
      * @throws \Exception
-     * @return bool
+     * @return array
      */
     function refund($order)
     {
@@ -130,10 +130,18 @@ class AliPay
         Log::error($responseNode);
         if (!empty($resultCode) && $resultCode == 10000) {
 //            echo "成功";
-            return true;
+//            return true;
+            return [
+                "code"=>1,
+                "msg"=>'退款成功'
+            ];
         } else {
 //            echo "失败";
-            return false;
+//            return false;
+            return [
+                "code"=>0,
+                "msg"=>'退款失败'
+            ];
         }
     }
 

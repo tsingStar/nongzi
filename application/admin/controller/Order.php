@@ -10,6 +10,7 @@
 namespace app\admin\controller;
 
 
+use app\common\model\AliPay;
 use app\common\model\SendSms;
 use app\common\model\WeiXinPay;
 use think\Log;
@@ -468,8 +469,17 @@ class Order extends BaseController
                     'shop_id' => session(config('adminKey')),
                     'pay_status' => $order['pay_type']
                 ];
-                $weixin = new WeiXinPay();
-                $res = $weixin->refund($orderInfo);
+                if($order['pay_type'] == 4){
+                    exit_json(-1, "线下支付订单不支持线上退款");
+                }
+                if($order["pay_type"] == 2){
+                    $ali = new AliPay();
+                    $orderInfo["refund_reason"] = "订单退款";
+                    $res = $ali->refund($orderInfo);
+                }else{
+                    $weixin = new WeiXinPay();
+                    $res = $weixin->refund($orderInfo);
+                }
                 if ($res['code']) {
                     $order->save(['refund_money' => $refund_money, "is_apply_refund" => 2]);
                     $refund->save(['status' => 2, 'image' => $image, 'pay_time' => $pay_time]);
