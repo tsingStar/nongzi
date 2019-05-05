@@ -155,14 +155,14 @@ class PayResult extends Controller
 //                exit;
 //            }
             $order_info = $this->formatRes($result, 1);
-            $order_pre = $order_info['out_trade_no'];
-            $transaction_id = $order_info['transaction_id'];
+            $order_pre = $order_info['order_no'];
+            $transaction_id = $order_info['out_transaction_id'];
             $pre_order = model("OrderPre")->where("order_no_pre", $order_pre)->find();
             if ($pre_order) {
                 $pre_order->save(["status"=>1]);
                 $order = model('Order')->where('order_no', $pre_order["order_no"])->find();
                 $order_no = $pre_order['order_no'];
-                if (((float)$order['order_money']) == $result['total_fee']/100) {
+                if (((float)$order['order_money']) == $order_info['order_money']) {
                     $pay_type = 2;
                     $num = model("Order")->where("user_id", $order["user_id"])->count();
                     $is_first = $num==1?1:0;

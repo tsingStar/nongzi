@@ -21,6 +21,7 @@ class Statistic extends BaseController
      */
     public function baseCount()
     {
+        set_time_limit(0);
         $start_time = input("mintime");
         $end_time = input("maxtime");
 
@@ -104,6 +105,7 @@ class Statistic extends BaseController
 
     public function userLoginDown()
     {
+        set_time_limit(0);
         $start_time = input("start_time");
         $end_time = input("end_time");
         $telephone = input("telephone");
@@ -119,11 +121,28 @@ class Statistic extends BaseController
         }
         $server = ["1" => "安卓", "2" => "苹果", "3" => "小程序", "" => "未知"];
         $list = $model->join("User b", "a.user_id=b.id", "left")->field("a.*, b.user_name, b.telephone")->order("a.create_time desc")->select();
-        $table = '<tr><td>用户ID</td><td>用户名</td><td>手机号</td><td>登录设备</td><td>登录时间</td></tr>';
+//        $table = '<tr><td>用户ID</td><td>用户名</td><td>手机号</td><td>登录设备</td><td>登录时间</td></tr>';
+        $header = [
+            "用户ID",
+            "用户名",
+            "手机号",
+            "登录设备",
+            "登陆时间"
+        ];
+        $data = [];
         foreach ($list as $item) {
             $type = $server[$item['type']];
-            $table .= '<tr><td>' . $item["user_id"] . '</td><td>' . $item["user_name"] . '</td><td>' . $item["telephone"] . '</td><td>' . $type . '</td><td>' . $item["create_time"] . '</td></tr>';
+            $data[] = [
+                $item["user_id"],
+                $item["user_name"],
+                $item["telephone"],
+                $type,
+                $item["create_time"]
+            ];
+//            $table .= '<tr><td>' . $item["user_id"] . '</td><td>' . $item["user_name"] . '</td><td>' . $item["telephone"] . '</td><td>' . $type . '</td><td>' . $item["create_time"] . '</td></tr>';
         }
+        echo \Excel::export($header, $data, "登录统计");
+        exit;
         $this->assign("table", $table);
         $this->assign("filename", "登录统计.xlsx");
         $this->assign("title", "登录统计");
@@ -160,16 +179,35 @@ class Statistic extends BaseController
             $model->where("a.create_time", "lt", strtotime($param["end_time"]) + 86400);
         }
         $list = $model->join("ProductCate b", "a.cate_id=b.id")->join("User c", "a.user_id=c.id", "left")->field("a.*, b.name, c.user_name, c.telephone")->order("days desc")->select();
-        $table = '<tr>
-            <th>用户ID</th>
-            <th>日期</th>
-            <th>分类名称</th>
-            <th>用户名</th>
-            <th>手机号</th>
-            <th>点击次数</th></tr>';
+//        $table = '<tr>
+//            <th>用户ID</th>
+//            <th>日期</th>
+//            <th>分类名称</th>
+//            <th>用户名</th>
+//            <th>手机号</th>
+//            <th>点击次数</th></tr>';
+        $header = [
+            "用户ID",
+            "日期",
+            "分类名称",
+            "用户名",
+            "手机号",
+            "点击次数"
+        ];
+        $data = [];
         foreach ($list as $item) {
-            $table .= '<tr><td>' . $item["user_id"] . '</td><td>' . $item["days"] . '</td><td>' . $item["name"] . '</td><td>' . $item["user_name"] . '</td><td>' . $item["telephone"] . '</td><td>' . $item["nums"] . '</td></tr>';
+            $data[] = [
+                $item["user_id"],
+                $item["days"],
+                $item["name"],
+                $item["user_name"],
+                $item["telephone"],
+                $item["nums"]
+            ];
+//            $table .= '<tr><td>' . $item["user_id"] . '</td><td>' . $item["days"] . '</td><td>' . $item["name"] . '</td><td>' . $item["user_name"] . '</td><td>' . $item["telephone"] . '</td><td>' . $item["nums"] . '</td></tr>';
         }
+        echo \Excel::export($header, $data, "分类统计");
+        exit;
         $this->assign("table", $table);
         $this->assign("filename", "分类统计.xlsx");
         $this->assign("title", "分类统计");
@@ -835,10 +873,10 @@ class Statistic extends BaseController
             exit;
         }
         $server = ["1" => "安卓", "2" => "苹果", "3" => "小程序", "" => "未知"];
-        $this->assign("server", ["1" => "安卓", "2" => "苹果", "3" => "小程序", "" => "未知"]);
-        $this->assign("user", $user);
+//        $this->assign("server", ["1" => "安卓", "2" => "苹果", "3" => "小程序", "" => "未知"]);
+//        $this->assign("user", $user);
         $admin = model("Admins")->where("vip_code", $user["vip_code"])->find();
-        $this->assign("admin", $admin);
+//        $this->assign("admin", $admin);
         switch ($type) {
             case 1:
                 $model = model("UserLoginLog");
@@ -850,21 +888,27 @@ class Statistic extends BaseController
                 }
                 $list = $model->where("user_id", $user["id"])->order("create_time desc")->select();
                 $title = "用户登录";
-                $table = '<tr>
-            <th>用户ID</th>
-            <th>用户名</th>
-            <th>手机号</th>
-            <th>登录设备</th>
-            <th>登录时间</th></tr>';
+//                $table = '<tr>
+//            <th>用户ID</th>
+//            <th>用户名</th>
+//            <th>手机号</th>
+//            <th>登录设备</th>
+//            <th>登录时间</th></tr>';
+                $data = [];
                 foreach ($list as $item) {
                     $type = $server[$item['type']];
-                    $table .= '<tr>
-            <td>' . $user["id"] . '</td>
-            <td>' . $user["user_name"] . '</td>
-            <td>' . $user["telephone"] . '</td>
-            <td>' . $type . '</td>
-            <td>' . $item["create_time"] . '</td>';
+//                    $table .= '<tr>
+//            <td>' . $user["id"] . '</td>
+//            <td>' . $user["user_name"] . '</td>
+//            <td>' . $user["telephone"] . '</td>
+//            <td>' . $type . '</td>
+//            <td>' . $item["create_time"] . '</td>';
+                    $data[] = [
+                        $user["id"],$user["user_name"],$user["telephone"],$type,$item["create_time"]
+                    ];
                 }
+                $header = ["用户ID", "用户名", "手机号", "登录设备", "登录时间"];
+
                 break;
             case 2:
                 $model = model("CateCollect");
@@ -876,21 +920,33 @@ class Statistic extends BaseController
                 }
                 $list = $model->alias("a")->join("ProductCate b", "a.cate_id=b.id")->where("a.user_id", $user["id"])->field("a.*, b.name")->order("days desc")->select();
                 $title = "分类访问统计";
-                $table = '<tr>
-            <th>用户ID</th>
-            <th>用户名</th>
-            <th>手机号</th>
-            <th>分类名称</th>
-            <th>日期</th>
-            <th>访问次数</th></tr>';
+//                $table = '<tr>
+//            <th>用户ID</th>
+//            <th>用户名</th>
+//            <th>手机号</th>
+//            <th>分类名称</th>
+//            <th>日期</th>
+//            <th>访问次数</th></tr>';
+                $header = [
+                    "用户ID","用户名","手机号","分类名称","日期","访问次数"
+                ];
+                $data = [];
                 foreach ($list as $item) {
-                    $table .= '<tr>
-            <td>' . $user["id"] . '</td>
-            <td>' . $user["user_name"] . '</td>
-            <td>' . $user["telephone"] . '</td>
-            <td>' . $item["name"] . '</td>
-            <td>' . $item["days"] . '</td>
-            <td>' . $item["nums"] . '</td>';
+//                    $table .= '<tr>
+//            <td>' . $user["id"] . '</td>
+//            <td>' . $user["user_name"] . '</td>
+//            <td>' . $user["telephone"] . '</td>
+//            <td>' . $item["name"] . '</td>
+//            <td>' . $item["days"] . '</td>
+//            <td>' . $item["nums"] . '</td>';
+                    $data[] = [
+                        $user["id"],
+                        $user["user_name"],
+                        $user["telephone"],
+                        $item["name"],
+                        $item["days"],
+                        $item["nums"]
+                    ];
                 }
                 break;
             case 4:
@@ -906,19 +962,34 @@ class Statistic extends BaseController
                 $list = $model->select();
 
                 $title = "产品搜索统计";
-                $table = '<tr>
-            <th>用户ID</th>
-            <th>用户名</th>
-            <th>手机号</th>
-            <th>日期</th>
-            <th>关键词</th></tr>';
+//                $table = '<tr>
+//            <th>用户ID</th>
+//            <th>用户名</th>
+//            <th>手机号</th>
+//            <th>日期</th>
+//            <th>关键词</th></tr>';
+                $header = [
+                    "用户ID",
+                    "用户名",
+                    "手机号",
+                    "日期",
+                    "关键词",
+                ];
+                $data = [];
                 foreach ($list as $item) {
-                    $table .= '<tr>
-            <td>' . $user["id"] . '</td>
-            <td>' . $user["user_name"] . '</td>
-            <td>' . $user["telephone"] . '</td>
-            <td>' . $item["create_time"] . '</td>
-            <td>' . $item["keys"] . '</td>';
+//                    $table .= '<tr>
+//            <td>' . $user["id"] . '</td>
+//            <td>' . $user["user_name"] . '</td>
+//            <td>' . $user["telephone"] . '</td>
+//            <td>' . $item["create_time"] . '</td>
+//            <td>' . $item["keys"] . '</td>';
+                    $data[] = [
+                        $user["id"],
+                        $user["user_name"],
+                        $user["telephone"],
+                        $item["create_time"],
+                        $item["keys"]
+                    ];
                 }
                 break;
             case 3:
@@ -933,23 +1004,42 @@ class Statistic extends BaseController
                 $model->order("create_time desc");
                 $list = $model->select();
                 $title = "产品详情统计";
-                $table = '<tr>
-            <th>用户ID</th>
-            <th>用户名</th>
-            <th>手机号</th>
-            <th>访问时间</th>
-            <th>销售客服</th>
-            <th>商品id</th>
-            <th>商品名称</th></tr>';
+//                $table = '<tr>
+//            <th>用户ID</th>
+//            <th>用户名</th>
+//            <th>手机号</th>
+//            <th>访问时间</th>
+//            <th>销售客服</th>
+//            <th>商品id</th>
+//            <th>商品名称</th></tr>';
+                $header = [
+                    "用户ID",
+                    "用户名",
+                    "手机号",
+                    "访问时间",
+                    "销售客服",
+                    "商品id",
+                    "商品名称",
+                ];
+                $data = [];
                 foreach ($list as $item) {
-                    $table .= '<tr>
-            <td>' . $user["id"] . '</td>
-            <td>' . $user["user_name"] . '</td>
-            <td>' . $user["telephone"] . '</td>
-            <td>' . $item["create_time"] . '</td>
-            <td>' . $admin["name"] . '</td>
-            <td>' . $item["product_id"] . '</td>
-            <td>' . $item["product_name"] . '</td>';
+//                    $table .= '<tr>
+//            <td>' . $user["id"] . '</td>
+//            <td>' . $user["user_name"] . '</td>
+//            <td>' . $user["telephone"] . '</td>
+//            <td>' . $item["create_time"] . '</td>
+//            <td>' . $admin["name"] . '</td>
+//            <td>' . $item["product_id"] . '</td>
+//            <td>' . $item["product_name"] . '</td>';
+                    $data[] = [
+                        $user["id"],
+                        $user["user_name"],
+                        $user["telephone"],
+                        $item["create_time"],
+                        $admin["name"],
+                        $item["product_id"],
+                        $item["product_name"]
+                    ];
                 }
                 break;
 
@@ -972,19 +1062,36 @@ class Statistic extends BaseController
             <th>访问时间</th>
             <th>类型</th>
             <th>供求id</th></tr>';
+                $header = [
+                    "用户ID",
+                    "用户名",
+                    "手机号",
+                    "访问时间",
+                    "类型",
+                    "供求id"
+                ];
+                $data = [];
                 foreach ($list as $item) {
                     if($item['type'] == 1){
                         $type = "求购";
                     }else{
                         $type = "供应";
                     }
-                    $table .= '<tr>
-            <td>' . $user["id"] . '</td>
-            <td>' . $user["user_name"] . '</td>
-            <td>' . $user["telephone"] . '</td>
-            <td>' . $item["create_time"] . '</td>
-            <td>' . $type . '</td>
-            <td>' . $item["supply_id"] . '</td>';
+//                    $table .= '<tr>
+//            <td>' . $user["id"] . '</td>
+//            <td>' . $user["user_name"] . '</td>
+//            <td>' . $user["telephone"] . '</td>
+//            <td>' . $item["create_time"] . '</td>
+//            <td>' . $type . '</td>
+//            <td>' . $item["supply_id"] . '</td>';
+                    $data[] = [
+                        $user["id"],
+                        $user["user_name"],
+                        $user["telephone"],
+                        $item["create_time"],
+                        $type,
+                        $item["supply_id"]
+                    ];
                 }
                 break;
             case 6:
@@ -999,17 +1106,30 @@ class Statistic extends BaseController
                 $model->order("create_time desc");
                 $list = $model->select();
                 $title = "客服统计";
-                $table = '<tr>
-            <th>用户ID</th>
-            <th>用户名</th>
-            <th>手机号</th>
-            <th>访问时间</th></tr>';
+//                $table = '<tr>
+//            <th>用户ID</th>
+//            <th>用户名</th>
+//            <th>手机号</th>
+//            <th>访问时间</th></tr>';
+                $header = [
+                    "用户ID",
+                    "用户名",
+                    "手机号",
+                    "访问时间"
+                ];
+                $data = [];
                 foreach ($list as $item) {
-                    $table .= '<tr>
-            <td>' . $user["id"] . '</td>
-            <td>' . $user["user_name"] . '</td>
-            <td>' . $user["telephone"] . '</td>
-            <td>' . $item["create_time"] . '</td>';
+//                    $table .= '<tr>
+//            <td>' . $user["id"] . '</td>
+//            <td>' . $user["user_name"] . '</td>
+//            <td>' . $user["telephone"] . '</td>
+//            <td>' . $item["create_time"] . '</td>';
+                    $data[] = [
+                        $user["id"],
+                        $user["user_name"],
+                        $user["telephone"],
+                        $item["create_time"]
+                    ];
                 }
                 break;
             case 7:
@@ -1025,19 +1145,34 @@ class Statistic extends BaseController
                 $list = $model->join("Product c", "a.product_id=c.id")->field('a.*, c.name')->select();
 
                 $title = "购物车统计";
-                $table = '<tr>
-            <th>用户ID</th>
-            <th>用户名</th>
-            <th>手机号</th>
-            <th>加入购物车时间</th>
-            <th>商品名称</th></tr>';
+//                $table = '<tr>
+//            <th>用户ID</th>
+//            <th>用户名</th>
+//            <th>手机号</th>
+//            <th>加入购物车时间</th>
+//            <th>商品名称</th></tr>';
+                $header = [
+                    "用户ID",
+                    "用户名",
+                    "手机号",
+                    "加入购物车时间",
+                    "商品名称",
+                ];
+                $data = [];
                 foreach ($list as $item) {
-                    $table .= '<tr>
-            <td>' . $user["id"] . '</td>
-            <td>' . $user["user_name"] . '</td>
-            <td>' . $user["telephone"] . '</td>
-            <td>' . $item["create_time"] . '</td>
-            <td>' . $item["name"] . '</td>';
+//                    $table .= '<tr>
+//            <td>' . $user["id"] . '</td>
+//            <td>' . $user["user_name"] . '</td>
+//            <td>' . $user["telephone"] . '</td>
+//            <td>' . $item["create_time"] . '</td>
+//            <td>' . $item["name"] . '</td>';
+                    $data[] = [
+                        $user["id"],
+                        $user["user_name"],
+                        $user["telephone"],
+                        $item["create_time"],
+                        $item["name"]
+                    ];
                 }
                 break;
             case 8:
@@ -1053,21 +1188,38 @@ class Statistic extends BaseController
                 $model->order("a.create_time desc");
                 $list = $model->select();
                 $title = "订单访问统计";
-                $table = '<tr>
-            <th>用户ID</th>
-            <th>用户名</th>
-            <th>手机号</th>
-            <th>访问时间</th>
-            <th>订单编号</th>
-            <th>访问次数</th></tr>';
+//                $table = '<tr>
+//            <th>用户ID</th>
+//            <th>用户名</th>
+//            <th>手机号</th>
+//            <th>访问时间</th>
+//            <th>订单编号</th>
+//            <th>访问次数</th></tr>';
+                $header = [
+                    "用户ID",
+                    "用户名",
+                    "手机号",
+                    "访问时间",
+                    "订单编号",
+                    "访问次数",
+                ];
+                $data = [];
                 foreach ($list as $item) {
-                    $table .= '<tr>
-            <td>' . $user["id"] . '</td>
-            <td>' . $user["user_name"] . '</td>
-            <td>' . $user["telephone"] . '</td>
-            <td>' . $item["day"] . '</td>
-            <td style="mso-number-format: \@">' . $item["order_no"] . '</td>
-            <td>' . $item["nums"] . '</td>';
+//                    $table .= '<tr>
+//            <td>' . $user["id"] . '</td>
+//            <td>' . $user["user_name"] . '</td>
+//            <td>' . $user["telephone"] . '</td>
+//            <td>' . $item["day"] . '</td>
+//            <td style="mso-number-format: \@">' . $item["order_no"] . '</td>
+//            <td>' . $item["nums"] . '</td>';
+                    $data[] = [
+                        $user["id"],
+                        $user["user_name"],
+                        $user["telephone"],
+                        $item["day"],
+                        $item["order_no"],
+                        $item["nums"]
+                    ];
                 }
                 break;
             case 9:
@@ -1081,24 +1233,41 @@ class Statistic extends BaseController
                 }
                 $list = $model->join("Order c", "a.order_no=c.order_no")->field("a.*, c.id order_id")->select();
                 $title = "支付统计";
-                $table = '<tr>
-            <th>用户ID</th>
-            <th>用户名</th>
-            <th>手机号</th>
-            <th>访问时间</th>
-            <th>订单编号</th></tr>';
+//                $table = '<tr>
+//            <th>用户ID</th>
+//            <th>用户名</th>
+//            <th>手机号</th>
+//            <th>访问时间</th>
+//            <th>订单编号</th></tr>';
+                $header = [
+                    "用户ID",
+                    "用户名",
+                    "手机号",
+                    "访问时间",
+                    "订单编号",
+                ];
+                $data = [];
                 foreach ($list as $item) {
-                    $table .= '<tr>
-            <td>' . $user["id"] . '</td>
-            <td>' . $user["user_name"] . '</td>
-            <td>' . $user["telephone"] . '</td>
-            <td>' . $item["create_time"] . '</td>
-            <td style="mso-number-format: \@">' . $item["order_no"] . '</td>';
+//                    $table .= '<tr>
+//            <td>' . $user["id"] . '</td>
+//            <td>' . $user["user_name"] . '</td>
+//            <td>' . $user["telephone"] . '</td>
+//            <td>' . $item["create_time"] . '</td>
+//            <td style="mso-number-format: \@">' . $item["order_no"] . '</td>';
+                    $data[] = [
+                        $user["id"],
+                        $user["user_name"],
+                        $user["telephone"],
+                        $item["create_time"],
+                        $item["order_no"],
+                    ];
                 }
                 break;
             default:
                 exit("参数错误");
         }
+        echo \Excel::export($header, $data, $title);
+        exit;
         $this->assign("table", $table);
         $this->assign("filename", $title . ".xlsx");
         $this->assign("title", $title);
@@ -1159,12 +1328,39 @@ class Statistic extends BaseController
                 ];
                 $start_time += 86400;
             }
-            $table = "<tr><td>日期</td><td>登录次数</td><td>分类访问次数</td><td>产品详情访问次数</td><td>产品搜索次数</td><td>供求访问次数</td><td>客服访问次数</td><td>购物车访问次数</td><td>订单页访问</td><td>支付页访问</td></tr>";
+//            $table = "<tr><td>日期</td><td>登录次数</td><td>分类访问次数</td><td>产品详情访问次数</td><td>产品搜索次数</td><td>供求访问次数</td><td>客服访问次数</td><td>购物车访问次数</td><td>订单页访问</td><td>支付页访问</td></tr>";
+            $header = [
+                "日期",
+                "登录次数",
+                "分类访问次数",
+                "产品详情访问次数",
+                "产品搜索次数",
+                "供求访问次数",
+                "客服访问次数",
+                "购物车访问次数",
+                "订单页访问",
+                "支付页访问",
+            ];
+            $data1 = [];
             foreach ($data as $key => $val) {
-                $table .= "<tr><td>$key</td><td>" . $val['login_nums'] . "</td><td>" . $val['cate_nums'] . "</td><td>" . $val['product_nums'] . "</td><td>" . $val['keywords_nums'] . "</td><td>" . $val['supply_nums'] . "</td><td>" . $val['custom_nums'] . "</td><td>" . $val['cart_nums'] . "</td><td>" . $val['order_nums'] . "</td><td>" . $val['pay_nums'] . "</td></tr>";
+//                $table .= "<tr><td>$key</td><td>" . $val['login_nums'] . "</td><td>" . $val['cate_nums'] . "</td><td>" . $val['product_nums'] . "</td><td>" . $val['keywords_nums'] . "</td><td>" . $val['supply_nums'] . "</td><td>" . $val['custom_nums'] . "</td><td>" . $val['cart_nums'] . "</td><td>" . $val['order_nums'] . "</td><td>" . $val['pay_nums'] . "</td></tr>";
+                $data1[] = [
+                    $key,
+                    $val['login_nums'],
+                    $val['cate_nums'],
+                    $val['product_nums'],
+                    $val['keywords_nums'],
+                    $val['supply_nums'],
+                    $val['custom_nums'],
+                    $val['cart_nums'],
+                    $val['order_nums'],
+                    $val['pay_nums'],
+                ];
             }
         }
         $title = "用户行为分析下载";
+        echo \Excel::export($header, $data1, $title);
+        exit;
         $filename = md5(time()) . ".xlsx";
         $this->assign("table", $table);
         $this->assign("title", $title);

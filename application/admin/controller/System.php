@@ -35,7 +35,7 @@ class System extends BaseController
      */
     public function agentLog()
     {
-        $list = model("AgentLog")->alias("a")->join("Admins b", "a.admin_id=b.id")->field("a.*, b.name admin_name")->paginate(15);
+        $list = model("AgentLog")->alias("a")->join("Admins b", "a.admin_id=b.id")->field("a.*, b.name admin_name")->order('a.create_time desc')->paginate(15);
         $this->assign("list", $list);
         return $this->fetch();
     }
@@ -45,7 +45,7 @@ class System extends BaseController
      */
     public function customOperaLog()
     {
-        $list = model("CustomOperaLog")->alias("a")->join("Admins b", "a.admin_id=b.id")->join("Admins c", "a.agent_id=c.id")->join("User d", "a.user_id=d.id")->field("a.*, b.name admin_name, c.name agent_name, d.user_name")->paginate(15);
+        $list = model("CustomOperaLog")->alias("a")->join("Admins b", "a.admin_id=b.id")->join("Admins c", "a.agent_id=c.id")->join("User d", "a.user_id=d.id")->field("a.*, b.name admin_name, c.name agent_name, d.user_name")->order('a.create_time desc')->paginate(15);
         $this->assign("list", $list);
         return $this->fetch();
     }
@@ -55,7 +55,7 @@ class System extends BaseController
      */
     public function productCommission()
     {
-        $list = model("ProductCommissionChangeLog")->alias("a")->join("Admins b", "a.admin_id=b.id")->join("Product c", "a.product_id=c.id")->field("a.*, b.name admin_name, c.name product_name")->paginate(15);
+        $list = model("ProductCommissionChangeLog")->alias("a")->join("Admins b", "a.admin_id=b.id")->join("Product c", "a.product_id=c.id")->field("a.*, b.name admin_name, c.name product_name")->order('a.create_time desc')->paginate(15);
         $this->assign("list", $list);
         return $this->fetch();
     }
@@ -65,7 +65,7 @@ class System extends BaseController
      */
     public function checkOrderLog()
     {
-        $list = model("OrderCommissionOperaLog")->alias("a")->join("Admins b","a.admin_id=b.id")->field("a.*, b.name admin_name")->paginate(15);
+        $list = model("OrderCommissionOperaLog")->alias("a")->join("Admins b","a.admin_id=b.id")->field("a.*, b.name admin_name")->order('a.create_time desc')->paginate(15);
         $this->assign("list", $list);
         return $this->fetch();
     }
