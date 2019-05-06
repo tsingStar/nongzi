@@ -212,10 +212,11 @@ class Order extends BaseController
     public function sureSend()
     {
         $order_no = input('order_no');
+        $forecast_time = input("forecast_receive");
         $order = model('Order')->where('order_no', $order_no)->find();
         if ($order) {
             if ($order['order_status'] == 1) {
-                $res = $order->save(['order_status' => 2, 'send_time' => date('Y-m-d H:i'), 'is_send' => 1]);
+                $res = $order->save(['order_status' => 2, 'send_time' => date('Y-m-d H:i'), 'is_send' => 1, "forecast_receive"=>$forecast_time]);
                 if ($res) {
                     $order_no = strlen($order_no)>20?(substr($order_no, 0, 8)."****".substr($order_no, -8)):$order_no;
                     $content = urlencode($order_no);

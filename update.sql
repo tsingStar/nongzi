@@ -141,3 +141,6 @@ CREATE TABLE `ybt_base_info` (
   `config` text
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 INSERT INTO `shop`.`ybt_menu`(`id`, `name`, `url`, `display`, `describe`, `parent_id`, `level`, `create_time`, `update_time`) VALUES (10091, '基础设置', 'admin/Site/baseInfo', 1, '', 10013, 3, 1556632287, 1556632287);
+-- 添加预计到货时间
+ALTER TABLE `shop`.`ybt_order`
+ADD COLUMN `forecast_receive` varchar(10) NOT NULL DEFAULT '' AFTER `first_money`;

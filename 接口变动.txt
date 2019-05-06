@@ -139,3 +139,41 @@
                 }
 
         }
+
+//20190506 订单详情添加商品优惠金额，运费金额，预计到货时间
+11.获取订单详情
+    请求地址：/app/Order/getOrderDetail
+    入参：user_id:
+         order_no:
+    返回：
+    {
+        "code": 1,
+        "msg": "请求成功",
+        "data": {
+            "order_no": "201904101227069358049",
+            "receiver_name": "宗家敏",
+            "receiver_telephone": "18256741688",
+            "address": "安徽省亳州涡阳县高公镇宗营村114",
+            "remarks": "",
+            "send_fee": "10.00",
+            "order_status": 1,
+            "order_money": "2128.00",
+            "create_time": "2019-04-10 12:27:06",
+            "forecast_receive":"2019-05-09",   //预计到货时间
+            "order_det": [
+                {
+                    "det_id": 3049,
+                    "name": "100ml青皮桔油",
+                    "thumb_img": "https://shop.qiangnongzi.com/upload/20190307/1113c74ed1d4456d42d0f6cf815a02da.png",
+                    "prop_value_attr": "213|256",
+                    "prop_name": "100ml*80瓶|2019",
+                    "price_comb": "336.00",
+                    "num": 1,
+                    "total_price": "336.00",
+                    "product_id": 3933,
+                    "discount": "10.00",          //优惠金额
+                    "send_fee": "5.00"            //运费
+                }
+            ]
+        }
+    }

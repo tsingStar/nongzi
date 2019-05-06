@@ -341,7 +341,7 @@ class Order extends BaseUser
     public function getOrderDetail()
     {
         $order_no = input('order_no');
-        $order = model('Order')->where('order_no', $order_no)->field('order_no, receiver_name, receiver_telephone, address, remarks, send_fee, order_status, order_money, create_time')->find();
+        $order = model('Order')->where('order_no', $order_no)->field('order_no, receiver_name, receiver_telephone, address, remarks, send_fee, order_status, order_money, create_time, forecast_receive')->find();
         if(!$order){
             exit_json(-1, '订单不存在');
         }
@@ -351,7 +351,7 @@ class Order extends BaseUser
         }else{
             model("CollectOrder")->save(["order_no"=>$order_no, "day"=>date("Y-m-d"), "nums"=>1, "user_id"=>USER_ID]);
         }
-        $order['order_det'] = model('OrderDet')->where('order_no', $order_no)->field('id det_id, name, thumb_img, prop_value_attr, prop_name, price price_comb, num, price*num total_price, product_id')->select();
+        $order['order_det'] = model('OrderDet')->where('order_no', $order_no)->field('id det_id, name, thumb_img, prop_value_attr, prop_name, price price_comb, num, price*num total_price, product_id, discount, send_fee')->select();
         exit_json(1, '请求成功', $order);
 
     }

@@ -32,8 +32,14 @@
             </div>
         </div>
         <div class="row cl">
+            <label class="form-label col-xs-4 col-sm-2"><span class="c-red">*</span>预计到货时间：</label>
+            <div class="formControls col-xs-8 col-sm-9">
+                <input type="text" class="input-text Wdate" onfocus="WdatePicker()" onclick="WdatePicker()" name="forecast_receive" required>
+            </div>
+        </div>
+        <div class="row cl">
             <div class="col-xs-8 col-sm-9 col-xs-offset-4 col-sm-offset-2">
-                <a href="javascript:;" class="btn btn-secondary radius" onclick="send_order('{$order_no}')"><i class="Hui-iconfont">&#xe632;</i>确定配送
+                <a href="javascript:;" class="btn btn-secondary radius" onclick="send_order('{$order_no}')"><i class="Hui-iconfont">&#xe632;</i>确定发货
                 </a>
                 <!--<button class="btn btn-primary radius" onclick="downloadOrder()">下载订单</button>-->
             </div>
@@ -44,7 +50,12 @@
 <script>
     //发货
     function send_order($order_no){
-        $.post("{:url('sureSend')}", {order_no:$order_no}, function (res) {
+        var time = $(".Wdate").val();
+        if(time == ""){
+            layer.alert("请输入预计到货时间");
+            return false;
+        }
+        $.post("{:url('sureSend')}", {order_no:$order_no, forecast_receive:time}, function (res) {
             if(res.code == 1){
                 layer.msg('操作成功');
                 parent.location.reload();
