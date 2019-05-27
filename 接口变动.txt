@@ -177,3 +177,44 @@
             ]
         }
     }
+//20190515
+11.获取新用户，特价，新品商品
+    请求地址：/app/Shop/getStatusProducts
+    入参：{
+        "status": 类型  1 新用户 2 特价 3 新品
+       	"sort": 排序字段 价格price 销量sell 时间time
+       	"is_desc": 正序，逆序  0 正序 1逆序
+       	"page": 页数 默认从0开始
+       	"pageNum": 每页数量 默认每页20条
+       }
+    返回：
+    {
+      "code": 1,
+      "msg": "请求成功",
+      "data": [
+        {
+          "id": 3468,
+          "thumb_img": "http://tsing.s1.natapp.cc/upload/20180801/537e1916bd925bfded0e03f8fae07ce8.jpg",
+          "name": "杀菌灵",
+          "prop_name": "10毫升*100瓶|2017年|无码|",
+          "price_comb": "200.00",
+          "price_one": "20.00"
+        },
+        {
+          "id": 3468,
+          "thumb_img": "http://tsing.s1.natapp.cc/upload/20180801/537e1916bd925bfded0e03f8fae07ce8.jpg",
+          "name": "杀菌灵",
+          "prop_name": "10毫升*100瓶|2017年|无码|",
+          "price_comb": "200.00",
+          "price_one": "20.00"
+        },
+        {
+          "id": 3468,
+          "thumb_img": "http://tsing.s1.natapp.cc/upload/20180801/537e1916bd925bfded0e03f8fae07ce8.jpg",
+          "name": "杀菌灵",
+          "prop_name": "10毫升*100瓶|2017年|无码|",
+          "price_comb": "200.00",
+          "price_one": "20.00"
+        }
+      ]
+    }

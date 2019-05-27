@@ -134,9 +134,14 @@ class Admin extends BaseController
                     exit_json(-1, "邀请码重复,请重新填写或留空使用系统随机生成");
                 }
             }
+            $ad = model("Admins")->where("id", $data["id"])->find();
+            if($ad["password"] != $data["password"] && $data["password"] != ""){
+                $data["password"] = md5($data["password"]);
+            }
+
             $vip_code = model("Admins")->where("id", $data["id"])->value("vip_code");
             model("User")->save(["vip_code"=>$data["vip_code"]], ["vip_code"=>$vip_code]);
-            $res = $this->adminModel->allowField(['role_id', 'uname', 'describe', 'name', 'department_id', 'department_pid', 'telephone', 'vip_code', 'province_id', 'city_id', 'country_id', 'agent_level', 'person_money', 'first_order', 'agent_cate'])->save($data, ['id'=>$data['id']]);
+            $res = $this->adminModel->allowField(['role_id', 'uname', 'describe', 'name', 'department_id', 'department_pid', 'telephone', 'vip_code', 'province_id', 'city_id', 'country_id', 'agent_level', 'person_money', 'first_order', 'agent_cate', "password"])->save($data, ['id'=>$data['id']]);
             if($res){
                 if(in_array(15, $role_id_arr)){
                     model("AgentLog")->save([

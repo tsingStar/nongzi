@@ -262,6 +262,31 @@ class Shop extends Controller
     }
 
     /**
+     * 获取新用户、特价、新品商品列表
+     */
+    public function getStatusProducts()
+    {
+        $type = input("status");
+        $where['is_up'] = 1;
+        switch ($type){
+            case 1:
+                $where["new_user"] = 1;
+                break;
+            case 2:
+                $where["tejia"] = 1;
+                break;
+            case 3:
+                $where["xinpin"] = 1;
+                break;
+            default:
+                exit_json(-1, "参数错误");
+        }
+        $data = $this->productList($where);
+        exit_json(1, '请求成功', $data);
+
+    }
+
+    /**
      * 关键字搜索商品
      */
     public function searchByKeywords()

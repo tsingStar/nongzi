@@ -67,6 +67,9 @@
                     <th width="30">运费</th>
                     <th width="20">首页显示</th>
                     <th width="20">热销产品</th>
+                    <th width="20">新用户</th>
+                    <th width="20">特价</th>
+                    <th width="20">新品</th>
                     <th width="50">库存状态</th>
                     <th width="30">排序</th>
                     <th width="200">规格</th>
@@ -104,7 +107,22 @@
                     </td>
                 <td class="td-status">
                     <!--<div class="switch switch-small">-->
-                        <input type="checkbox" onchange="setHot('{$good.id}', this)" {if condition="$good.is_hot eq 1"}checked{/if} />
+                    <input type="checkbox" onchange="setHot('{$good.id}', this)" {if condition="$good.is_hot eq 1"}checked{/if} />
+                    <!--</div>-->
+                </td>
+                <td class="td-status">
+                    <!--<div class="switch switch-small">-->
+                    <input type="checkbox" onchange="setStatus('{$good.id}', this, 'new_user')" {if condition="$good.new_user eq 1"}checked{/if} />
+                    <!--</div>-->
+                </td>
+                <td class="td-status">
+                    <!--<div class="switch switch-small">-->
+                    <input type="checkbox" onchange="setStatus('{$good.id}', this, 'tejia')" {if condition="$good.tejia eq 1"}checked{/if} />
+                    <!--</div>-->
+                </td>
+                <td class="td-status">
+                    <!--<div class="switch switch-small">-->
+                    <input type="checkbox" onchange="setStatus('{$good.id}',this, 'xinpin')" {if condition="$good.xinpin eq 1"}checked{/if} />
                     <!--</div>-->
                 </td>
                 <td class="td-status">
@@ -296,6 +314,21 @@
     function setHot(product_id, o){
         var is_index = $(o).prop('checked')?1:0;
         $.post("{:url('setHot')}", {product_id:product_id, is_hot:is_index}, function (res) {
+            if(res.code == 1){
+                layer.msg('操作成功');
+            }else{
+                layer.msg(res.msg);
+                if(is_index == 0){
+                    $(o).prop('checked', false);
+                }else{
+                    $(o).prop('checked', true);
+                }
+            }
+        });
+    }
+    function setStatus(product_id, o, name){
+        var is_index = $(o).prop('checked')?1:0;
+        $.post("{:url('setStatus')}", {product_id:product_id, is_hot:is_index, name:name}, function (res) {
             if(res.code == 1){
                 layer.msg('操作成功');
             }else{

@@ -48,7 +48,8 @@ class Order extends BaseUser
                 'agent_commission'=>$p["agent_commission"],
                 'salesman_commission'=>$p["salesman_commission"],
                 "parttime_commission"=>$p["parttime_commission"],
-                "send_fee"=>$p["send_fee"]
+                "send_fee"=>$p['is_send'] != 1?sprintf("%.2f", $p["send_fee"]*$c['num']):0,
+                "discount"=>0
             ];
             if ($p['is_send'] != 1) {
                 $send_fee += $c['num'] * $p['send_fee'];
@@ -104,7 +105,8 @@ class Order extends BaseUser
                 'agent_commission'=>$p["agent_commission"],
                 'salesman_commission'=>$p["salesman_commission"],
                 "parttime_commission"=>$p["parttime_commission"],
-                "send_fee"=>$p["send_fee"]
+                "send_fee"=>$p['is_send'] != 1?sprintf("%.2f", $p["send_fee"]*$num):0,
+                "discount"=>0
             ]
         ];
         $send_fee = 0;
@@ -175,8 +177,8 @@ class Order extends BaseUser
                     'agent_commission'=>$item["agent_commission"],
                     'salesman_commission'=>$item["salesman_commission"],
                     "parttime_commission"=>$item["parttime_commission"],
-                    "pre_send_fee"=>$item["send_fee"]*$item["num"],
-                    "send_fee"=>$item["send_fee"]*$item["num"]
+                    "pre_send_fee"=>$item["send_fee"],
+                    "send_fee"=>$item["send_fee"]
                 ];
                 $prop_attr = model('ProductAttr')->where('product_id', $item['product_id'])->where('prop_value_attr', $item['prop_value_attr'])->find();
                 if ($prop_attr['remain']<$item['num']){
@@ -244,7 +246,7 @@ class Order extends BaseUser
         
         //pay_type 支付方式   1 威富通 微信支付  2 支付宝 3  小程序支付
         $pay_info = [
-            'wxpay' => "",
+            'wxpay' => new \stdClass(),
             'alipay' => "",
             'xcxpay' => ""
         ];

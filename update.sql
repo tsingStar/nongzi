@@ -51,6 +51,7 @@ CREATE TABLE `ybt_bank_info` (
   `bank_card` varchar(50) NOT NULL COMMENT '银行卡号',
   `bank_name` varchar(30) NOT NULL COMMENT '银行名称',
   `card_user_name` varchar(20) NOT NULL COMMENT '持卡人姓名',
+  `update_time` int(10) DEFAULT NULL,
   PRIMARY KEY (`bank_card`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8 COMMENT='线下支付银行卡信息';
 -- ##添加启动图
@@ -144,3 +145,8 @@ INSERT INTO `shop`.`ybt_menu`(`id`, `name`, `url`, `display`, `describe`, `paren
 -- 添加预计到货时间
 ALTER TABLE `shop`.`ybt_order`
 ADD COLUMN `forecast_receive` varchar(10) NOT NULL DEFAULT '' AFTER `first_money`;
+--添加商品 新用户 新品 特价属性
+ALTER TABLE `shop`.`ybt_product`
+ADD COLUMN `new_user` tinyint(1) NOT NULL DEFAULT 0 COMMENT '是否是新用户 0 否 1 是' AFTER `parttime_commission`,
+ADD COLUMN `tejia` tinyint(1) NOT NULL DEFAULT 0 COMMENT '是否是特价 0 否 1 是' AFTER `new_user`,
+ADD COLUMN `xinpin` tinyint(1) NOT NULL DEFAULT 0 COMMENT '是否是新品 0 否 1 是' AFTER `tejia`;

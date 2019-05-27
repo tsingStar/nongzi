@@ -608,6 +608,27 @@ class Product extends BaseController
         }
 
     }
+    /**
+     * 设为热销
+     */
+    public function setStatus()
+    {
+        $product_id = input('product_id');
+        $is_index = input('is_hot');
+        $name = input("name");
+        $pro = model('Product')->where('id', $product_id)->find();
+        if ($pro) {
+            $r = $pro->save(["$name" => $is_index]);
+            if ($r) {
+                exit_json();
+            } else {
+                exit_json(-1, '设置失败');
+            }
+        } else {
+            exit_json(-1, '商品不存在');
+        }
+
+    }
 
     /**
      * 上下架商品

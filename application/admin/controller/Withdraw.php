@@ -75,6 +75,8 @@ class Withdraw extends BaseController
             "beizhu"=>$reason
         ]);
         if($res){
+            //拒绝之后返还佣金
+            model("Admins")->where("id", $wd['agent_id'])->setInc("able_commission", $wd["money"]);
             exit_json();
         }else{
             exit_json(-1, "处理失败");

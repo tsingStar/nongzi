@@ -26,6 +26,9 @@ class Interval extends Controller
      */
     public function sendChaoShiOrder()
     {
+        ignore_user_abort(true);
+        Log::error("okokokokokoko");
+        exit;
         $c = db("base_info")->find();
         $time = unserialize($c['config'])['chaoshi_order'];
         $list = model("Order")->alias("a")->join("User b", "a.user_id=b.id")->where("a.is_trash", 0)->where("a.create_time", "gt", time() - $time*60)->where("a.create_time", "lt", time()+60-$time*60)->where("a.pay_status", 0)->field("a.*, b.telephone")->select();
