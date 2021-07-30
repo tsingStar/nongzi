@@ -19,6 +19,7 @@ define('__PUBLIC__', __DIR__);
 define('__URI__', $_SERVER['HTTP_HOST']);
 $http = $_SERVER['SERVER_PORT'] == '443'?'https://':'http://';
 define('__URL__', $http.__URI__);
+//
 
 define('SITENAME', "大镰刀");
 // 加载框架引导文件
